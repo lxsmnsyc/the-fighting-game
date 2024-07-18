@@ -42,10 +42,10 @@
 - Apply Penetration when gaining Protection.
 - Gain Protection when applying Poison.
 
-### With Regen
+### With Heal
 
-- Apply Penetration when gaining Regen.
-- Gain Regen when applying Poison.
+- Apply Penetration when gaining Heal.
+- Gain Heal when applying Poison.
 
 ### With Speed
 

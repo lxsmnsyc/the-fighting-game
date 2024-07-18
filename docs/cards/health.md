@@ -47,9 +47,9 @@
 
 - Apply Penetration for every Health lost
 
-### With Regen
+### With Heal
 
-- Gain Regen for every Health lost
+- Gain Heal for every Health lost
 
 ## Tier 2
 

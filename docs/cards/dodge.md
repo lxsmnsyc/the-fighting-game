@@ -37,9 +37,9 @@
 
 - Each Dodge gain Protection
 
-### With Regen
+### With Heal
 
-- Each Dodge gain Regen
+- Each Dodge gain Heal
 
 ### With Slow
 

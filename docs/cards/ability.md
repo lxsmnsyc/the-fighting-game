@@ -38,9 +38,9 @@
 
 - Gain Protection every time Ability is used.
 
-### With Regen
+### With Heal
 
-- Gain Regen every time Ability is used.
+- Gain Heal every time Ability is used.
 
 ### With Slow
 

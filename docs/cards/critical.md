@@ -41,9 +41,9 @@
 
 - Each Critical gain Protection
 
-### With Regen
+### With Heal
 
-- Each Critical gain Regen
+- Each Critical gain Heal
 
 ### With Slow
 

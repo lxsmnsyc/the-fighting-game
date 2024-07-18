@@ -52,10 +52,10 @@
 - Gain Speed when applying Protection.
 - Apply Penetration when gaining Speed.
 
-### With Regen
+### With Heal
 
-- Gain Speed when gaining Regen.
-- Gain Regen when gaining Speed.
+- Gain Speed when gaining Heal.
+- Gain Heal when gaining Speed.
 
 ## Tier 2
 

@@ -47,10 +47,10 @@
 - Apply Slow when applying Protection.
 - Apply Penetration when applying Slow.
 
-### With Regen
+### With Heal
 
-- Apply Slow when gaining Regen.
-- Gain Regen when applying Slow.
+- Apply Slow when gaining Heal.
+- Gain Heal when applying Slow.
 
 ### With Speed
 

@@ -42,10 +42,10 @@
 - Apply Poison when gaining Protection.
 - Gain Protection when applying Poison.
 
-### With Regen
+### With Heal
 
-- Apply Poison when gaining Regen.
-- Gain Regen when applying Poison.
+- Apply Poison when gaining Heal.
+- Gain Heal when applying Poison.
 
 ### With Speed
 

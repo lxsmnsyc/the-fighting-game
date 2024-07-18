@@ -6,7 +6,7 @@
 - Magic
 - Mana
 - Health
-- Regen
+- Heal
 - Critical
 - Dodge
 - Speed

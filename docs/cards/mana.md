@@ -44,10 +44,10 @@
 - Gain Mana when gaining Protection.
 - Gain Proteciton when gaining Mana.
 
-### With Regen
+### With Heal
 
-- Gain Mana when gaining Regen.
-- Gain Regen when gaining Mana.
+- Gain Mana when gaining Heal.
+- Gain Heal when gaining Mana.
 
 ### With Slow
 

@@ -42,9 +42,9 @@
 
 - Gain Protection when dealing Attack damage
 
-### With Regen
+### With Heal
 
-- Gain Regen when dealing Attack damage
+- Gain Heal when dealing Attack damage
 
 ### With Slow
 

@@ -44,10 +44,10 @@
 - Gain Protection when applying Poison.
 - Apply Poison when gaining Protection.
 
-### With Regen
+### With Heal
 
-- Gain Protection when gaining Regen.
-- Gain Regen when gaining Protection.
+- Gain Protection when gaining Heal.
+- Gain Heal when gaining Protection.
 
 ### With Slow
 
