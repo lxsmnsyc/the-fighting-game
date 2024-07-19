@@ -103,71 +103,6 @@ export class Player {
   }
 }
 
-export interface BaseEvent {
-  priority: number;
-}
-
-function createBaseEvent(priority: number): BaseEvent {
-  return { priority };
-}
-
-export interface PlayerEvent extends BaseEvent {
-  source: Player;
-}
-
-function createPlayerEvent(source: Player, priority: number): PlayerEvent {
-  return { source, priority };
-}
-
-export interface PlayerValueEvent extends PlayerEvent {
-  amount: number;
-}
-
-export interface DamageFlags {
-  critical: boolean;
-  dodged: boolean;
-}
-
-export interface DamageEvent extends PlayerValueEvent {
-  type: DamageType;
-  target: Player;
-  flags: DamageFlags;
-}
-
-function createDamageEvent(
-  type: DamageType,
-  source: Player,
-  target: Player,
-  amount: number,
-  flags: DamageFlags,
-  priority: number,
-): DamageEvent {
-  return { type, source, target, amount, flags, priority };
-}
-
-export interface BuffEvent extends PlayerValueEvent {}
-
-function createBuffEvent(
-  source: Player,
-  amount: number,
-  priority: number,
-): BuffEvent {
-  return { source, amount, priority };
-}
-
-export interface DebuffEvent extends PlayerValueEvent {
-  target: Player;
-}
-
-function createDebuffEvent(
-  source: Player,
-  target: Player,
-  amount: number,
-  priority: number,
-): DebuffEvent {
-  return { source, target, amount, priority };
-}
-
 export const enum EventType {
   Close = 1,
   Prepare = 2,
@@ -191,6 +126,55 @@ export const enum EventType {
   RemoveProtection = 20,
   RemoveSlow = 21,
   RemoveSpeed = 22,
+}
+
+export interface BaseEvent {}
+
+export interface PlayerEvent extends BaseEvent {
+  source: Player;
+}
+
+export interface PlayerValueEvent extends PlayerEvent {
+  amount: number;
+}
+
+export interface DamageFlags {
+  critical: boolean;
+  dodged: boolean;
+}
+
+export interface DamageEvent extends PlayerValueEvent {
+  type: DamageType;
+  target: Player;
+  flags: DamageFlags;
+}
+
+function createDamageEvent(
+  type: DamageType,
+  source: Player,
+  target: Player,
+  amount: number,
+  flags: DamageFlags,
+): DamageEvent {
+  return { type, source, target, amount, flags };
+}
+
+export interface BuffEvent extends PlayerValueEvent {}
+
+function createBuffEvent(source: Player, amount: number): BuffEvent {
+  return { source, amount };
+}
+
+export interface DebuffEvent extends PlayerValueEvent {
+  target: Player;
+}
+
+function createDebuffEvent(
+  source: Player,
+  target: Player,
+  amount: number,
+): DebuffEvent {
+  return { source, target, amount };
 }
 
 export type BuffEventType =
@@ -281,9 +265,10 @@ export class Game {
 
   on<E extends EventType>(
     type: E,
+    priority: number,
     listener: EventEmitterListener<GameEvents[E]>,
   ): void {
-    this.emitters[type].on(listener);
+    this.emitters[type].on(priority, listener);
   }
 
   emit<E extends EventType>(type: E, event: GameEvents[E]): void {
@@ -291,80 +276,46 @@ export class Game {
   }
 
   prepare(): void {
-    this.emit(EventType.Prepare, createBaseEvent(1));
-    this.emit(EventType.Prepare, createBaseEvent(2));
-    this.emit(EventType.Prepare, createBaseEvent(3));
+    this.emit(EventType.Prepare, {});
   }
 
   setup(): void {
-    this.emit(EventType.Setup, createBaseEvent(1));
-    this.emit(EventType.Setup, createBaseEvent(2));
-    this.emit(EventType.Setup, createBaseEvent(3));
+    this.emit(EventType.Setup, {});
   }
 
   start(): void {
-    this.emit(EventType.Start, createBaseEvent(1));
-    this.emit(EventType.Start, createBaseEvent(2));
-    this.emit(EventType.Start, createBaseEvent(3));
+    this.emit(EventType.Start, {});
   }
 
   close(): void {
-    this.emit(EventType.Close, createBaseEvent(1));
-    this.emit(EventType.Close, createBaseEvent(2));
-    this.emit(EventType.Close, createBaseEvent(3));
+    this.emit(EventType.Close, {});
   }
 
-  castAbility(player: Player): void {
-    this.emit(EventType.CastAbility, createPlayerEvent(player, 1));
-    this.emit(EventType.CastAbility, createPlayerEvent(player, 2));
-    this.emit(EventType.CastAbility, createPlayerEvent(player, 3));
+  castAbility(source: Player): void {
+    this.emit(EventType.CastAbility, { source });
   }
 
   dealDamage(
     type: DamageType,
     source: Player,
     target: Player,
-    flags: DamageFlags,
     amount: number,
+    flags: DamageFlags,
   ): void {
     if (amount === 0) {
       return;
     }
-    // Phase 1, Critical and Evasion
-    const phase1 = createDamageEvent(type, source, target, amount, flags, 1);
-    this.emit(EventType.Damage, phase1);
-    // Phase 2 Protection
-    const phase2 = createDamageEvent(
-      type,
-      source,
-      target,
-      phase1.amount,
-      flags,
-      2,
-    );
-    this.emit(EventType.Damage, phase2);
-    // Phase 3 Actual Damage
     this.emit(
       EventType.Damage,
-      createDamageEvent(type, source, target, phase2.amount, flags, 3),
-    );
-    this.emit(
-      EventType.Damage,
-      createDamageEvent(type, source, target, phase2.amount, flags, 4),
+      createDamageEvent(type, source, target, amount, flags),
     );
   }
 
-  triggerBuff(eventType: BuffEventType, player: Player, amount: number): void {
+  triggerBuff(eventType: BuffEventType, source: Player, amount: number): void {
     if (amount === 0) {
       return;
     }
-    const phase1 = createBuffEvent(player, amount, 1);
-    this.emit(eventType, phase1);
-    if (phase1.amount <= 0) {
-      return;
-    }
-    this.emit(eventType, createBuffEvent(player, phase1.amount, 2));
-    this.emit(eventType, createBuffEvent(player, phase1.amount, 3));
+    this.emit(eventType, createBuffEvent(source, amount));
   }
 
   triggerDebuff(
@@ -376,12 +327,6 @@ export class Game {
     if (amount === 0) {
       return;
     }
-    const phase1 = createDebuffEvent(source, target, amount, 1);
-    this.emit(eventType, phase1);
-    if (phase1.amount <= 0) {
-      return;
-    }
-    this.emit(eventType, createDebuffEvent(source, target, phase1.amount, 2));
-    this.emit(eventType, createDebuffEvent(source, target, phase1.amount, 3));
+    this.emit(eventType, createDebuffEvent(source, target, amount));
   }
 }

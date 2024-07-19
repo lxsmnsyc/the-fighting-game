@@ -1,15 +1,20 @@
 export type EventEmitterListener<T> = (event: T) => void;
 
 export class EventEmitter<T> {
-  listeners = new Set<EventEmitterListener<T>>();
+  queue: Set<EventEmitterListener<T>>[] = [];
 
-  on(listener: EventEmitterListener<T>): void {
-    this.listeners.add(listener);
+  on(priority: number, listener: EventEmitterListener<T>): void {
+    if (!(priority in this.queue)) {
+      this.queue[priority] = new Set();
+    }
+    this.queue[priority].add(listener);
   }
 
   emit(event: T): void {
-    for (const listener of [...this.listeners]) {
-      listener(event);
+    for (const listeners of [...this.queue]) {
+      for (const listener of [...listeners]) {
+        listener(event);
+      }
     }
   }
 }

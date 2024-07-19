@@ -1,9 +1,10 @@
 import { DamageType, EventType, type Game } from '../game';
+import { DamagePriority } from '../priorities';
 
 export function setupCriticalMechanics(game: Game): void {
-  game.on(EventType.Damage, event => {
+  game.on(EventType.Damage, DamagePriority.Critical, event => {
     // Event priority 1 (before protection)
-    if (event.priority === 1 && !event.flags.dodged && !event.flags.critical) {
+    if (!(event.flags.dodged || event.flags.critical)) {
       // Dodge mechanics
       const currentCrit = event.source.critChance;
       // Check if player can crit it
