@@ -17,9 +17,9 @@
 
 - Each Critical gains Mana.
 
-### With Dodge
+### With Evasion
 
-- Each Dodge gains Mana.
+- Each Evasion gains Mana.
 
 ### With Health
 
@@ -39,9 +39,9 @@
 - Apply Poison when gaining Mana.
 - Gain Mana when applying Poison.
 
-### With Protection
+### With Armor
 
-- Gain Mana when gaining Protection.
+- Gain Mana when gaining Armor.
 - Gain Proteciton when gaining Mana.
 
 ### With Heal

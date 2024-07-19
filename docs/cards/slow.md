@@ -17,9 +17,9 @@
 
 - Each Critical apply Slow
 
-### With Dodge
+### With Evasion
 
-- Each Dodge apply Slow
+- Each Evasion apply Slow
 
 ### With Health
 
@@ -37,14 +37,14 @@
 - Apply Slow when applying Poison.
 - Apply Poison when applying Slow.
 
-### With Protection
+### With Armor
 
-- Apply Slow when gaining Protection.
-- Gain Protection when applying Slow.
+- Apply Slow when gaining Armor.
+- Gain Armor when applying Slow.
 
 ### With Penetration
 
-- Apply Slow when applying Protection.
+- Apply Slow when applying Armor.
 - Apply Penetration when applying Slow.
 
 ### With Heal

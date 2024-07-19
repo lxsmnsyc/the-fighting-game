@@ -14,9 +14,9 @@
 
 - Increase Health by Critical
 
-### With Dodge
+### With Evasion
 
-- Increase Health by Dodge
+- Increase Health by Evasion
 
 ### With Magic
 
@@ -39,9 +39,9 @@
 
 - Gain Speed for every Health lost
 
-### With Protection
+### With Armor
 
-- Gain Protection for every Health lost
+- Gain Armor for every Health lost
 
 ### With Penetration
 

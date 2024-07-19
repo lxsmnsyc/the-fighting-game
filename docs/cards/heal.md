@@ -17,9 +17,9 @@
 
 - Each Critical gains Heal.
 
-### With Dodge
+### With Evasion
 
-- Each Dodge gains Heal.
+- Each Evasion gains Heal.
 
 ### With Health
 
@@ -39,9 +39,9 @@
 - Apply Poison when gaining Heal.
 - Gain Heal when applying Poison.
 
-### With Protection
+### With Armor
 
-- Gain Heal when gaining Protection.
+- Gain Heal when gaining Armor.
 - Gain Proteciton when gaining Heal.
 
 ### With Heal

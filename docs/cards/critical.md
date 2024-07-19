@@ -13,9 +13,9 @@
 
 - Each Critical increases Attack
 
-### With Dodge
+### With Evasion
 
-- Each Dodge increases Critical
+- Each Evasion increases Critical
 
 ### With Health
 
@@ -37,9 +37,9 @@
 
 - Each Critical apply Poison
 
-### With Protection
+### With Armor
 
-- Each Critical gain Protection
+- Each Critical gain Armor
 
 ### With Heal
 

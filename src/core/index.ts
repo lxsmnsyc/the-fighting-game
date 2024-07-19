@@ -1,15 +1,13 @@
 import { EventType, type Game } from './game';
 import { log } from './log';
 import { setupAbilityMechanics } from './mechanics/ability';
+import { setupEvasionMechanics } from './mechanics/evasion';
+import { setupArmorMechanics } from './mechanics/armor';
 import { setupCriticalMechanics } from './mechanics/critical';
 import { setupDamageMechanics } from './mechanics/damage';
-import { setupDodgeMechanics } from './mechanics/dodge';
 import { setupHealthMechanics } from './mechanics/health';
 import { setupManaMechanics } from './mechanics/mana';
-import { setupPenetrationMechanics } from './mechanics/penetration';
 import { setupPoisonMechanics } from './mechanics/poison';
-import { setupProtectionMechanics } from './mechanics/protection';
-import { setupSlowMechanics } from './mechanics/slow';
 import { setupSpeedMechanics } from './mechanics/speed';
 import { EventPriority } from './priorities';
 
@@ -27,13 +25,11 @@ export function setupGame(game: Game): void {
     setupManaMechanics(game);
     // Damage
     setupDamageMechanics(game);
-    setupDodgeMechanics(game);
+    setupEvasionMechanics(game);
     setupCriticalMechanics(game);
-    setupProtectionMechanics(game);
-    setupPenetrationMechanics(game);
+    setupArmorMechanics(game);
     // Speed and Slow
     setupSpeedMechanics(game);
-    setupSlowMechanics(game);
     // Poison
     setupPoisonMechanics(game);
 

@@ -12,13 +12,12 @@ export const enum DebuffPriority {
 
 export const enum DamagePriority {
   Critical = 1,
-  Dodge = 2,
+  Evasion = 2,
   Custom = 3,
-  Penetration = 4,
-  Protection = 5,
-  Pre = 6,
-  Exact = 7,
-  Post = 8,
+  Armor = 4,
+  Pre = 5,
+  Exact = 6,
+  Post = 7,
 }
 
 export const enum EventPriority {

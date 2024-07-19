@@ -1,65 +1,65 @@
-# Dodge Cards
+# Evasion Cards
 
 ## Tier 1
 
-- Increase Dodge
-- Reduce Dodge of Enemy
+- Increase Evasion
+- Reduce Evasion of Enemy
 
 ### With Attack
 
-- Each Dodge increases Attack
+- Each Evasion increases Attack
 
 ### With Critical
 
-- Each Dodge increases Critical
+- Each Evasion increases Critical
 
 ### With Health
 
-- Increase Health by Dodge
+- Increase Health by Evasion
 
 ### With Magic
 
-- Each Dodge increases Magic
+- Each Evasion increases Magic
 
 ### With Mana
 
-- Each Dodge gain Mana
+- Each Evasion gain Mana
 
 ### With Penetration
 
-- Each Dodge apply Penetration
+- Each Evasion apply Penetration
 
 ### With Poison
 
-- Each Dodge apply Poison
+- Each Evasion apply Poison
 
-### With Protection
+### With Armor
 
-- Each Dodge gain Protection
+- Each Evasion gain Armor
 
 ### With Heal
 
-- Each Dodge gain Heal
+- Each Evasion gain Heal
 
 ### With Slow
 
-- Each Dodge apply Slow
+- Each Evasion apply Slow
 
 ### With Speed
 
-- Each Dodge gain Speed
+- Each Evasion gain Speed
 
 ## Tier 2
 
-- Magic can be dodged by Dodge %
-- Each Dodge deals Attack damage
-- Each Dodge deals Magic damage
-- Increase Dodge per X second
+- Magic can be Evasiond by Evasion %
+- Each Evasion deals Attack damage
+- Each Evasion deals Magic damage
+- Increase Evasion per X second
 
 ## Tier 3
 
-- Each Dodge has a chance to return damage (of the same type)
-- When Health drops to 20%, increase Dodge by 100.
+- Each Evasion has a chance to return damage (of the same type)
+- When Health drops to 20%, increase Evasion by 100.
 
 ## Domain
 

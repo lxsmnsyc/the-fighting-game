@@ -17,9 +17,9 @@
 
 - Each Critical apply Poison
 
-### With Dodge
+### With Evasion
 
-- Each Dodge apply Poison
+- Each Evasion apply Poison
 
 ### With Health
 
@@ -34,13 +34,13 @@
 
 ### With Penetration
 
-- Apply Poison when applying Protection.
+- Apply Poison when applying Armor.
 - Apply Penetration when applying Poison.
 
-### With Protection
+### With Armor
 
-- Apply Poison when gaining Protection.
-- Gain Protection when applying Poison.
+- Apply Poison when gaining Armor.
+- Gain Armor when applying Poison.
 
 ### With Heal
 

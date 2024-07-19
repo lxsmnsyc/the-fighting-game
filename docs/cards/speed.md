@@ -17,9 +17,9 @@
 
 - Each Critical gain Speed
 
-### With Dodge
+### With Evasion
 
-- Each Dodge gain Speed
+- Each Evasion gain Speed
 
 ### With Health
 
@@ -42,14 +42,14 @@
 - Gain Speed when applying Slow.
 - Apply Slow when gaining Speed.
 
-### With Protection
+### With Armor
 
-- Gain Speed when gaining Protection.
-- Gain Protection when gaining Speed.
+- Gain Speed when gaining Armor.
+- Gain Armor when gaining Speed.
 
 ### With Penetration
 
-- Gain Speed when applying Protection.
+- Gain Speed when applying Armor.
 - Apply Penetration when gaining Speed.
 
 ### With Heal

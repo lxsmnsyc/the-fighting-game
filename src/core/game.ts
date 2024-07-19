@@ -77,23 +77,19 @@ export class Player {
 
   magicDamage = 0;
 
-  critChance = 0;
-
   critMultiplier = DEFAULT_CRIT_MULTIPLIER;
-
-  dodgeChance = 0;
 
   // Stacks
 
   poisonStacks = 0;
 
-  penetrationStacks = 0;
-
-  protectionStacks = 0;
+  armorStacks = 0;
 
   speedStacks = 0;
 
-  slowStacks = 0;
+  criticalStacks = 0;
+
+  evasionStacks = 0;
 
   constructor(public name: string) {}
 
@@ -118,25 +114,23 @@ export const enum EventType {
   Prepare = 2,
   Setup = 3,
   Start = 4,
-  CastAbility = 5,
-  Damage = 6,
-  // Critical = 7,
-  // Dodge = 8,
-  AddHealth = 9,
+  EndGame = 5,
+  CastAbility = 6,
+  Damage = 7,
+  AddHealth = 8,
+  RemoveHealth = 9,
   AddMana = 10,
-  AddPenetration = 11,
+  RemoveMana = 11,
   AddPoison = 12,
-  AddProtection = 13,
-  AddSlow = 14,
-  AddSpeed = 15,
-  RemoveHealth = 16,
-  RemoveMana = 17,
-  RemovePenetration = 18,
-  RemovePoison = 19,
-  RemoveProtection = 20,
-  RemoveSlow = 21,
-  RemoveSpeed = 22,
-  EndGame = 23,
+  RemovePoison = 13,
+  AddArmor = 14,
+  RemoveArmor = 15,
+  AddSpeed = 16,
+  RemoveSpeed = 17,
+  AddEvasion = 18,
+  RemoveEvasion = 19,
+  AddCritical = 20,
+  RemoveCritical = 21,
 }
 
 export interface BaseEvent {}
@@ -155,7 +149,7 @@ export interface PlayerValueEvent extends PlayerEvent {
 
 export interface DamageFlags {
   critical: boolean;
-  dodged: boolean;
+  missed: boolean;
 }
 
 export interface DamageEvent extends PlayerValueEvent {
@@ -200,20 +194,20 @@ export interface EndGameEvent extends BaseEvent {
 export type BuffEventType =
   | EventType.AddHealth
   | EventType.AddMana
-  | EventType.AddProtection
+  | EventType.AddArmor
   | EventType.AddSpeed
-  | EventType.RemovePenetration
-  | EventType.RemovePoison
-  | EventType.RemoveSlow;
+  | EventType.AddEvasion
+  | EventType.AddCritical
+  | EventType.RemovePoison;
 
 export type DebuffEventType =
-  | EventType.AddPenetration
   | EventType.AddPoison
-  | EventType.AddSlow
   | EventType.RemoveHealth
   | EventType.RemoveMana
-  | EventType.RemoveProtection
-  | EventType.RemoveSpeed;
+  | EventType.RemoveArmor
+  | EventType.RemoveSpeed
+  | EventType.RemoveEvasion
+  | EventType.RemoveCritical;
 
 export type GameEvents = {
   [EventType.Close]: BaseEvent;
@@ -236,19 +230,19 @@ export type GameEvents = {
   [EventType.Damage]: DamageEvent;
 
   [EventType.AddHealth]: BuffEvent;
-  [EventType.AddMana]: BuffEvent;
-  [EventType.AddPenetration]: DebuffEvent;
-  [EventType.AddPoison]: DebuffEvent;
-  [EventType.AddProtection]: BuffEvent;
-  [EventType.AddSlow]: DebuffEvent;
-  [EventType.AddSpeed]: BuffEvent;
   [EventType.RemoveHealth]: DebuffEvent;
+  [EventType.AddMana]: BuffEvent;
   [EventType.RemoveMana]: DebuffEvent;
-  [EventType.RemovePenetration]: BuffEvent;
+  [EventType.AddPoison]: DebuffEvent;
   [EventType.RemovePoison]: BuffEvent;
-  [EventType.RemoveProtection]: DebuffEvent;
-  [EventType.RemoveSlow]: BuffEvent;
+  [EventType.AddArmor]: BuffEvent;
+  [EventType.RemoveArmor]: DebuffEvent;
+  [EventType.AddSpeed]: BuffEvent;
   [EventType.RemoveSpeed]: DebuffEvent;
+  [EventType.AddEvasion]: BuffEvent;
+  [EventType.RemoveEvasion]: DebuffEvent;
+  [EventType.AddCritical]: BuffEvent;
+  [EventType.RemoveCritical]: DebuffEvent;
 
   [EventType.EndGame]: EndGameEvent;
 };
@@ -263,23 +257,23 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.Prepare]: new EventEmitter(),
     [EventType.Setup]: new EventEmitter(),
     [EventType.Start]: new EventEmitter(),
+    [EventType.EndGame]: new EventEmitter(),
     [EventType.CastAbility]: new EventEmitter(),
     [EventType.Damage]: new EventEmitter(),
     [EventType.AddHealth]: new EventEmitter(),
-    [EventType.AddMana]: new EventEmitter(),
-    [EventType.AddPenetration]: new EventEmitter(),
-    [EventType.AddPoison]: new EventEmitter(),
-    [EventType.AddProtection]: new EventEmitter(),
-    [EventType.AddSlow]: new EventEmitter(),
-    [EventType.AddSpeed]: new EventEmitter(),
     [EventType.RemoveHealth]: new EventEmitter(),
+    [EventType.AddMana]: new EventEmitter(),
     [EventType.RemoveMana]: new EventEmitter(),
-    [EventType.RemovePenetration]: new EventEmitter(),
+    [EventType.AddPoison]: new EventEmitter(),
     [EventType.RemovePoison]: new EventEmitter(),
-    [EventType.RemoveProtection]: new EventEmitter(),
-    [EventType.RemoveSlow]: new EventEmitter(),
+    [EventType.AddArmor]: new EventEmitter(),
+    [EventType.RemoveArmor]: new EventEmitter(),
+    [EventType.AddSpeed]: new EventEmitter(),
     [EventType.RemoveSpeed]: new EventEmitter(),
-    [EventType.EndGame]: new EventEmitter(),
+    [EventType.AddEvasion]: new EventEmitter(),
+    [EventType.RemoveEvasion]: new EventEmitter(),
+    [EventType.AddCritical]: new EventEmitter(),
+    [EventType.RemoveCritical]: new EventEmitter(),
   };
 }
 

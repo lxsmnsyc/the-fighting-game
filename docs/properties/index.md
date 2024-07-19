@@ -8,9 +8,9 @@
 - Health
 - Heal
 - Critical
-- Dodge
+- Evasion
 - Speed
 - Slow
-- Protection
+- Armor
 - Penetration
 - Poison

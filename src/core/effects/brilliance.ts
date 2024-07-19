@@ -4,8 +4,8 @@ import { log } from '../log';
 import { EventPriority } from '../priorities';
 import { FRAME_DURATION, createTick } from '../tick';
 
-const MIN_PERIOD = 5;
-const MAX_PERIOD = 0.2;
+const MIN_PERIOD = 5000;
+const MAX_PERIOD = 200;
 const MAX_SPEED = 750;
 
 function getBrilliancePeriod(speed: number): number {
@@ -37,7 +37,7 @@ export default createEffectCardSource({
       const cleanup = createTick(() => {
         // Calculate period
         elapsed += FRAME_DURATION;
-        if (elapsed >= period * 1000) {
+        if (elapsed >= period) {
           elapsed -= period;
           period = getBrilliancePeriod(player.speedStacks);
 

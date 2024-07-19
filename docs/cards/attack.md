@@ -13,9 +13,9 @@
 
 - Each Critical increases Attack
 
-### With Dodge
+### With Evasion
 
-- Each Dodge increases Attack
+- Each Evasion increases Attack
 
 ### With Health
 
@@ -38,9 +38,9 @@
 
 - Apply Poison when dealing attack damage.
 
-### With Protection
+### With Armor
 
-- Gain Protection when dealing Attack damage
+- Gain Armor when dealing Attack damage
 
 ### With Heal
 

@@ -10,9 +10,9 @@
 
 - Increase Critical every time AbilityCard is used.
 
-### With Dodge
+### With Evasion
 
-- Increase Dodge every time AbilityCard is used.
+- Increase Evasion every time AbilityCard is used.
 
 ### With Health
 
@@ -34,9 +34,9 @@
 
 - Apply Poison every time AbilityCard is used.
 
-### With Protection
+### With Armor
 
-- Gain Protection every time AbilityCard is used.
+- Gain Armor every time AbilityCard is used.
 
 ### With Heal
 
