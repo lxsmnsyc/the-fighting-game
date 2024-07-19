@@ -1,22 +1,22 @@
-import { EventType, createEffectCardSource } from '../game';
-import { log } from '../log';
-import { BuffPriority } from '../priorities';
+import { EventType, createEffectCardSource } from '../../../game';
+import { log } from '../../../log';
+import { BuffPriority } from '../../../priorities';
 
 export default createEffectCardSource({
-  name: 'Card #017',
+  name: 'Card #015',
   tier: 1,
   getDescription(level) {
     return [
       'Increases ',
-      'Critical',
+      'Evasion',
       ' stacks gained by ',
       5 * level,
       ' points.',
     ];
   },
   load(game, player, level) {
-    log(`Setting up Card 017 for ${player.name}`);
-    game.on(EventType.AddCritical, BuffPriority.Pre, event => {
+    log(`Setting up Card 015 for ${player.name}`);
+    game.on(EventType.AddEvasion, BuffPriority.Pre, event => {
       if (event.source === player) {
         event.amount += 5 * level;
       }

@@ -1,6 +1,6 @@
-import { EventType, createEffectCardSource } from '../game';
-import { log } from '../log';
-import { DebuffPriority } from '../priorities';
+import { EventType, createEffectCardSource } from '../../../game';
+import { log } from '../../../log';
+import { DebuffPriority } from '../../../priorities';
 
 export default createEffectCardSource({
   name: 'Card #022',

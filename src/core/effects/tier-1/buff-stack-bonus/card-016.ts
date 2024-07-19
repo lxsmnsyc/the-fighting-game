@@ -1,6 +1,6 @@
-import { EventType, createEffectCardSource } from '../game';
-import { log } from '../log';
-import { BuffPriority } from '../priorities';
+import { EventType, createEffectCardSource } from '../../../game';
+import { log } from '../../../log';
+import { BuffPriority } from '../../../priorities';
 
 export default createEffectCardSource({
   name: 'Card #016',
