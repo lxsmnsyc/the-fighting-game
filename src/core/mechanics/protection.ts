@@ -20,13 +20,26 @@ export function setupProtectionMechanics(game: Game): void {
     }
   });
 
+  // Protection/Penetration interaction
+  game.on(EventType.AddProtection, event => {
+    if (event.priority === 2) {
+      // Get the remaining amount of stacks that can be applied to protection
+      const overflow = event.source.penetrationStacks - event.amount;
+      // The rest we can deduct to the penetrationStacks
+      const deduction = Math.min(event.source.penetrationStacks, event.amount);
+      game.triggerBuff(EventType.RemovePenetration, event.source, deduction);
+      // For the final amount, add it to current stacks
+      if (overflow < 0) {
+        event.source.protectionStacks += -overflow;
+      }
+    }
+  });
+
   // Re-adjust protection stacks when consumed.
   game.on(EventType.RemoveProtection, event => {
     if (event.priority === 2) {
-      event.target.protectionStacks = Math.max(
-        0,
-        event.target.protectionStacks - event.amount,
-      );
+      event.amount = Math.min(event.amount, event.target.protectionStacks);
+      event.target.protectionStacks -= event.amount;
     }
   });
 }
