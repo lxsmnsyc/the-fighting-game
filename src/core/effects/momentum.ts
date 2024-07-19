@@ -41,7 +41,7 @@ export default createEffectCardSource({
           elapsed -= period;
           period = getMomentumPeriod(player.speedStacks);
 
-          game.triggerBuff(EventType.AddSpeed, player, 0.2 * level);
+          game.triggerBuff(EventType.AddSpeed, player, level);
         }
       });
 

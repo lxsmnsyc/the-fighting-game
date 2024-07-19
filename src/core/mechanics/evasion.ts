@@ -52,10 +52,12 @@ export function setupEvasionMechanics(game: Game): void {
   });
 
   game.on(EventType.AddEvasion, BuffPriority.Exact, event => {
+    log(`${event.source.name} gained ${event.amount} stacks of Evasion`);
     event.source.evasionStacks += event.amount;
   });
 
   game.on(EventType.RemoveEvasion, DebuffPriority.Exact, event => {
+    log(`${event.target.name} lost ${event.amount} stacks of Evasion`);
     event.target.evasionStacks -= event.amount;
   });
 }

@@ -54,11 +54,13 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.AddSpeed, BuffPriority.Exact, event => {
+  game.on(EventType.AddCritical, BuffPriority.Exact, event => {
+    log(`${event.source.name} gained ${event.amount} stacks of Critical`);
     event.source.criticalStacks += event.amount;
   });
 
-  game.on(EventType.RemoveSpeed, DebuffPriority.Exact, event => {
+  game.on(EventType.RemoveCritical, DebuffPriority.Exact, event => {
+    log(`${event.target.name} lost ${event.amount} stacks of Critical`);
     event.target.criticalStacks -= event.amount;
   });
 }

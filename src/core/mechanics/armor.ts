@@ -25,10 +25,12 @@ export function setupArmorMechanics(game: Game): void {
   });
 
   game.on(EventType.AddArmor, BuffPriority.Exact, event => {
+    log(`${event.source.name} gained ${event.amount} stacks of Armor`);
     event.source.armorStacks += event.amount;
   });
 
   game.on(EventType.RemoveArmor, DebuffPriority.Exact, event => {
+    log(`${event.target.name} lost ${event.amount} stacks of Armor`);
     event.target.armorStacks -= event.amount;
   });
 }
