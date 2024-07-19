@@ -19,7 +19,7 @@ export default createEffectCardSource({
     return [
       'Periodically gains ',
       level,
-      ' mana. Period ranges from',
+      ' points of Mana. Period ranges from',
       5,
       ' seconds to ',
       0.2,
