@@ -19,7 +19,7 @@ export default createEffectCardSource({
     return [
       'Periodically gains ',
       level,
-      ' stacks of Speed. Period ranges from',
+      ' points of Mana. Period ranges from',
       5,
       ' seconds to ',
       0.2,
@@ -41,7 +41,7 @@ export default createEffectCardSource({
           elapsed -= period;
           period = getCard002Period(player.speedStacks);
 
-          game.triggerBuff(EventType.AddSpeed, player, level);
+          game.triggerBuff(EventType.AddMana, player, level);
         }
       });
 

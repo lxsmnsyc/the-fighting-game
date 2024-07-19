@@ -17,9 +17,9 @@ export default createEffectCardSource({
   tier: 1,
   getDescription(level) {
     return [
-      'Periodically applies ',
+      'Periodically gains ',
       level,
-      ' stacks of Poison to the enemy. Period ranges from',
+      ' stacks of Speed. Period ranges from',
       5,
       ' seconds to ',
       0.2,
@@ -41,12 +41,7 @@ export default createEffectCardSource({
           elapsed -= period;
           period = getCard006Period(player.speedStacks);
 
-          game.triggerDebuff(
-            EventType.AddPoison,
-            player,
-            game.getOppositePlayer(player),
-            level,
-          );
+          game.triggerBuff(EventType.AddSpeed, player, level);
         }
       });
 

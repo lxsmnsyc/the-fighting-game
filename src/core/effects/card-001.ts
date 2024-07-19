@@ -19,7 +19,7 @@ export default createEffectCardSource({
     return [
       'Periodically gains ',
       level,
-      ' points of Mana. Period ranges from',
+      ' points of Health. Period ranges from',
       5,
       ' seconds to ',
       0.2,
@@ -41,7 +41,7 @@ export default createEffectCardSource({
           elapsed -= period;
           period = getCard001Period(player.speedStacks);
 
-          game.triggerBuff(EventType.AddMana, player, level);
+          game.triggerBuff(EventType.AddHealth, player, level);
         }
       });
 

@@ -19,7 +19,7 @@ export default createEffectCardSource({
     return [
       'Periodically gains ',
       level,
-      ' stacks of Critical. Period ranges from',
+      ' stacks of Evasion. Period ranges from',
       5,
       ' seconds to ',
       0.2,
@@ -41,7 +41,7 @@ export default createEffectCardSource({
           elapsed -= period;
           period = getCard004Period(player.speedStacks);
 
-          game.triggerBuff(EventType.AddCritical, player, level);
+          game.triggerBuff(EventType.AddEvasion, player, level);
         }
       });
 
