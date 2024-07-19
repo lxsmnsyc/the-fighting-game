@@ -103,17 +103,11 @@ export class Player {
   }
 }
 
-export type EventPriority =
-  | 1 // post
-  | 2 // exact
-  | 3 // pre, on protection
-  | 4; // before protection
-
 export interface BaseEvent {
-  priority: EventPriority;
+  priority: number;
 }
 
-function createBaseEvent(priority: EventPriority): BaseEvent {
+function createBaseEvent(priority: number): BaseEvent {
   return { priority };
 }
 
@@ -121,10 +115,7 @@ export interface PlayerEvent extends BaseEvent {
   source: Player;
 }
 
-function createPlayerEvent(
-  source: Player,
-  priority: EventPriority,
-): PlayerEvent {
+function createPlayerEvent(source: Player, priority: number): PlayerEvent {
   return { source, priority };
 }
 
@@ -142,7 +133,7 @@ function createDamageEvent(
   source: Player,
   target: Player,
   amount: number,
-  priority: EventPriority,
+  priority: number,
 ): DamageEvent {
   return { type, source, target, amount, priority };
 }
@@ -152,7 +143,7 @@ export interface BuffEvent extends PlayerValueEvent {}
 function createBuffEvent(
   source: Player,
   amount: number,
-  priority: EventPriority,
+  priority: number,
 ): BuffEvent {
   return { source, amount, priority };
 }
@@ -165,7 +156,7 @@ function createDebuffEvent(
   source: Player,
   target: Player,
   amount: number,
-  priority: EventPriority,
+  priority: number,
 ): DebuffEvent {
   return { source, target, amount, priority };
 }
@@ -300,33 +291,33 @@ export class Game {
   }
 
   prepare(): void {
-    this.emit(EventType.Prepare, createBaseEvent(3));
-    this.emit(EventType.Prepare, createBaseEvent(2));
     this.emit(EventType.Prepare, createBaseEvent(1));
+    this.emit(EventType.Prepare, createBaseEvent(2));
+    this.emit(EventType.Prepare, createBaseEvent(3));
   }
 
   setup(): void {
-    this.emit(EventType.Setup, createBaseEvent(3));
-    this.emit(EventType.Setup, createBaseEvent(2));
     this.emit(EventType.Setup, createBaseEvent(1));
+    this.emit(EventType.Setup, createBaseEvent(2));
+    this.emit(EventType.Setup, createBaseEvent(3));
   }
 
   start(): void {
-    this.emit(EventType.Start, createBaseEvent(3));
-    this.emit(EventType.Start, createBaseEvent(2));
     this.emit(EventType.Start, createBaseEvent(1));
+    this.emit(EventType.Start, createBaseEvent(2));
+    this.emit(EventType.Start, createBaseEvent(3));
   }
 
   close(): void {
-    this.emit(EventType.Close, createBaseEvent(3));
-    this.emit(EventType.Close, createBaseEvent(2));
     this.emit(EventType.Close, createBaseEvent(1));
+    this.emit(EventType.Close, createBaseEvent(2));
+    this.emit(EventType.Close, createBaseEvent(3));
   }
 
   castAbility(player: Player): void {
-    this.emit(EventType.CastAbility, createPlayerEvent(player, 3));
-    this.emit(EventType.CastAbility, createPlayerEvent(player, 2));
     this.emit(EventType.CastAbility, createPlayerEvent(player, 1));
+    this.emit(EventType.CastAbility, createPlayerEvent(player, 2));
+    this.emit(EventType.CastAbility, createPlayerEvent(player, 3));
   }
 
   dealDamage(
@@ -339,13 +330,13 @@ export class Game {
       return;
     }
     // Phase 1, Critical and Evasion
-    const phase1 = createDamageEvent(type, source, target, amount, 4);
+    const phase1 = createDamageEvent(type, source, target, amount, 1);
     this.emit(EventType.Damage, phase1);
     if (phase1.amount <= 0) {
       return;
     }
     // Phase 2 Protection
-    const phase2 = createDamageEvent(type, source, target, phase1.amount, 3);
+    const phase2 = createDamageEvent(type, source, target, phase1.amount, 2);
     this.emit(EventType.Damage, phase2);
     if (phase2.amount <= 0) {
       return;
@@ -353,11 +344,11 @@ export class Game {
     // Phase 3 Actual Damage
     this.emit(
       EventType.Damage,
-      createDamageEvent(type, source, target, phase2.amount, 2),
+      createDamageEvent(type, source, target, phase2.amount, 3),
     );
     this.emit(
       EventType.Damage,
-      createDamageEvent(type, source, target, phase2.amount, 1),
+      createDamageEvent(type, source, target, phase2.amount, 4),
     );
   }
 
@@ -369,7 +360,7 @@ export class Game {
   ): void {
     this.emit(
       EventType.Critical,
-      createDamageEvent(type, source, target, amount, 3),
+      createDamageEvent(type, source, target, amount, 1),
     );
     this.emit(
       EventType.Critical,
@@ -377,7 +368,7 @@ export class Game {
     );
     this.emit(
       EventType.Critical,
-      createDamageEvent(type, source, target, amount, 1),
+      createDamageEvent(type, source, target, amount, 3),
     );
   }
 
@@ -392,7 +383,7 @@ export class Game {
     }
     this.emit(
       EventType.Dodge,
-      createDamageEvent(type, source, target, amount, 3),
+      createDamageEvent(type, source, target, amount, 1),
     );
     this.emit(
       EventType.Dodge,
@@ -400,7 +391,7 @@ export class Game {
     );
     this.emit(
       EventType.Dodge,
-      createDamageEvent(type, source, target, amount, 1),
+      createDamageEvent(type, source, target, amount, 3),
     );
   }
 
@@ -408,13 +399,13 @@ export class Game {
     if (amount === 0) {
       return;
     }
-    const phase1 = createBuffEvent(player, amount, 3);
+    const phase1 = createBuffEvent(player, amount, 1);
     this.emit(eventType, phase1);
     if (phase1.amount <= 0) {
       return;
     }
     this.emit(eventType, createBuffEvent(player, phase1.amount, 2));
-    this.emit(eventType, createBuffEvent(player, phase1.amount, 1));
+    this.emit(eventType, createBuffEvent(player, phase1.amount, 3));
   }
 
   triggerDebuff(
@@ -426,12 +417,12 @@ export class Game {
     if (amount === 0) {
       return;
     }
-    const phase1 = createDebuffEvent(source, target, amount, 3);
+    const phase1 = createDebuffEvent(source, target, amount, 1);
     this.emit(eventType, phase1);
     if (phase1.amount <= 0) {
       return;
     }
     this.emit(eventType, createDebuffEvent(source, target, phase1.amount, 2));
-    this.emit(eventType, createDebuffEvent(source, target, phase1.amount, 1));
+    this.emit(eventType, createDebuffEvent(source, target, phase1.amount, 3));
   }
 }
