@@ -1,5 +1,5 @@
 import { EventType, type Game } from '../game';
-import { BuffPriority, DamagePriority } from '../priorities';
+import { BuffPriority, DamagePriority, DebuffPriority } from '../priorities';
 
 const CONSUMABLE_PROTECTION_STACKS = 0.5;
 
@@ -37,7 +37,7 @@ export function setupProtectionMechanics(game: Game): void {
   });
 
   // Re-adjust protection stacks when consumed.
-  game.on(EventType.RemoveProtection, BuffPriority.Exact, event => {
+  game.on(EventType.RemoveProtection, DebuffPriority.Exact, event => {
     event.amount = Math.min(event.amount, event.target.protectionStacks);
     event.target.protectionStacks -= event.amount;
   });

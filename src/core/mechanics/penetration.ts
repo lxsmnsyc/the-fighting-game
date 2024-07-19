@@ -3,8 +3,8 @@ import { BuffPriority, DamagePriority, DebuffPriority } from '../priorities';
 
 const CONSUMABLE_PENETRATION_STACKS = 0.5;
 
-export function setupProtectionMechanics(game: Game): void {
-  // Trigger Protection consumption when about to take damage.
+export function setupPenetrationMechanics(game: Game): void {
+  // Trigger Penetration consumption when about to take damage.
   game.on(EventType.Damage, DamagePriority.Penetration, event => {
     if (!event.flags.dodged) {
       // Get 50% of the protection
@@ -23,7 +23,7 @@ export function setupProtectionMechanics(game: Game): void {
     // Get the remaining amount of stacks that can be applied to protection
     const overflow = event.amount - event.target.protectionStacks;
     // The rest we can deduct to the protectionStacks
-    const deduction = Math.min(event.target.penetrationStacks, event.amount);
+    const deduction = Math.min(event.target.protectionStacks, event.amount);
     // For the final amount, add it to current stacks
     if (overflow > 0) {
       event.target.penetrationStacks += overflow;
@@ -38,7 +38,7 @@ export function setupProtectionMechanics(game: Game): void {
 
   // Re-adjust protection stacks when consumed.
   game.on(EventType.RemovePenetration, BuffPriority.Exact, event => {
-    event.amount = Math.min(event.amount, event.source.protectionStacks);
-    event.source.protectionStacks -= event.amount;
+    event.amount = Math.min(event.amount, event.source.penetrationStacks);
+    event.source.penetrationStacks -= event.amount;
   });
 }

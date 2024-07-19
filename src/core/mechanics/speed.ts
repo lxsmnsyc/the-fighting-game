@@ -7,7 +7,7 @@ export function setupSpeedMechanics(game: Game): void {
     // Get the remaining amount of stacks that can be applied to speed
     const overflow = event.amount - event.source.slowStacks;
     // The rest we can deduct to the slowStacks
-    const deduction = Math.min(event.source.slowStacks, event.amount);
+    const deduction = Math.min(event.source.speedStacks, event.amount);
     // For the final amount, add it to current stacks
     if (overflow > 0) {
       event.source.speedStacks += overflow;
