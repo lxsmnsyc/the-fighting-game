@@ -2,7 +2,8 @@ import { DamageType, EventType, type Game } from '../game';
 
 export function setupCriticalMechanics(game: Game): void {
   game.on(EventType.Damage, event => {
-    if (event.priority === 1) {
+    // Event priority 1 (before protection)
+    if (event.priority === 4) {
       // Dodge mechanics
       const currentCrit = event.source.critChance;
       // Check if player can crit it
@@ -11,12 +12,6 @@ export function setupCriticalMechanics(game: Game): void {
         const random = Math.random() * 100;
         if (random <= currentCrit) {
           event.amount *= event.source.critMultiplier;
-          game.triggerCritical(
-            DamageType.Attack,
-            event.source,
-            event.target,
-            event.amount,
-          );
         }
       }
     }

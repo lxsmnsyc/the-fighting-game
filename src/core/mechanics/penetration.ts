@@ -5,6 +5,7 @@ const CONSUMABLE_PENETRATION_STACKS = 0.5;
 export function setupProtectionMechanics(game: Game): void {
   // Trigger Protection consumption when about to take damage.
   game.on(EventType.Damage, event => {
+    // Event priority 2 (after amount modification, before damage dealing)
     if (event.priority === 2) {
       // Get 50% of the protection
       const currentProtection = event.target.penetrationStacks;
@@ -19,6 +20,7 @@ export function setupProtectionMechanics(game: Game): void {
 
   // Protection/Penetration interaction
   game.on(EventType.AddPenetration, event => {
+    // Event priority 2 (exact)
     if (event.priority === 2) {
       // Get the remaining amount of stacks that can be applied to protection
       const overflow = event.amount - event.target.protectionStacks;

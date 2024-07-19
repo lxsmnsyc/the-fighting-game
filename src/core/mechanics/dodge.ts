@@ -2,6 +2,7 @@ import { DamageType, EventType, type Game } from '../game';
 
 export function setupDodgeMechanics(game: Game): void {
   game.on(EventType.Damage, event => {
+    // Event priority 1 (before protection)
     if (event.priority === 1) {
       // Dodge mechanics
       const currentDodge = event.target.dodgeChance;
