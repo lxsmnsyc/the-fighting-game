@@ -9,13 +9,15 @@ export function setupProtectionMechanics(game: Game): void {
       // Get 50% of the protection
       const currentProtection = event.target.protectionStacks;
       if (currentProtection > 0) {
+        const consumable =
+          (currentProtection * CONSUMABLE_PROTECTION_STACKS) | 0;
         game.triggerDebuff(
           EventType.RemoveProtection,
           event.source,
           event.target,
-          currentProtection * CONSUMABLE_PROTECTION_STACKS,
+          consumable,
         );
-        event.amount -= currentProtection;
+        event.amount -= consumable;
       }
     }
   });
