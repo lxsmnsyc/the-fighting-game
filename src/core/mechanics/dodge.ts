@@ -3,7 +3,7 @@ import { DamageType, EventType, type Game } from '../game';
 export function setupDodgeMechanics(game: Game): void {
   game.on(EventType.Damage, event => {
     // Event priority 1 (before protection)
-    if (event.priority === 1) {
+    if (event.priority === 1 && !event.flags.dodged) {
       // Dodge mechanics
       const currentDodge = event.target.dodgeChance;
       // Check if player can dodge it
@@ -11,14 +11,7 @@ export function setupDodgeMechanics(game: Game): void {
         // Push your luck
         const random = Math.random() * 100;
         if (random <= currentDodge) {
-          const currentAmount = event.amount;
-          event.amount = 0;
-          game.triggerDodge(
-            DamageType.Attack,
-            event.source,
-            event.target,
-            currentAmount,
-          );
+          event.flags.dodged = true;
         }
       }
     }

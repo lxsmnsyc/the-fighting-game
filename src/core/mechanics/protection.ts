@@ -6,7 +6,7 @@ export function setupProtectionMechanics(game: Game): void {
   // Trigger Protection consumption when about to take damage.
   game.on(EventType.Damage, event => {
     // Event priority 2 (after amount modification, before damage dealing)
-    if (event.priority === 2) {
+    if (event.priority === 2 && !event.flags.dodged) {
       // Get 50% of the protection
       const currentProtection = event.target.protectionStacks;
       if (currentProtection > 0) {

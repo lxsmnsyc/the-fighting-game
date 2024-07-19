@@ -123,9 +123,15 @@ export interface PlayerValueEvent extends PlayerEvent {
   amount: number;
 }
 
+export interface DamageFlags {
+  critical: boolean;
+  dodged: boolean;
+}
+
 export interface DamageEvent extends PlayerValueEvent {
   type: DamageType;
   target: Player;
+  flags: DamageFlags;
 }
 
 function createDamageEvent(
@@ -133,9 +139,10 @@ function createDamageEvent(
   source: Player,
   target: Player,
   amount: number,
+  flags: DamageFlags,
   priority: number,
 ): DamageEvent {
-  return { type, source, target, amount, priority };
+  return { type, source, target, amount, flags, priority };
 }
 
 export interface BuffEvent extends PlayerValueEvent {}
@@ -168,8 +175,8 @@ export const enum EventType {
   Start = 4,
   CastAbility = 5,
   Damage = 6,
-  Critical = 7,
-  Dodge = 8,
+  // Critical = 7,
+  // Dodge = 8,
   AddHealth = 9,
   AddMana = 10,
   AddPenetration = 11,
@@ -224,11 +231,6 @@ export type GameEvents = {
   // Event for when a player deals damage
   [EventType.Damage]: DamageEvent;
 
-  // Event for when a player's deals a critical
-  [EventType.Critical]: DamageEvent;
-
-  // Event for when a player dodges a damage
-  [EventType.Dodge]: DamageEvent;
   [EventType.AddHealth]: BuffEvent;
   [EventType.AddMana]: BuffEvent;
   [EventType.AddPenetration]: DebuffEvent;
@@ -256,9 +258,7 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.Setup]: new EventEmitter(),
     [EventType.Start]: new EventEmitter(),
     [EventType.CastAbility]: new EventEmitter(),
-    [EventType.Critical]: new EventEmitter(),
     [EventType.Damage]: new EventEmitter(),
-    [EventType.Dodge]: new EventEmitter(),
     [EventType.AddHealth]: new EventEmitter(),
     [EventType.AddMana]: new EventEmitter(),
     [EventType.AddPenetration]: new EventEmitter(),
@@ -324,74 +324,33 @@ export class Game {
     type: DamageType,
     source: Player,
     target: Player,
+    flags: DamageFlags,
     amount: number,
   ): void {
     if (amount === 0) {
       return;
     }
     // Phase 1, Critical and Evasion
-    const phase1 = createDamageEvent(type, source, target, amount, 1);
+    const phase1 = createDamageEvent(type, source, target, amount, flags, 1);
     this.emit(EventType.Damage, phase1);
-    if (phase1.amount <= 0) {
-      return;
-    }
     // Phase 2 Protection
-    const phase2 = createDamageEvent(type, source, target, phase1.amount, 2);
+    const phase2 = createDamageEvent(
+      type,
+      source,
+      target,
+      phase1.amount,
+      flags,
+      2,
+    );
     this.emit(EventType.Damage, phase2);
-    if (phase2.amount <= 0) {
-      return;
-    }
     // Phase 3 Actual Damage
     this.emit(
       EventType.Damage,
-      createDamageEvent(type, source, target, phase2.amount, 3),
+      createDamageEvent(type, source, target, phase2.amount, flags, 3),
     );
     this.emit(
       EventType.Damage,
-      createDamageEvent(type, source, target, phase2.amount, 4),
-    );
-  }
-
-  triggerCritical(
-    type: DamageType,
-    source: Player,
-    target: Player,
-    amount: number,
-  ): void {
-    this.emit(
-      EventType.Critical,
-      createDamageEvent(type, source, target, amount, 1),
-    );
-    this.emit(
-      EventType.Critical,
-      createDamageEvent(type, source, target, amount, 2),
-    );
-    this.emit(
-      EventType.Critical,
-      createDamageEvent(type, source, target, amount, 3),
-    );
-  }
-
-  triggerDodge(
-    type: DamageType,
-    source: Player,
-    target: Player,
-    amount: number,
-  ): void {
-    if (amount === 0) {
-      return;
-    }
-    this.emit(
-      EventType.Dodge,
-      createDamageEvent(type, source, target, amount, 1),
-    );
-    this.emit(
-      EventType.Dodge,
-      createDamageEvent(type, source, target, amount, 2),
-    );
-    this.emit(
-      EventType.Dodge,
-      createDamageEvent(type, source, target, amount, 3),
+      createDamageEvent(type, source, target, phase2.amount, flags, 4),
     );
   }
 
