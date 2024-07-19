@@ -11,13 +11,13 @@ export function setupProtectionMechanics(game: Game): void {
       if (currentProtection > 0) {
         const consumable =
           (currentProtection * CONSUMABLE_PROTECTION_STACKS) | 0;
+        event.amount -= consumable;
         game.triggerDebuff(
           EventType.RemoveProtection,
           event.source,
           event.target,
           consumable,
         );
-        event.amount -= consumable;
       }
     }
   });
@@ -29,11 +29,11 @@ export function setupProtectionMechanics(game: Game): void {
       const overflow = event.amount - event.source.penetrationStacks;
       // The rest we can deduct to the penetrationStacks
       const deduction = Math.min(event.source.penetrationStacks, event.amount);
-      game.triggerBuff(EventType.RemovePenetration, event.source, deduction);
       // For the final amount, add it to current stacks
       if (overflow > 0) {
         event.source.protectionStacks += overflow;
       }
+      game.triggerBuff(EventType.RemovePenetration, event.source, deduction);
     }
   });
 
