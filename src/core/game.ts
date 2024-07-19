@@ -333,6 +333,9 @@ export class Game {
     target: Player,
     amount: number,
   ): void {
+    if (amount === 0) {
+      return;
+    }
     // Phase 1, Critical and Evasion
     const phase1 = createDamageEvent(type, source, target, amount, 4);
     this.emit(EventType.Damage, phase1);
@@ -362,6 +365,9 @@ export class Game {
     target: Player,
     amount: number,
   ): void {
+    if (amount === 0) {
+      return;
+    }
     const phase1 = createDamageEvent(type, source, target, amount, 3);
     this.emit(EventType.Critical, phase1);
     if (phase1.amount <= 0) {
@@ -383,6 +389,9 @@ export class Game {
     target: Player,
     amount: number,
   ): void {
+    if (amount === 0) {
+      return;
+    }
     const phase1 = createDamageEvent(type, source, target, amount, 3);
     this.emit(EventType.Dodge, phase1);
     if (phase1.amount <= 0) {
@@ -399,6 +408,9 @@ export class Game {
   }
 
   triggerBuff(eventType: BuffEventType, player: Player, amount: number): void {
+    if (amount === 0) {
+      return;
+    }
     const phase1 = createBuffEvent(player, amount, 3);
     this.emit(eventType, phase1);
     if (phase1.amount <= 0) {
@@ -414,6 +426,9 @@ export class Game {
     target: Player,
     amount: number,
   ): void {
+    if (amount === 0) {
+      return;
+    }
     const phase1 = createDebuffEvent(source, target, amount, 3);
     this.emit(eventType, phase1);
     if (phase1.amount <= 0) {
