@@ -5,10 +5,10 @@ import { BuffPriority, DebuffPriority } from '../priorities';
 export function setupManaMechanics(game: Game): void {
   log('Setting up Mana mechanics.');
   game.on(EventType.AddMana, BuffPriority.Exact, event => {
-    log(`${event.source.name} gained ${event.amount} of Health`);
-    event.source.health = Math.min(
-      event.source.maxHealth,
-      event.source.health + event.amount,
+    log(`${event.source.name} gained ${event.amount} of Mana`);
+    event.source.mana = Math.min(
+      event.source.maxMana,
+      event.source.mana + event.amount,
     );
   });
 
