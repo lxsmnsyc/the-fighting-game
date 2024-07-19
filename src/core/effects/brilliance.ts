@@ -38,7 +38,7 @@ export default createEffectCardSource({
         // Calculate period
         elapsed += FRAME_DURATION;
         if (elapsed >= period * 1000) {
-          elapsed = 0;
+          elapsed -= period;
           period = getBrilliancePeriod(player.speedStacks);
 
           game.triggerBuff(EventType.AddMana, player, 0.2 * level);
