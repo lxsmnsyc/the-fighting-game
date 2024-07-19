@@ -1,6 +1,6 @@
 import { setupGame } from './core';
 import snowball from './core/abilities/snowball';
-import normalAttack from './core/effects/normal-attack';
+import brilliance from './core/effects/brilliance';
 import { Game, Player } from './core/game';
 
 const playerA = new Player('Player A');
@@ -10,8 +10,8 @@ const game = new Game(playerA, playerB);
 playerA.ability = { source: snowball, level: 5 };
 playerB.ability = { source: snowball, level: 5 };
 
-playerA.effects = [{ source: normalAttack, level: 5 }];
-playerB.effects = [{ source: normalAttack, level: 5 }];
+playerA.effects = [{ source: brilliance, level: 5 }];
+playerB.effects = [{ source: brilliance, level: 5 }];
 
 playerA.game = game;
 playerB.game = game;
