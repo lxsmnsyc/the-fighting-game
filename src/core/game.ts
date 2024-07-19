@@ -79,20 +79,6 @@ export class Player {
 
   dodgeChance = 0;
 
-  manaBonus = 0;
-
-  healBonus = 0;
-
-  poisonBonus = 0;
-
-  penetrationBonus = 0;
-
-  protectionBonus = 0;
-
-  speedBonus = 0;
-
-  slowBonus = 0;
-
   // Stacks
 
   poisonStacks = 0;
