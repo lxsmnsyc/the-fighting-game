@@ -211,60 +211,49 @@ export type DebuffEventType =
   | EventType.RemoveProtection
   | EventType.RemoveSpeed;
 
-export type GameEventEmitters =
-  | [type: EventType.Close, event: BaseEvent]
+export type GameEvents = {
+  [EventType.Close]: BaseEvent;
   // Event when beginning pick phase
-  | [type: EventType.Prepare, event: BaseEvent]
+  [EventType.Prepare]: BaseEvent;
 
   // Setup event takes place before start.
   // Stat adjustments should be made here.
-  | [type: EventType.Setup, event: BaseEvent]
+  [EventType.Setup]: BaseEvent;
 
   // Start event begins the game.
   // Timeout events for the entire game should
   // be applied here (e.g. Poison damage)
-  | [type: EventType.Start, event: BaseEvent]
+  [EventType.Start]: BaseEvent;
 
   // Event for when a player casts their ability.
-  | [type: EventType.CastAbility, event: PlayerEvent]
+  [EventType.CastAbility]: PlayerEvent;
 
   // Event for when a player deals damage
-  | [type: EventType.Damage, event: DamageEvent]
+  [EventType.Damage]: DamageEvent;
 
   // Event for when a player's deals a critical
-  | [type: EventType.Critical, event: DamageEvent]
+  [EventType.Critical]: DamageEvent;
 
   // Event for when a player dodges a damage
-  | [type: EventType.Dodge, event: DamageEvent]
-  | [type: EventType.AddHealth, event: BuffEvent]
-  | [type: EventType.AddMana, event: BuffEvent]
-  | [type: EventType.AddPenetration, event: DebuffEvent]
-  | [type: EventType.AddPoison, event: DebuffEvent]
-  | [type: EventType.AddProtection, event: BuffEvent]
-  | [type: EventType.AddSlow, event: DebuffEvent]
-  | [type: EventType.AddSpeed, event: BuffEvent]
-  | [type: EventType.RemoveHealth, event: DebuffEvent]
-  | [type: EventType.RemoveMana, event: DebuffEvent]
-  | [type: EventType.RemovePenetration, event: BuffEvent]
-  | [type: EventType.RemovePoison, event: BuffEvent]
-  | [type: EventType.RemoveProtection, event: DebuffEvent]
-  | [type: EventType.RemoveSlow, event: BuffEvent]
-  | [type: EventType.RemoveSpeed, event: DebuffEvent];
-
-type GameEventListenerTuple<T> = T extends GameEventEmitters
-  ? [type: T[0], listener: EventEmitterListener<T[1]>]
-  : never;
-
-export type GameEventListeners = GameEventListenerTuple<GameEventEmitters>;
-
-type TupleToObject<T extends GameEventEmitters> = {
-  [key in T[0]]: Extract<T, [key, any]>[1];
+  [EventType.Dodge]: DamageEvent;
+  [EventType.AddHealth]: BuffEvent;
+  [EventType.AddMana]: BuffEvent;
+  [EventType.AddPenetration]: DebuffEvent;
+  [EventType.AddPoison]: DebuffEvent;
+  [EventType.AddProtection]: BuffEvent;
+  [EventType.AddSlow]: DebuffEvent;
+  [EventType.AddSpeed]: BuffEvent;
+  [EventType.RemoveHealth]: DebuffEvent;
+  [EventType.RemoveMana]: DebuffEvent;
+  [EventType.RemovePenetration]: BuffEvent;
+  [EventType.RemovePoison]: BuffEvent;
+  [EventType.RemoveProtection]: DebuffEvent;
+  [EventType.RemoveSlow]: BuffEvent;
+  [EventType.RemoveSpeed]: DebuffEvent;
 };
 
-type GameEventEmitterMap = TupleToObject<GameEventEmitters>;
-
 type GameEventEmitterInstances = {
-  [key in keyof GameEventEmitterMap]: EventEmitter<GameEventEmitterMap[key]>;
+  [key in keyof GameEvents]: EventEmitter<GameEvents[key]>;
 };
 
 function createGameEventEmitterInstances(): GameEventEmitterInstances {
@@ -297,12 +286,15 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
 export class Game {
   private emitters = createGameEventEmitterInstances();
 
-  on(...[type, listener]: GameEventListeners): void {
-    this.emitters[type].on(listener as any);
+  on<E extends EventType>(
+    type: E,
+    listener: EventEmitterListener<GameEvents[E]>,
+  ): void {
+    this.emitters[type].on(listener);
   }
 
-  emit(...[type, event]: GameEventEmitters): void {
-    this.emitters[type].emit(event as any);
+  emit<E extends EventType>(type: E, event: GameEvents[E]): void {
+    this.emitters[type].emit(event);
   }
 
   prepare(): void {
