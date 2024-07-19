@@ -1,7 +1,7 @@
 import { setupGame } from './core';
 import snowball from './core/abilities/snowball';
-import card001 from './core/effects/card-002';
-import card002 from './core/effects/card-006';
+import card001 from './core/effects/tier-1/periodic buff/card-002';
+import card002 from './core/effects/tier-1/periodic buff/card-006';
 import { Game, Player } from './core/game';
 
 const playerA = new Player('Player A');

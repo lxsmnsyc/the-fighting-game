@@ -1,8 +1,8 @@
-import { EventType, createEffectCardSource } from '../game';
-import { lerp } from '../lerp';
-import { log } from '../log';
-import { EventPriority } from '../priorities';
-import { FRAME_DURATION, createTick } from '../tick';
+import { EventType, createEffectCardSource } from '../../../game';
+import { lerp } from '../../../lerp';
+import { log } from '../../../log';
+import { EventPriority } from '../../../priorities';
+import { FRAME_DURATION, createTick } from '../../../tick';
 
 const MIN_PERIOD = 5000;
 const MAX_PERIOD = 200;
