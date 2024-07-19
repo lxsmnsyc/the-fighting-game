@@ -1,9 +1,11 @@
 import { EventType, type Game } from '../game';
+import { log } from '../log';
 import { BuffPriority, DamagePriority, DebuffPriority } from '../priorities';
 
 const CONSUMABLE_PROTECTION_STACKS = 0.5;
 
 export function setupProtectionMechanics(game: Game): void {
+  log('Setting up Protection mechanics.');
   // Trigger Protection consumption when about to take damage.
   game.on(EventType.Damage, DamagePriority.Protection, event => {
     if (!event.flags.dodged) {

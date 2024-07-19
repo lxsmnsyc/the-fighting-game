@@ -1,7 +1,9 @@
 import { EventType, type Game } from '../game';
+import { log } from '../log';
 import { DebuffPriority } from '../priorities';
 
 export function setupPoisonMechanics(game: Game): void {
+  log('Setting up Poison mechanics.');
   game.on(EventType.AddPoison, DebuffPriority.Exact, event => {
     event.target.poisonStacks += event.amount;
   });

@@ -11,9 +11,13 @@ export class EventEmitter<T> {
   }
 
   emit(event: T): void {
-    for (const listeners of [...this.queue]) {
-      for (const listener of [...listeners]) {
-        listener(event);
+    const queue = [...this.queue];
+    for (let i = 0, len = queue.length; i < len; i++) {
+      const listeners = queue[i];
+      if (listeners) {
+        for (const listener of [...listeners]) {
+          listener(event);
+        }
       }
     }
   }

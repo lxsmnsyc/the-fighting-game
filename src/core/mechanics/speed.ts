@@ -1,7 +1,9 @@
 import { EventType, type Game } from '../game';
+import { log } from '../log';
 import { BuffPriority, DebuffPriority } from '../priorities';
 
 export function setupSpeedMechanics(game: Game): void {
+  log('Setting up Speed mechanics.');
   // Speed/Slow interaction
   game.on(EventType.AddSpeed, BuffPriority.Exact, event => {
     // Get the remaining amount of stacks that can be applied to speed

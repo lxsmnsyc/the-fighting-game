@@ -1,9 +1,11 @@
 import { EventType, type Game } from '../game';
+import { log } from '../log';
 import { BuffPriority, DamagePriority, DebuffPriority } from '../priorities';
 
 const CONSUMABLE_PENETRATION_STACKS = 0.5;
 
 export function setupPenetrationMechanics(game: Game): void {
+  log('Setting up Penetration mechanics.');
   // Trigger Penetration consumption when about to take damage.
   game.on(EventType.Damage, DamagePriority.Penetration, event => {
     if (!event.flags.dodged) {

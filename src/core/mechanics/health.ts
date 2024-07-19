@@ -1,8 +1,11 @@
 import { EventType, type Game } from '../game';
+import { log } from '../log';
 import { BuffPriority, DebuffPriority } from '../priorities';
 
 export function setupHealthMechanics(game: Game): void {
+  log('Setting up Health mechanics.');
   game.on(EventType.AddHealth, BuffPriority.Exact, event => {
+    log(`${event.source.name} gained ${event.amount} of Health`);
     event.source.health = Math.min(
       event.source.maxHealth,
       event.source.health + event.amount,
@@ -10,6 +13,8 @@ export function setupHealthMechanics(game: Game): void {
   });
 
   game.on(EventType.RemoveHealth, DebuffPriority.Exact, event => {
-    event.source.health = Math.max(0, event.source.health - event.amount);
+    const deduction = Math.min(event.target.health, event.amount);
+    log(`${event.target.name} lost ${deduction} of Health`);
+    event.target.health -= deduction;
   });
 }
