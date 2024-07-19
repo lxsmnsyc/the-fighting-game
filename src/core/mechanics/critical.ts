@@ -10,6 +10,7 @@ export function setupCriticalMechanics(game: Game): void {
         // Push your luck
         const random = Math.random() * 100;
         if (random <= currentCrit) {
+          event.amount *= event.source.critMultiplier;
           game.triggerCritical(
             DamageType.Attack,
             event.source,
@@ -18,13 +19,6 @@ export function setupCriticalMechanics(game: Game): void {
           );
         }
       }
-    }
-  });
-
-  // Apply critical multiplier
-  game.on(EventType.Critical, event => {
-    if (event.priority === 2) {
-      event.amount *= event.source.critMultiplier;
     }
   });
 }

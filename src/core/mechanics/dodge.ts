@@ -10,20 +10,16 @@ export function setupDodgeMechanics(game: Game): void {
         // Push your luck
         const random = Math.random() * 100;
         if (random <= currentDodge) {
+          const currentAmount = event.amount;
+          event.amount = 0;
           game.triggerDodge(
             DamageType.Attack,
             event.source,
             event.target,
-            event.amount,
+            currentAmount,
           );
         }
       }
-    }
-  });
-
-  game.on(EventType.Dodge, event => {
-    if (event.priority === 2) {
-      event.amount = 0;
     }
   });
 }
