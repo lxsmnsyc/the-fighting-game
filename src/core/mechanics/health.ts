@@ -17,4 +17,11 @@ export function setupHealthMechanics(game: Game): void {
     log(`${event.target.name} lost ${deduction} of Health`);
     event.target.health -= deduction;
   });
+
+  game.on(EventType.RemoveHealth, DebuffPriority.Post, event => {
+    if (event.target.health === 0) {
+      log(`${event.target.name} died.`);
+      game.endGame(event.source, event.target);
+    }
+  });
 }

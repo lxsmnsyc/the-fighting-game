@@ -20,27 +20,43 @@ export const enum DamageType {
   Poison = 5,
 }
 
-export interface EffectSource {
+export interface PassiveSource {
   name: string;
   tier: 1 | 2 | 3;
   load: (game: Game, player: Player, level: number) => void;
-  getDescription: (level: number) => string[];
+  getDescription: (level: number) => (string | number)[];
 }
 
 export interface AbilitySource {
   name: string;
   load: (game: Game, player: Player, level: number) => void;
-  getDescription: (level: number) => string[];
+  getDescription: (level: number) => (string | number)[];
 }
 
-export interface Effect {
-  source: EffectSource;
+export function createPassiveSource(source: PassiveSource): PassiveSource {
+  return source;
+}
+
+export function createAbilitySource(source: AbilitySource): AbilitySource {
+  return source;
+}
+
+export interface Passive {
+  source: PassiveSource;
   level: number;
 }
 
 export interface Ability {
   source: AbilitySource;
   level: number;
+}
+
+export function createPassive(source: Passive): Passive {
+  return source;
+}
+
+export function createAbility(source: Ability): Ability {
+  return source;
 }
 
 export class Player {
@@ -53,7 +69,7 @@ export class Player {
 
   mana = 0;
 
-  attackDamage = 0;
+  attackDamage = 100;
 
   magicDamage = 0;
 
@@ -89,18 +105,22 @@ export class Player {
 
   slowStacks = 0;
 
-  constructor(
-    public game: Game,
-    public ability: Ability,
-    public effects: Effect[],
-  ) {}
+  constructor(public name: string) {}
 
-  load() {
-    this.ability.source.load(this.game, this, this.ability.level);
-    for (const effect of this.effects) {
-      effect.source.load(this.game, this, this.ability.level);
+  load(game: Game) {
+    if (this.ability) {
+      this.ability.source.load(game, this, this.ability.level);
+    }
+    if (this.effects) {
+      for (const effect of this.effects) {
+        effect.source.load(game, this, effect.level);
+      }
     }
   }
+
+  public ability?: Ability;
+  public effects?: Passive[];
+  public game?: Game;
 }
 
 export const enum EventType {
@@ -126,11 +146,16 @@ export const enum EventType {
   RemoveProtection = 20,
   RemoveSlow = 21,
   RemoveSpeed = 22,
+  EndGame = 23,
 }
 
 export interface BaseEvent {}
 
 export interface PlayerEvent extends BaseEvent {
+  source: Player;
+}
+
+export interface AbilityEvent extends PlayerEvent {
   source: Player;
 }
 
@@ -177,6 +202,11 @@ function createDebuffEvent(
   return { source, target, amount };
 }
 
+export interface EndGameEvent extends BaseEvent {
+  winner: Player;
+  loser: Player;
+}
+
 export type BuffEventType =
   | EventType.AddHealth
   | EventType.AddMana
@@ -210,7 +240,7 @@ export type GameEvents = {
   [EventType.Start]: BaseEvent;
 
   // Event for when a player casts their ability.
-  [EventType.CastAbility]: PlayerEvent;
+  [EventType.CastAbility]: AbilityEvent;
 
   // Event for when a player deals damage
   [EventType.Damage]: DamageEvent;
@@ -229,6 +259,8 @@ export type GameEvents = {
   [EventType.RemoveProtection]: DebuffEvent;
   [EventType.RemoveSlow]: BuffEvent;
   [EventType.RemoveSpeed]: DebuffEvent;
+
+  [EventType.EndGame]: EndGameEvent;
 };
 
 type GameEventEmitterInstances = {
@@ -257,11 +289,17 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.RemoveProtection]: new EventEmitter(),
     [EventType.RemoveSlow]: new EventEmitter(),
     [EventType.RemoveSpeed]: new EventEmitter(),
+    [EventType.EndGame]: new EventEmitter(),
   };
 }
 
 export class Game {
   private emitters = createGameEventEmitterInstances();
+
+  constructor(
+    public playerA: Player,
+    public playerB: Player,
+  ) {}
 
   on<E extends EventType>(
     type: E,
@@ -328,5 +366,16 @@ export class Game {
       return;
     }
     this.emit(eventType, createDebuffEvent(source, target, amount));
+  }
+
+  getOppositePlayer(player: Player) {
+    if (player === this.playerA) {
+      return this.playerB;
+    }
+    return this.playerA;
+  }
+
+  endGame(winner: Player, loser: Player): void {
+    this.emit(EventType.EndGame, { winner, loser });
   }
 }
