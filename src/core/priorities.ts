@@ -18,3 +18,9 @@ export const enum DamagePriority {
   Exact = 5,
   Post = 6,
 }
+
+export const enum EventPriority {
+  Pre = 1,
+  Exact = 2,
+  Post = 3,
+}
