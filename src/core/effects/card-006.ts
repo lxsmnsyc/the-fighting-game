@@ -13,7 +13,7 @@ function getCard006Period(speed: number): number {
 }
 
 export default createEffectCardSource({
-  name: 'Card 006',
+  name: 'Card #006',
   tier: 1,
   getDescription(level) {
     return [

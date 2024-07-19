@@ -13,7 +13,7 @@ function getCard007Period(speed: number): number {
 }
 
 export default createEffectCardSource({
-  name: 'Card-007',
+  name: 'Card #007',
   tier: 1,
   getDescription(level) {
     return [
@@ -29,7 +29,7 @@ export default createEffectCardSource({
     ];
   },
   load(game, player, level) {
-    log(`Setting up Card-007 for ${player.name}`);
+    log(`Setting up Card 007 for ${player.name}`);
     game.on(EventType.Start, EventPriority.Post, () => {
       let elapsed = 0;
       let period = getCard007Period(player.speedStacks);
