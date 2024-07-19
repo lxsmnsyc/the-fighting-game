@@ -4,6 +4,8 @@ const DEFAULT_HEALTH = 1000;
 
 const DEFAULT_MANA_POOL = 100;
 
+const DEFAULT_CRIT_MULTIPLIER = 2.0;
+
 export const enum DamageType {
   Magic = 1,
   Attack = 2,
@@ -57,7 +59,7 @@ export class Player {
 
   critChance = 0;
 
-  critMultiplier = 0;
+  critMultiplier = DEFAULT_CRIT_MULTIPLIER;
 
   dodgeChance = 0;
 
