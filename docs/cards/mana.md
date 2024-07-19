@@ -5,9 +5,9 @@
 - Increase Mana gain.
 - Reduce Mana gain.
 
-### With Ability
+### With AbilityCard
 
-- Gain Mana every time Ability is used.
+- Gain Mana every time AbilityCard is used.
 
 ### With Attack
 
@@ -72,4 +72,4 @@
 
 ## Domain
 
-## Ability
+## AbilityCard

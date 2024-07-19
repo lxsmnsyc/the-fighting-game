@@ -1,65 +1,65 @@
-# Ability Cards
+# AbilityCard Cards
 
 ## Tier 1
 
 ### With Attack
 
-- Increase Attack every time Ability is used.
+- Increase Attack every time AbilityCard is used.
 
 ### With Critical
 
-- Increase Critical every time Ability is used.
+- Increase Critical every time AbilityCard is used.
 
 ### With Dodge
 
-- Increase Dodge every time Ability is used.
+- Increase Dodge every time AbilityCard is used.
 
 ### With Health
 
-- Increase Health every time Ability is used.
+- Increase Health every time AbilityCard is used.
 
 ### With Magic
 
-- Increase Magic every time Ability is used.
+- Increase Magic every time AbilityCard is used.
 
 ### With Mana
 
-- Gain Mana every time Ability is used.
+- Gain Mana every time AbilityCard is used.
 
 ### With Penetration
 
-- Apply Penetration every time Ability is used.
+- Apply Penetration every time AbilityCard is used.
 
 ### With Poison
 
-- Apply Poison every time Ability is used.
+- Apply Poison every time AbilityCard is used.
 
 ### With Protection
 
-- Gain Protection every time Ability is used.
+- Gain Protection every time AbilityCard is used.
 
 ### With Heal
 
-- Gain Heal every time Ability is used.
+- Gain Heal every time AbilityCard is used.
 
 ### With Slow
 
-- Apply Slow every time Ability is used.
+- Apply Slow every time AbilityCard is used.
 
 ### With Speed
 
-- Gain Speed every time Ability is used.
+- Gain Speed every time AbilityCard is used.
 
 ## Tier 2
 
-- Deal Attack damage every time Ability is used.
-- Deal Magic damage every time Ability is used.
+- Deal Attack damage every time AbilityCard is used.
+- Deal Magic damage every time AbilityCard is used.
 
 ## Tier 3
 
-- Repeat Ability when Ability is used.
-- Start of the game, immediately use Ability.
+- Repeat AbilityCard when AbilityCard is used.
+- Start of the game, immediately use AbilityCard.
 
 ## Domain
 
-## Ability
+## AbilityCard

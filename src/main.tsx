@@ -7,8 +7,8 @@ const playerA = new Player('Player A');
 const playerB = new Player('Player B');
 const game = new Game(playerA, playerB);
 
-playerA.ability = { source: snowball, level: 5 };
-playerB.ability = { source: snowball, level: 5 };
+playerA.AbilityCard = { source: snowball, level: 5 };
+playerB.AbilityCard = { source: snowball, level: 5 };
 
 playerA.effects = [{ source: brilliance, level: 5 }];
 playerB.effects = [{ source: brilliance, level: 5 }];

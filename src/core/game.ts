@@ -20,42 +20,46 @@ export const enum DamageType {
   Poison = 5,
 }
 
-export interface PassiveSource {
+export interface EffectCardSource {
   name: string;
   tier: 1 | 2 | 3;
   load: (game: Game, player: Player, level: number) => void;
   getDescription: (level: number) => (string | number)[];
 }
 
-export interface AbilitySource {
+export interface AbilityCardSource {
   name: string;
   load: (game: Game, player: Player, level: number) => void;
   getDescription: (level: number) => (string | number)[];
 }
 
-export function createPassiveSource(source: PassiveSource): PassiveSource {
+export function createEffectCardSource(
+  source: EffectCardSource,
+): EffectCardSource {
   return source;
 }
 
-export function createAbilitySource(source: AbilitySource): AbilitySource {
+export function createAbilityCardSource(
+  source: AbilityCardSource,
+): AbilityCardSource {
   return source;
 }
 
-export interface Passive {
-  source: PassiveSource;
+export interface EffectCard {
+  source: EffectCardSource;
   level: number;
 }
 
-export interface Ability {
-  source: AbilitySource;
+export interface AbilityCard {
+  source: AbilityCardSource;
   level: number;
 }
 
-export function createPassive(source: Passive): Passive {
+export function createEffectCard(source: EffectCard): EffectCard {
   return source;
 }
 
-export function createAbility(source: Ability): Ability {
+export function createAbilityCard(source: AbilityCard): AbilityCard {
   return source;
 }
 
@@ -94,8 +98,8 @@ export class Player {
   constructor(public name: string) {}
 
   load(game: Game) {
-    if (this.ability) {
-      this.ability.source.load(game, this, this.ability.level);
+    if (this.AbilityCard) {
+      this.AbilityCard.source.load(game, this, this.AbilityCard.level);
     }
     if (this.effects) {
       for (const effect of this.effects) {
@@ -104,8 +108,8 @@ export class Player {
     }
   }
 
-  public ability?: Ability;
-  public effects?: Passive[];
+  public AbilityCard?: AbilityCard;
+  public effects?: EffectCard[];
   public game?: Game;
 }
 
@@ -141,7 +145,7 @@ export interface PlayerEvent extends BaseEvent {
   source: Player;
 }
 
-export interface AbilityEvent extends PlayerEvent {
+export interface AbilityCardEvent extends PlayerEvent {
   source: Player;
 }
 
@@ -225,8 +229,8 @@ export type GameEvents = {
   // be applied here (e.g. Poison damage)
   [EventType.Start]: BaseEvent;
 
-  // Event for when a player casts their ability.
-  [EventType.CastAbility]: AbilityEvent;
+  // Event for when a player casts their AbilityCard.
+  [EventType.CastAbility]: AbilityCardEvent;
 
   // Event for when a player deals damage
   [EventType.Damage]: DamageEvent;
@@ -315,7 +319,7 @@ export class Game {
     this.emit(EventType.Close, {});
   }
 
-  castAbility(source: Player): void {
+  CastAbility(source: Player): void {
     this.emit(EventType.CastAbility, { source });
   }
 

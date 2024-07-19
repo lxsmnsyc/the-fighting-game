@@ -5,9 +5,9 @@
 - Increase Protection stacks.
 - Chance for enemy Protection gain to fail.
 
-### With Ability
+### With AbilityCard
 
-- Gain Protection every time Ability is used.
+- Gain Protection every time AbilityCard is used.
 
 ### With Attack
 
@@ -76,4 +76,4 @@
 
 ## Domain
 
-## Ability
+## AbilityCard

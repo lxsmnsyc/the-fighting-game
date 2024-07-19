@@ -7,7 +7,7 @@ export function setupAbilityMechanics(game: Game): void {
 
   game.on(EventType.AddMana, EventPriority.Post, event => {
     if (event.source.mana === event.source.maxMana) {
-      game.castAbility(event.source);
+      game.CastAbility(event.source);
     }
   });
 

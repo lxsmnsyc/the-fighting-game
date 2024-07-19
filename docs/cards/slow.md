@@ -5,9 +5,9 @@
 - Increase Slow stacks.
 - Chance for enemy Slow application to fail.
 
-### With Ability
+### With AbilityCard
 
-- Apply Slow every time Ability is used.
+- Apply Slow every time AbilityCard is used.
 
 ### With Attack
 
@@ -73,4 +73,4 @@
 
 ## Domain
 
-## Ability
+## AbilityCard

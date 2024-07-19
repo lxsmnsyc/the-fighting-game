@@ -5,9 +5,9 @@
 - Increase Attack
 - Reduce Attack of Enemy
 
-### With Ability
+### With AbilityCard
 
-- Increase Attack every time Ability is used.
+- Increase Attack every time AbilityCard is used.
 
 ### With Critical
 
@@ -63,6 +63,6 @@
 
 ## Domain
 
-## Ability
+## AbilityCard
 
 - Immediately perform X instance of attacks

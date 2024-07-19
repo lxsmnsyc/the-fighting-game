@@ -5,9 +5,9 @@
 - Increase Heal gain.
 - Chance for enemy Heal gain to fail.
 
-### With Ability
+### With AbilityCard
 
-- Gain Heal every time Ability is used.
+- Gain Heal every time AbilityCard is used.
 
 ### With Attack
 
@@ -74,4 +74,4 @@
 
 ## Domain
 
-## Ability
+## AbilityCard

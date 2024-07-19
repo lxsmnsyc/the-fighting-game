@@ -5,9 +5,9 @@
 - Increase Poison stacks.
 - Chance for enemy Poison application to fail.
 
-### With Ability
+### With AbilityCard
 
-- Apply Poison every time Ability is used.
+- Apply Poison every time AbilityCard is used.
 
 ### With Attack
 
@@ -73,4 +73,4 @@
 
 ## Domain
 
-## Ability
+## AbilityCard

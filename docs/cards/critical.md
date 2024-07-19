@@ -5,9 +5,9 @@
 - Increase Critical
 - Reduce Critical of Enemy
 
-### With Ability
+### With AbilityCard
 
-- Increase Critical every time Ability is used.
+- Increase Critical every time AbilityCard is used.
 
 ### With Attack
 
@@ -65,4 +65,4 @@
 
 ## Domain
 
-## Ability
+## AbilityCard

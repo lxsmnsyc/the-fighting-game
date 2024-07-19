@@ -5,9 +5,9 @@
 - Increase Speed stacks.
 - Chance for enemy Speed gain to fail.
 
-### With Ability
+### With AbilityCard
 
-- Gain Speed every time Ability is used.
+- Gain Speed every time AbilityCard is used.
 
 ### With Attack
 
@@ -73,4 +73,4 @@
 
 ## Domain
 
-## Ability
+## AbilityCard
