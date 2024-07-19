@@ -367,14 +367,10 @@ export class Game {
     target: Player,
     amount: number,
   ): void {
-    if (amount === 0) {
-      return;
-    }
-    const phase1 = createDamageEvent(type, source, target, amount, 3);
-    this.emit(EventType.Critical, phase1);
-    if (phase1.amount <= 0) {
-      return;
-    }
+    this.emit(
+      EventType.Critical,
+      createDamageEvent(type, source, target, amount, 3),
+    );
     this.emit(
       EventType.Critical,
       createDamageEvent(type, source, target, amount, 2),
@@ -394,11 +390,10 @@ export class Game {
     if (amount === 0) {
       return;
     }
-    const phase1 = createDamageEvent(type, source, target, amount, 3);
-    this.emit(EventType.Dodge, phase1);
-    if (phase1.amount <= 0) {
-      return;
-    }
+    this.emit(
+      EventType.Dodge,
+      createDamageEvent(type, source, target, amount, 3),
+    );
     this.emit(
       EventType.Dodge,
       createDamageEvent(type, source, target, amount, 2),
