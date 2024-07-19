@@ -1,7 +1,7 @@
 import { setupGame } from './core';
 import snowball from './core/abilities/snowball';
-import brilliance from './core/effects/brilliance';
-import momentum from './core/effects/momentum';
+import card001 from './core/effects/card-001';
+import card002 from './core/effects/card-002';
 import { Game, Player } from './core/game';
 
 const playerA = new Player('Player A');
@@ -12,12 +12,12 @@ playerA.AbilityCard = { source: snowball, level: 5 };
 playerB.AbilityCard = { source: snowball, level: 5 };
 
 playerA.effects = [
-  { source: brilliance, level: 5 },
-  { source: momentum, level: 5 },
+  { source: card001, level: 5 },
+  { source: card002, level: 5 },
 ];
 playerB.effects = [
-  { source: brilliance, level: 5 },
-  { source: momentum, level: 5 },
+  { source: card001, level: 5 },
+  { source: card002, level: 5 },
 ];
 
 playerA.game = game;
