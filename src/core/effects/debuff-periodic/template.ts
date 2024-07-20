@@ -1,4 +1,6 @@
 import {
+  DEBUFF_NAME,
+  DEBUFF_STACKS,
   type DebuffEventType,
   type EffectCardSource,
   EventType,
@@ -17,8 +19,7 @@ const DEFAULT_GAIN_MULTIPLIER = 1;
 export interface PeriodicDebuffEffectCardSourceOptions {
   name: string;
   tier: number;
-  debuffType: DebuffEventType;
-  debuffName: string;
+  debuff: DebuffEventType;
   multiplier?: number;
   maxPeriod?: number;
   minPeriod?: number;
@@ -57,8 +58,8 @@ export default function createPeriodicDebuffEffectCardSource(
       return [
         'Periodically gains ',
         getPeriodicGain(level),
-        ' points of ',
-        current.debuffName,
+        ` ${DEBUFF_STACKS[current.debuff] ? 'stacks' : 'points'} of `,
+        DEBUFF_NAME[current.debuff],
         '. Period ranges from',
         current.minPeriod,
         ' seconds to ',
@@ -72,17 +73,17 @@ export default function createPeriodicDebuffEffectCardSource(
       log(`Setting up ${current.name} for ${player.name}`);
       game.on(EventType.Start, EventPriority.Post, () => {
         let elapsed = 0;
-        let period = getPeriod(player.speedStacks);
+        let period = getPeriod(player.stacks.speed);
 
         const cleanup = createTick(() => {
           // Calculate period
           elapsed += FRAME_DURATION;
           if (elapsed >= period) {
             elapsed -= period;
-            period = getPeriod(player.speedStacks);
+            period = getPeriod(player.stacks.speed);
 
             game.triggerDebuff(
-              current.debuffType,
+              current.debuff,
               player,
               game.getOppositePlayer(player),
               getPeriodicGain(level),

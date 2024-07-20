@@ -10,7 +10,7 @@ export function setupArmorMechanics(game: Game): void {
   game.on(EventType.Damage, DamagePriority.Armor, event => {
     if (!event.flags.missed) {
       // Get 50% of the armor
-      const currentArmor = event.target.armorStacks;
+      const currentArmor = event.target.stacks.armor;
       if (currentArmor > 0) {
         const consumable = (currentArmor * CONSUMABLE_ARMOR_STACKS) | 0;
         event.amount -= consumable;
@@ -26,11 +26,11 @@ export function setupArmorMechanics(game: Game): void {
 
   game.on(EventType.AddArmor, BuffPriority.Exact, event => {
     log(`${event.source.name} gained ${event.amount} stacks of Armor`);
-    event.source.armorStacks += event.amount;
+    event.source.stacks.armor += event.amount;
   });
 
   game.on(EventType.RemoveArmor, DebuffPriority.Exact, event => {
     log(`${event.target.name} lost ${event.amount} stacks of Armor`);
-    event.target.armorStacks -= event.amount;
+    event.target.stacks.armor -= event.amount;
   });
 }

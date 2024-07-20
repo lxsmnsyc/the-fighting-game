@@ -6,11 +6,11 @@ export function setupSpeedMechanics(game: Game): void {
   log('Setting up Speed mechanics.');
   game.on(EventType.AddSpeed, BuffPriority.Exact, event => {
     log(`${event.source.name} gained ${event.amount} stacks of Speed`);
-    event.source.speedStacks += event.amount;
+    event.source.stacks.speed += event.amount;
   });
 
   game.on(EventType.RemoveSpeed, DebuffPriority.Exact, event => {
     log(`${event.target.name} lost ${event.amount} stacks of Speed`);
-    event.target.speedStacks -= event.amount;
+    event.target.stacks.speed -= event.amount;
   });
 }

@@ -13,11 +13,8 @@ export const enum DamageType {
   // Can trigger some damage events
   Pure = 3,
 
-  // Does not trigger normal damage events
-  Loss = 4,
-
   // Does not trigger normal damage events either
-  Poison = 5,
+  Poison = 4,
 }
 
 export interface EffectCardSource {
@@ -63,6 +60,15 @@ export function createAbilityCard(source: AbilityCard): AbilityCard {
   return source;
 }
 
+export interface PlayerStacks {
+  poison: number;
+  armor: number;
+  speed: number;
+  critical: number;
+  evasion: number;
+  luck: number;
+}
+
 export class Player {
   maxHealth = DEFAULT_HEALTH;
 
@@ -81,17 +87,14 @@ export class Player {
 
   // Stacks
 
-  poisonStacks = 0;
-
-  armorStacks = 0;
-
-  speedStacks = 0;
-
-  criticalStacks = 0;
-
-  evasionStacks = 0;
-
-  luckStacks = 0;
+  stacks: PlayerStacks = {
+    poison: 0,
+    armor: 0,
+    speed: 0,
+    critical: 0,
+    evasion: 0,
+    luck: 0,
+  };
 
   constructor(public name: string) {}
 
@@ -156,6 +159,50 @@ export type DebuffEventType =
   | EventType.RemoveEvasion
   | EventType.RemoveCritical
   | EventType.RemoveLuck;
+
+export const BUFF_NAME: Record<BuffEventType, string> = {
+  [EventType.RemovePoison]: 'Cure',
+  [EventType.AddHealth]: 'Health',
+  [EventType.AddMana]: 'Mana',
+  [EventType.AddArmor]: 'Armor',
+  [EventType.AddSpeed]: 'Speed',
+  [EventType.AddEvasion]: 'Evasion',
+  [EventType.AddCritical]: 'Critical',
+  [EventType.AddLuck]: 'Luck',
+};
+
+export const DEBUFF_NAME: Record<DebuffEventType, string> = {
+  [EventType.AddPoison]: 'Poison',
+  [EventType.RemoveHealth]: 'Health Loss',
+  [EventType.RemoveMana]: 'Mana Loss',
+  [EventType.RemoveArmor]: 'Armor Decay',
+  [EventType.RemoveSpeed]: 'Slow',
+  [EventType.RemoveEvasion]: 'Evasion Decay',
+  [EventType.RemoveCritical]: 'Critical Decay',
+  [EventType.RemoveLuck]: 'Curse',
+};
+
+export const BUFF_STACKS: Record<BuffEventType, boolean> = {
+  [EventType.RemovePoison]: true,
+  [EventType.AddHealth]: false,
+  [EventType.AddMana]: false,
+  [EventType.AddArmor]: true,
+  [EventType.AddSpeed]: true,
+  [EventType.AddEvasion]: true,
+  [EventType.AddCritical]: true,
+  [EventType.AddLuck]: true,
+};
+
+export const DEBUFF_STACKS: Record<DebuffEventType, boolean> = {
+  [EventType.AddPoison]: true,
+  [EventType.RemoveHealth]: false,
+  [EventType.RemoveMana]: false,
+  [EventType.RemoveArmor]: true,
+  [EventType.RemoveSpeed]: true,
+  [EventType.RemoveEvasion]: true,
+  [EventType.RemoveCritical]: true,
+  [EventType.RemoveLuck]: true,
+};
 
 export interface BaseEvent {}
 

@@ -36,11 +36,11 @@ export function setupLuckMechanics(game: Game): void {
   log('Setting up Luck mechanics.');
   game.on(EventType.AddLuck, BuffPriority.Exact, event => {
     log(`${event.source.name} gained ${event.amount} stacks of Luck`);
-    event.source.luckStacks += event.amount;
+    event.source.stacks.luck += event.amount;
   });
 
   game.on(EventType.RemoveLuck, DebuffPriority.Exact, event => {
     log(`${event.target.name} lost ${event.amount} stacks of Luck`);
-    event.target.luckStacks -= event.amount;
+    event.target.stacks.luck -= event.amount;
   });
 }
