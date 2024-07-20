@@ -1,16 +1,35 @@
-import { EventType, type Game } from '../game';
+import { EventType, type Game, Stack } from '../game';
 import { log } from '../log';
-import { BuffPriority, DebuffPriority } from '../priorities';
+import { StackPriority } from '../priorities';
 
 export function setupSpeedMechanics(game: Game): void {
   log('Setting up Speed mechanics.');
-  game.on(EventType.AddSpeed, BuffPriority.Exact, event => {
-    log(`${event.source.name} gained ${event.amount} stacks of Speed`);
-    event.source.stacks.speed += event.amount;
+  game.on(EventType.SetStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Speed) {
+      log(`${event.source.name}'s Speed changed to ${event.amount}`);
+      event.source.stacks[Stack.Speed] = event.amount;
+    }
   });
 
-  game.on(EventType.RemoveSpeed, DebuffPriority.Exact, event => {
-    log(`${event.target.name} lost ${event.amount} stacks of Speed`);
-    event.target.stacks.speed -= event.amount;
+  game.on(EventType.AddStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Speed) {
+      log(`${event.source.name} gained ${event.amount} stacks of Speed`);
+      game.setStack(
+        Stack.Speed,
+        event.source,
+        event.source.stacks[Stack.Speed] + event.amount,
+      );
+    }
+  });
+
+  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Speed) {
+      log(`${event.target.name} lost ${event.amount} stacks of Speed`);
+      game.setStack(
+        Stack.Speed,
+        event.target,
+        event.target.stacks[Stack.Speed] - event.amount,
+      );
+    }
   });
 }
