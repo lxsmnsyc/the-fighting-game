@@ -9,6 +9,7 @@ import { setupDamageMechanics } from './mechanics/damage';
 import { setupEvasionMechanics } from './mechanics/evasion';
 import { setupHealthMechanics } from './mechanics/health';
 import { setupLuckMechanics } from './mechanics/luck';
+import { setupMagicMechanics } from './mechanics/magic';
 import { setupManaMechanics } from './mechanics/mana';
 import { setupSpeedMechanics } from './mechanics/speed';
 import { EventPriority } from './priorities';
@@ -27,15 +28,16 @@ export function setupGame(game: Game): void {
     setupManaMechanics(game);
     // Other stats
     setupAttackMechanics(game);
+    setupMagicMechanics(game);
     // Stacks
     setupLuckMechanics(game);
     setupSpeedMechanics(game);
     setupCureMechanics(game);
-    // Damage
-    setupDamageMechanics(game);
     setupEvasionMechanics(game);
     setupCriticalMechanics(game);
     setupArmorMechanics(game);
+    // Damage
+    setupDamageMechanics(game);
 
     game.playerA.load(game);
     game.playerB.load(game);
