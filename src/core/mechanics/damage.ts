@@ -1,4 +1,4 @@
-import { EventType, type Game } from '../game';
+import { EventType, type Game, Stat } from '../game';
 import { log } from '../log';
 import { DamagePriority } from '../priorities';
 
@@ -9,12 +9,7 @@ export function setupDamageMechanics(game: Game): void {
       log(
         `${event.source.name} dealt ${event.amount} damage to ${event.target.name}`,
       );
-      game.triggerDebuff(
-        EventType.RemoveHealth,
-        event.source,
-        event.target,
-        event.amount,
-      );
+      game.removeStat(Stat.Health, event.source, event.target, event.amount);
     }
   });
 }
