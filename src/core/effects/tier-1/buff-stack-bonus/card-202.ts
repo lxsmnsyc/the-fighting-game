@@ -3,20 +3,14 @@ import { log } from '../../../log';
 import { BuffPriority } from '../../../priorities';
 
 export default createEffectCardSource({
-  name: 'Card #017',
+  name: 'Card #202',
   tier: 1,
   getDescription(level) {
-    return [
-      'Increases ',
-      'Critical',
-      ' stacks gained by ',
-      5 * level,
-      ' points.',
-    ];
+    return ['Increases ', 'Mana', ' points gained by ', 5 * level, ' points.'];
   },
   load(game, player, level) {
-    log(`Setting up Card 017 for ${player.name}`);
-    game.on(EventType.AddCritical, BuffPriority.Additive, event => {
+    log(`Setting up Card 202 for ${player.name}`);
+    game.on(EventType.AddMana, BuffPriority.Additive, event => {
       if (event.source === player) {
         event.amount += 5 * level;
       }
