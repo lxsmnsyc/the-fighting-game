@@ -402,10 +402,14 @@ export class Game {
   }
 
   setStack(type: Stack, source: Player, amount: number): void {
-    this.emit(EventType.SetStack, createSetStackEvent(type, source, amount));
+    this.emit(
+      EventType.SetStack,
+      createSetStackEvent(type, source, amount | 0),
+    );
   }
 
   addStack(type: Stack, source: Player, amount: number): void {
+    amount |= 0;
     if (amount === 0) {
       return;
     }
@@ -418,6 +422,7 @@ export class Game {
     target: Player,
     amount: number,
   ): void {
+    amount |= 0;
     if (amount === 0) {
       return;
     }
@@ -428,10 +433,11 @@ export class Game {
   }
 
   setStat(type: Stat, source: Player, amount: number): void {
-    this.emit(EventType.SetStat, createSetStatEvent(type, source, amount));
+    this.emit(EventType.SetStat, createSetStatEvent(type, source, amount | 0));
   }
 
   addStat(type: Stat, source: Player, amount: number): void {
+    amount |= 0;
     if (amount === 0) {
       return;
     }
@@ -439,6 +445,7 @@ export class Game {
   }
 
   removeStat(type: Stat, source: Player, target: Player, amount: number): void {
+    amount |= 0;
     if (amount === 0) {
       return;
     }
