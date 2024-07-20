@@ -101,7 +101,7 @@ export function setupCriticalMechanics(game: Game): void {
   game.on(EventType.AddStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
       log(
-        `${event.source.name} gained ${event.amount} stacks of Critical Multiplier`,
+        `${event.source.name} gained ${event.amount} points of Critical Multiplier`,
       );
       game.setStat(
         Stat.CritMultiplier,
@@ -114,7 +114,7 @@ export function setupCriticalMechanics(game: Game): void {
   game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
       log(
-        `${event.target.name} lost ${event.amount} stacks of Critical Multiplier`,
+        `${event.target.name} lost ${event.amount} points of Critical Multiplier`,
       );
       game.setStat(
         Stat.CritMultiplier,
