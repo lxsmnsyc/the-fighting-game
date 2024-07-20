@@ -8,18 +8,18 @@ const MIN_PERIOD = 5000;
 const MAX_PERIOD = 200;
 const MAX_SPEED = 750;
 
-function getCard010Period(speed: number): number {
+function getCard102Period(speed: number): number {
   return lerp(MIN_PERIOD, MAX_PERIOD, Math.min(speed / MAX_SPEED, 1));
 }
 
 export default createEffectCardSource({
-  name: 'Card #010',
+  name: 'Card #102',
   tier: 1,
   getDescription(level) {
     return [
       'Periodically applies ',
       level,
-      ' stacks of Critical Decay to the enemy. Period ranges from',
+      ' stacks of Armor Decay to the enemy. Period ranges from',
       5,
       ' seconds to ',
       0.2,
@@ -29,20 +29,20 @@ export default createEffectCardSource({
     ];
   },
   load(game, player, level) {
-    log(`Setting up Card 010 for ${player.name}`);
+    log(`Setting up Card 102 for ${player.name}`);
     game.on(EventType.Start, EventPriority.Post, () => {
       let elapsed = 0;
-      let period = getCard010Period(player.speedStacks);
+      let period = getCard102Period(player.speedStacks);
 
       const cleanup = createTick(() => {
         // Calculate period
         elapsed += FRAME_DURATION;
         if (elapsed >= period) {
           elapsed -= period;
-          period = getCard010Period(player.speedStacks);
+          period = getCard102Period(player.speedStacks);
 
           game.triggerDebuff(
-            EventType.RemoveCritical,
+            EventType.RemoveArmor,
             player,
             game.getOppositePlayer(player),
             level,

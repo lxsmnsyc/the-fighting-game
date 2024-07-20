@@ -8,12 +8,12 @@ const MIN_PERIOD = 5000;
 const MAX_PERIOD = 200;
 const MAX_SPEED = 750;
 
-function getCard009Period(speed: number): number {
+function getCard103Period(speed: number): number {
   return lerp(MIN_PERIOD, MAX_PERIOD, Math.min(speed / MAX_SPEED, 1));
 }
 
 export default createEffectCardSource({
-  name: 'Card #009',
+  name: 'Card #103',
   tier: 1,
   getDescription(level) {
     return [
@@ -29,17 +29,17 @@ export default createEffectCardSource({
     ];
   },
   load(game, player, level) {
-    log(`Setting up Card 009 for ${player.name}`);
+    log(`Setting up Card 103 for ${player.name}`);
     game.on(EventType.Start, EventPriority.Post, () => {
       let elapsed = 0;
-      let period = getCard009Period(player.speedStacks);
+      let period = getCard103Period(player.speedStacks);
 
       const cleanup = createTick(() => {
         // Calculate period
         elapsed += FRAME_DURATION;
         if (elapsed >= period) {
           elapsed -= period;
-          period = getCard009Period(player.speedStacks);
+          period = getCard103Period(player.speedStacks);
 
           game.triggerDebuff(
             EventType.RemoveEvasion,
