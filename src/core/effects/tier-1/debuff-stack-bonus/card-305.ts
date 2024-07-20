@@ -3,20 +3,14 @@ import { log } from '../../../log';
 import { DebuffPriority } from '../../../priorities';
 
 export default createEffectCardSource({
-  name: 'Card #020',
+  name: 'Card #305',
   tier: 1,
   getDescription(level) {
-    return [
-      'Increases ',
-      'Evasion Decay',
-      ' stacks applied by ',
-      5 * level,
-      ' points.',
-    ];
+    return ['Increases ', 'Slow', ' stacks applied by ', 5 * level, ' points.'];
   },
   load(game, player, level) {
-    log(`Setting up Card 020 for ${player.name}`);
-    game.on(EventType.RemoveEvasion, DebuffPriority.Additive, event => {
+    log(`Setting up Card 305 for ${player.name}`);
+    game.on(EventType.RemoveSpeed, DebuffPriority.Additive, event => {
       if (event.source === player) {
         event.amount += 5 * level;
       }
