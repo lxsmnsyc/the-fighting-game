@@ -1,20 +1,86 @@
-import { EventType, type Game } from '../game';
+import { EventType, type Game, Stat } from '../game';
 import { log } from '../log';
-import { BuffPriority, DebuffPriority } from '../priorities';
+import { StatPriority } from '../priorities';
 
 export function setupManaMechanics(game: Game): void {
   log('Setting up Mana mechanics.');
-  game.on(EventType.AddMana, BuffPriority.Exact, event => {
-    log(`${event.source.name} gained ${event.amount} of Mana`);
-    event.source.mana = Math.min(
-      event.source.maxMana,
-      event.source.mana + event.amount,
-    );
+  game.on(EventType.SetStat, StatPriority.Exact, event => {
+    if (event.type === Stat.Mana) {
+      log(`${event.source.name}'s Mana changed to ${event.amount}`);
+      event.source.stats[Stat.Mana] = Math.max(0, event.amount);
+    }
   });
 
-  game.on(EventType.RemoveMana, DebuffPriority.Exact, event => {
-    const deduction = Math.min(event.target.mana, event.amount);
-    log(`${event.target.name} lost ${deduction} of Mana`);
-    event.target.mana -= deduction;
+  game.on(EventType.AddStat, StatPriority.Exact, event => {
+    if (event.type === Stat.Mana) {
+      log(`${event.source.name} gained ${event.amount} of Mana`);
+
+      game.setStat(
+        Stat.Mana,
+        event.source,
+        event.source.stats[Stat.Mana] + event.amount,
+      );
+    }
+  });
+
+  game.on(EventType.RemoveStat, StatPriority.Exact, event => {
+    if (event.type === Stat.Mana) {
+      log(`${event.target.name} lost ${event.amount} of Mana`);
+
+      game.setStat(
+        Stat.Mana,
+        event.target,
+        event.target.stats[Stat.Mana] - event.amount,
+      );
+    }
+  });
+
+  log('Setting up Max Mana mechanics.');
+  game.on(EventType.SetStat, StatPriority.Exact, event => {
+    if (event.type === Stat.MaxMana) {
+      log(`${event.source.name}'s MaxMana changed to ${event.amount}`);
+      event.source.stats[Stat.MaxMana] = Math.max(1, event.amount);
+    }
+  });
+
+  game.on(EventType.AddStat, StatPriority.Exact, event => {
+    if (event.type === Stat.MaxMana) {
+      log(`${event.source.name} gained ${event.amount} of Max Mana`);
+      // Get the current health percentage
+      const currentMana =
+        event.source.stats[Stat.Mana] / event.source.stats[Stat.MaxMana];
+
+      game.setStat(
+        Stat.MaxMana,
+        event.source,
+        event.source.stats[Stat.MaxMana] + event.amount,
+      );
+      // Rescale
+      game.setStat(
+        Stat.Mana,
+        event.source,
+        currentMana * event.source.stats[Stat.MaxMana],
+      );
+    }
+  });
+
+  game.on(EventType.RemoveStat, StatPriority.Exact, event => {
+    if (event.type === Stat.MaxMana) {
+      log(`${event.target.name} lost ${event.amount} of Max Mana`);
+      // Get the current health percentage
+      const currentMana =
+        event.source.stats[Stat.Mana] / event.source.stats[Stat.MaxMana];
+      game.setStat(
+        Stat.MaxMana,
+        event.source,
+        event.source.stats[Stat.MaxMana] - event.amount,
+      );
+      // Rescale
+      game.setStat(
+        Stat.Mana,
+        event.source,
+        currentMana * event.source.stats[Stat.MaxMana],
+      );
+    }
   });
 }
