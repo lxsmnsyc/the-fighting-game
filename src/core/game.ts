@@ -71,7 +71,7 @@ export const enum Stat {
 }
 
 export const enum Stack {
-  Poison = 1,
+  Cure = 1,
   Armor = 2,
   Speed = 3,
   Critical = 4,
@@ -90,7 +90,7 @@ export interface PlayerStats {
 }
 
 export interface PlayerStacks {
-  [Stack.Poison]: number;
+  [Stack.Cure]: number;
   [Stack.Armor]: number;
   [Stack.Speed]: number;
   [Stack.Critical]: number;
@@ -112,7 +112,7 @@ export class Player {
 
   // Stacks
   stacks: PlayerStacks = {
-    [Stack.Poison]: 0,
+    [Stack.Cure]: 0,
     [Stack.Armor]: 0,
     [Stack.Speed]: 0,
     [Stack.Critical]: 0,
@@ -169,7 +169,7 @@ export const ADD_STACK_NAME: Record<Stack, string> = {
   [Stack.Critical]: 'Critical',
   [Stack.Evasion]: 'Evasion',
   [Stack.Luck]: 'Luck',
-  [Stack.Poison]: 'Poison',
+  [Stack.Cure]: 'Cure',
   [Stack.Speed]: 'Speed',
 };
 
@@ -178,7 +178,7 @@ export const REMOVE_STACK_NAME: Record<Stack, string> = {
   [Stack.Critical]: 'Critical Decay',
   [Stack.Evasion]: 'Evasion Decay',
   [Stack.Luck]: 'Curse',
-  [Stack.Poison]: 'Cure',
+  [Stack.Cure]: 'Poison',
   [Stack.Speed]: 'Slow',
 };
 
