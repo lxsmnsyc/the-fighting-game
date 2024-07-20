@@ -42,8 +42,8 @@ export function setupArmorMechanics(game: Game): void {
       log(`${event.target.name} lost ${event.amount} stacks of Armor`);
       game.setStack(
         Stack.Armor,
-        event.source,
-        event.source.stacks[Stack.Armor] - event.amount,
+        event.target,
+        event.target.stacks[Stack.Armor] - event.amount,
       );
     }
   });
