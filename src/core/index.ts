@@ -2,13 +2,14 @@ import { EventType, type Game } from './game';
 import { log } from './log';
 import { setupAbilityMechanics } from './mechanics/ability';
 import { setupArmorMechanics } from './mechanics/armor';
+import { setupAttackMechanics } from './mechanics/attack';
 import { setupCriticalMechanics } from './mechanics/critical';
+import { setupCureMechanics } from './mechanics/cure';
 import { setupDamageMechanics } from './mechanics/damage';
 import { setupEvasionMechanics } from './mechanics/evasion';
 import { setupHealthMechanics } from './mechanics/health';
 import { setupLuckMechanics } from './mechanics/luck';
 import { setupManaMechanics } from './mechanics/mana';
-import { setupPoisonMechanics } from './mechanics/poison';
 import { setupSpeedMechanics } from './mechanics/speed';
 import { EventPriority } from './priorities';
 
@@ -24,17 +25,17 @@ export function setupGame(game: Game): void {
     // Health and Mana
     setupHealthMechanics(game);
     setupManaMechanics(game);
-    // Luck
+    // Other stats
+    setupAttackMechanics(game);
+    // Stacks
     setupLuckMechanics(game);
+    setupSpeedMechanics(game);
+    setupCureMechanics(game);
     // Damage
     setupDamageMechanics(game);
     setupEvasionMechanics(game);
     setupCriticalMechanics(game);
     setupArmorMechanics(game);
-    // Speed and Slow
-    setupSpeedMechanics(game);
-    // Poison
-    setupPoisonMechanics(game);
 
     game.playerA.load(game);
     game.playerB.load(game);
