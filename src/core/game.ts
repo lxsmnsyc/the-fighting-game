@@ -22,7 +22,7 @@ export const enum DamageType {
 
 export interface EffectCardSource {
   name: string;
-  tier: 1 | 2 | 3;
+  tier: number;
   load: (game: Game, player: Player, level: number) => void;
   getDescription: (level: number) => (string | number)[];
 }
@@ -137,6 +137,26 @@ export const enum EventType {
   RemoveLuck = 23,
 }
 
+export type BuffEventType =
+  | EventType.AddHealth
+  | EventType.AddMana
+  | EventType.AddArmor
+  | EventType.AddSpeed
+  | EventType.AddEvasion
+  | EventType.AddCritical
+  | EventType.RemovePoison
+  | EventType.AddLuck;
+
+export type DebuffEventType =
+  | EventType.AddPoison
+  | EventType.RemoveHealth
+  | EventType.RemoveMana
+  | EventType.RemoveArmor
+  | EventType.RemoveSpeed
+  | EventType.RemoveEvasion
+  | EventType.RemoveCritical
+  | EventType.RemoveLuck;
+
 export interface BaseEvent {}
 
 export interface PlayerEvent extends BaseEvent {
@@ -194,24 +214,6 @@ export interface EndGameEvent extends BaseEvent {
   winner: Player;
   loser: Player;
 }
-
-export type BuffEventType =
-  | EventType.AddHealth
-  | EventType.AddMana
-  | EventType.AddArmor
-  | EventType.AddSpeed
-  | EventType.AddEvasion
-  | EventType.AddCritical
-  | EventType.RemovePoison;
-
-export type DebuffEventType =
-  | EventType.AddPoison
-  | EventType.RemoveHealth
-  | EventType.RemoveMana
-  | EventType.RemoveArmor
-  | EventType.RemoveSpeed
-  | EventType.RemoveEvasion
-  | EventType.RemoveCritical;
 
 export type GameEvents = {
   [EventType.Close]: BaseEvent;
