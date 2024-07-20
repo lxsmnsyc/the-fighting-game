@@ -1,7 +1,7 @@
 import { DamageType, EventType, type Game, Stack, Stat } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
-import { BuffPriority, DamagePriority, DebuffPriority } from '../priorities';
+import { DamagePriority, StackPriority, StatPriority } from '../priorities';
 
 const MIN_CRITICAL_CHANCE = 0;
 const MAX_CRITICAL_CHANCE = 100;
@@ -59,14 +59,14 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.SetStack, BuffPriority.Exact, event => {
+  game.on(EventType.SetStack, StackPriority.Exact, event => {
     if (event.type === Stack.Critical) {
       log(`${event.source.name}'s Critical stacks changed to ${event.amount}`);
       event.source.stacks[Stack.Critical] = event.amount;
     }
   });
 
-  game.on(EventType.AddStack, BuffPriority.Exact, event => {
+  game.on(EventType.AddStack, StackPriority.Exact, event => {
     if (event.type === Stack.Critical) {
       log(`${event.source.name} gained ${event.amount} stacks of Critical`);
       game.setStack(
@@ -77,7 +77,7 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStack, DebuffPriority.Exact, event => {
+  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Critical) {
       log(`${event.target.name} lost ${event.amount} stacks of Critical`);
       game.setStack(
@@ -89,7 +89,7 @@ export function setupCriticalMechanics(game: Game): void {
   });
 
   log('Setting up Critical Multiplier mechanics.');
-  game.on(EventType.SetStat, BuffPriority.Exact, event => {
+  game.on(EventType.SetStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
       log(
         `${event.source.name}'s Critical Multiplier changed to ${event.amount}`,
@@ -98,7 +98,7 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.AddStat, BuffPriority.Exact, event => {
+  game.on(EventType.AddStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
       log(
         `${event.source.name} gained ${event.amount} stacks of Critical Multiplier`,
@@ -111,7 +111,7 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStat, DebuffPriority.Exact, event => {
+  game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
       log(
         `${event.target.name} lost ${event.amount} stacks of Critical Multiplier`,
