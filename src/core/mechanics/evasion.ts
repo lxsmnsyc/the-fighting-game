@@ -1,7 +1,7 @@
-import { DamageType, EventType, type Game } from '../game';
+import { DamageType, EventType, type Game, Stack } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
-import { BuffPriority, DamagePriority, DebuffPriority } from '../priorities';
+import { DamagePriority, StatPriority } from '../priorities';
 
 const MIN_EVASION_CHANCE = 0;
 const MAX_EVASION_CHANCE = 100;
@@ -23,41 +23,65 @@ export function setupEvasionMechanics(game: Game): void {
       return;
     }
     // Check if player can evade it
-    if (event.type === DamageType.Attack && event.target.evasionStacks !== 0) {
+    if (
+      event.type === DamageType.Attack &&
+      event.target.stacks[Stack.Evasion] !== 0
+    ) {
       // If there's an evasion stack
-      if (event.target.evasionStacks > 0) {
+      if (event.target.stacks[Stack.Evasion] > 0) {
         // Calculat evasion chance
-        const currentEvasion = getEvasionChance(event.target.evasionStacks);
+        const currentEvasion = getEvasionChance(
+          event.target.stacks[Stack.Evasion],
+        );
         // Push your luck
         const random = Math.random() * 100;
         if (random <= currentEvasion) {
           log(`${event.target.name} dodged ${event.amount} of damage.`);
           event.flags.missed = true;
 
-          const consumable =
-            (event.target.evasionStacks * CONSUMABLE_EVASION_STACKS) | 0;
-          game.triggerDebuff(
-            EventType.RemoveEvasion,
+          game.removeStack(
+            Stack.Evasion,
             event.source,
             event.target,
-            consumable,
+            event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
           );
         }
       } else {
-        const consumable =
-          (event.target.evasionStacks * CONSUMABLE_EVASION_STACKS) | 0;
-        game.triggerBuff(EventType.AddEvasion, event.source, -consumable);
+        game.addStack(
+          Stack.Evasion,
+          event.target,
+          -event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
+        );
       }
     }
   });
 
-  game.on(EventType.AddEvasion, BuffPriority.Exact, event => {
-    log(`${event.source.name} gained ${event.amount} stacks of Evasion`);
-    event.source.evasionStacks += event.amount;
+  game.on(EventType.SetStack, StatPriority.Exact, event => {
+    if (event.type === Stack.Evasion) {
+      log(`${event.source.name}'s Evasion changed to ${event.amount}`);
+      event.source.stacks[Stack.Evasion] = event.amount;
+    }
   });
 
-  game.on(EventType.RemoveEvasion, DebuffPriority.Exact, event => {
-    log(`${event.target.name} lost ${event.amount} stacks of Evasion`);
-    event.target.evasionStacks -= event.amount;
+  game.on(EventType.AddStack, StatPriority.Exact, event => {
+    if (event.type === Stack.Evasion) {
+      log(`${event.source.name} gained ${event.amount} stacks of Evasion`);
+      game.setStack(
+        Stack.Evasion,
+        event.source,
+        event.source.stacks[Stack.Evasion] + event.amount,
+      );
+    }
+  });
+
+  game.on(EventType.RemoveStack, StatPriority.Exact, event => {
+    if (event.type === Stack.Evasion) {
+      log(`${event.target.name} lost ${event.amount} stacks of Evasion`);
+      game.setStack(
+        Stack.Evasion,
+        event.target,
+        event.target.stacks[Stack.Evasion] - event.amount,
+      );
+    }
   });
 }
