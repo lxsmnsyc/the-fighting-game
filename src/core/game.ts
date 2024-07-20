@@ -73,9 +73,9 @@ export class Player {
 
   mana = 0;
 
-  attackDamage = 100;
+  attack = 100;
 
-  magicDamage = 0;
+  magic = 0;
 
   critMultiplier = DEFAULT_CRIT_MULTIPLIER;
 

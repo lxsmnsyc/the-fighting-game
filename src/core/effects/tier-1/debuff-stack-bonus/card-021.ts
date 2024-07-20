@@ -16,7 +16,7 @@ export default createEffectCardSource({
   },
   load(game, player, level) {
     log(`Setting up Card 021 for ${player.name}`);
-    game.on(EventType.RemoveCritical, DebuffPriority.Pre, event => {
+    game.on(EventType.RemoveCritical, DebuffPriority.Additive, event => {
       if (event.source === player) {
         event.amount += 5 * level;
       }

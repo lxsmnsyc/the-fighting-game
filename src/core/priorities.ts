@@ -1,13 +1,17 @@
 export const enum BuffPriority {
-  Pre = 1,
-  Exact = 2,
-  Post = 3,
+  Initial = 1,
+  Additive = 2,
+  Multiplicative = 3,
+  Exact = 4,
+  Post = 5,
 }
 
 export const enum DebuffPriority {
-  Pre = 1,
-  Exact = 2,
-  Post = 3,
+  Initial = 1,
+  Additive = 2,
+  Multiplicative = 3,
+  Exact = 4,
+  Post = 5,
 }
 
 export const enum DamagePriority {

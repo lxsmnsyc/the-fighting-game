@@ -16,7 +16,7 @@ export default createEffectCardSource({
   },
   load(game, player, level) {
     log(`Setting up Card 018 for ${player.name}`);
-    game.on(EventType.AddPoison, DebuffPriority.Pre, event => {
+    game.on(EventType.AddPoison, DebuffPriority.Additive, event => {
       if (event.source === player) {
         event.amount += 5 * level;
       }

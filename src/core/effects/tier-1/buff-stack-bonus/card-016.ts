@@ -10,7 +10,7 @@ export default createEffectCardSource({
   },
   load(game, player, level) {
     log(`Setting up Card 016 for ${player.name}`);
-    game.on(EventType.AddSpeed, BuffPriority.Pre, event => {
+    game.on(EventType.AddSpeed, BuffPriority.Additive, event => {
       if (event.source === player) {
         event.amount += 5 * level;
       }
