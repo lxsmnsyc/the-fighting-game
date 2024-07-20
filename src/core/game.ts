@@ -1,8 +1,8 @@
 import { EventEmitter, type EventEmitterListener } from './event-emitter';
 
-const DEFAULT_HEALTH = 1000;
+const DEFAULT_MAX_HEALTH = 1000;
 
-const DEFAULT_MANA_POOL = 100;
+const DEFAULT_MAX_MANA = 100;
 
 const DEFAULT_CRIT_MULTIPLIER = 2.0;
 
@@ -60,40 +60,64 @@ export function createAbilityCard(source: AbilityCard): AbilityCard {
   return source;
 }
 
+export const enum Stat {
+  MaxHealth = 1,
+  Health = 2,
+  MaxMana = 3,
+  Mana = 4,
+  Attack = 5,
+  Magic = 6,
+  CritMultiplier = 7,
+}
+
+export const enum Stack {
+  Poison = 1,
+  Armor = 2,
+  Speed = 3,
+  Critical = 4,
+  Evasion = 5,
+  Luck = 6,
+}
+
+export interface PlayerStats {
+  [Stat.MaxHealth]: number;
+  [Stat.Health]: number;
+  [Stat.MaxMana]: number;
+  [Stat.Mana]: number;
+  [Stat.Attack]: number;
+  [Stat.Magic]: number;
+  [Stat.CritMultiplier]: number;
+}
+
 export interface PlayerStacks {
-  poison: number;
-  armor: number;
-  speed: number;
-  critical: number;
-  evasion: number;
-  luck: number;
+  [Stack.Poison]: number;
+  [Stack.Armor]: number;
+  [Stack.Speed]: number;
+  [Stack.Critical]: number;
+  [Stack.Evasion]: number;
+  [Stack.Luck]: number;
 }
 
 export class Player {
-  maxHealth = DEFAULT_HEALTH;
-
-  maxMana = DEFAULT_MANA_POOL;
-
-  // Statuses
-  health = DEFAULT_HEALTH;
-
-  mana = 0;
-
-  attack = 100;
-
-  magic = 0;
-
-  critMultiplier = DEFAULT_CRIT_MULTIPLIER;
+  // Stats
+  stats: PlayerStats = {
+    [Stat.MaxHealth]: DEFAULT_MAX_HEALTH,
+    [Stat.Health]: DEFAULT_MAX_HEALTH,
+    [Stat.MaxMana]: DEFAULT_MAX_MANA,
+    [Stat.Mana]: 0,
+    [Stat.Attack]: 20,
+    [Stat.Magic]: 20,
+    [Stat.CritMultiplier]: DEFAULT_CRIT_MULTIPLIER,
+  };
 
   // Stacks
-
   stacks: PlayerStacks = {
-    poison: 0,
-    armor: 0,
-    speed: 0,
-    critical: 0,
-    evasion: 0,
-    luck: 0,
+    [Stack.Poison]: 0,
+    [Stack.Armor]: 0,
+    [Stack.Speed]: 0,
+    [Stack.Critical]: 0,
+    [Stack.Evasion]: 0,
+    [Stack.Luck]: 0,
   };
 
   constructor(public name: string) {}
@@ -122,86 +146,38 @@ export const enum EventType {
   EndGame = 5,
   CastAbility = 6,
   Damage = 7,
-  AddHealth = 8,
-  RemoveHealth = 9,
-  AddMana = 10,
-  RemoveMana = 11,
-  AddPoison = 12,
-  RemovePoison = 13,
-  AddArmor = 14,
-  RemoveArmor = 15,
-  AddSpeed = 16,
-  RemoveSpeed = 17,
-  AddEvasion = 18,
-  RemoveEvasion = 19,
-  AddCritical = 20,
-  RemoveCritical = 21,
-  AddLuck = 22,
-  RemoveLuck = 23,
+  AddStack = 8,
+  RemoveStack = 9,
+  AddStat = 10,
+  RemoveStat = 11,
 }
 
-export type BuffEventType =
-  | EventType.AddHealth
-  | EventType.AddMana
-  | EventType.AddArmor
-  | EventType.AddSpeed
-  | EventType.AddEvasion
-  | EventType.AddCritical
-  | EventType.RemovePoison
-  | EventType.AddLuck;
-
-export type DebuffEventType =
-  | EventType.AddPoison
-  | EventType.RemoveHealth
-  | EventType.RemoveMana
-  | EventType.RemoveArmor
-  | EventType.RemoveSpeed
-  | EventType.RemoveEvasion
-  | EventType.RemoveCritical
-  | EventType.RemoveLuck;
-
-export const BUFF_NAME: Record<BuffEventType, string> = {
-  [EventType.RemovePoison]: 'Cure',
-  [EventType.AddHealth]: 'Health',
-  [EventType.AddMana]: 'Mana',
-  [EventType.AddArmor]: 'Armor',
-  [EventType.AddSpeed]: 'Speed',
-  [EventType.AddEvasion]: 'Evasion',
-  [EventType.AddCritical]: 'Critical',
-  [EventType.AddLuck]: 'Luck',
+export const STAT_NAME: Record<Stat, string> = {
+  [Stat.Health]: 'Health',
+  [Stat.Mana]: 'Mana',
+  [Stat.MaxHealth]: 'Max Health',
+  [Stat.MaxMana]: 'Max Mana',
+  [Stat.Attack]: 'Attack',
+  [Stat.Magic]: 'Magic',
+  [Stat.CritMultiplier]: 'Critical Multiplier',
 };
 
-export const DEBUFF_NAME: Record<DebuffEventType, string> = {
-  [EventType.AddPoison]: 'Poison',
-  [EventType.RemoveHealth]: 'Health Loss',
-  [EventType.RemoveMana]: 'Mana Loss',
-  [EventType.RemoveArmor]: 'Armor Decay',
-  [EventType.RemoveSpeed]: 'Slow',
-  [EventType.RemoveEvasion]: 'Evasion Decay',
-  [EventType.RemoveCritical]: 'Critical Decay',
-  [EventType.RemoveLuck]: 'Curse',
+export const ADD_STACK_NAME: Record<Stack, string> = {
+  [Stack.Armor]: 'Armor',
+  [Stack.Critical]: 'Critical',
+  [Stack.Evasion]: 'Evasion',
+  [Stack.Luck]: 'Luck',
+  [Stack.Poison]: 'Poison',
+  [Stack.Speed]: 'Speed',
 };
 
-export const BUFF_STACKS: Record<BuffEventType, boolean> = {
-  [EventType.RemovePoison]: true,
-  [EventType.AddHealth]: false,
-  [EventType.AddMana]: false,
-  [EventType.AddArmor]: true,
-  [EventType.AddSpeed]: true,
-  [EventType.AddEvasion]: true,
-  [EventType.AddCritical]: true,
-  [EventType.AddLuck]: true,
-};
-
-export const DEBUFF_STACKS: Record<DebuffEventType, boolean> = {
-  [EventType.AddPoison]: true,
-  [EventType.RemoveHealth]: false,
-  [EventType.RemoveMana]: false,
-  [EventType.RemoveArmor]: true,
-  [EventType.RemoveSpeed]: true,
-  [EventType.RemoveEvasion]: true,
-  [EventType.RemoveCritical]: true,
-  [EventType.RemoveLuck]: true,
+export const REMOVE_STACK_NAME: Record<Stack, string> = {
+  [Stack.Armor]: 'Armor Decay',
+  [Stack.Critical]: 'Critical Decay',
+  [Stack.Evasion]: 'Evasion Decay',
+  [Stack.Luck]: 'Curse',
+  [Stack.Poison]: 'Cure',
+  [Stack.Speed]: 'Slow',
 };
 
 export interface BaseEvent {}
@@ -239,22 +215,54 @@ function createDamageEvent(
   return { type, source, target, amount, flags };
 }
 
-export interface BuffEvent extends PlayerValueEvent {}
-
-function createBuffEvent(source: Player, amount: number): BuffEvent {
-  return { source, amount };
+export interface AddStackEvent extends PlayerValueEvent {
+  type: Stack;
 }
 
-export interface DebuffEvent extends PlayerValueEvent {
+function createAddStackEvent(
+  type: Stack,
+  source: Player,
+  amount: number,
+): AddStackEvent {
+  return { type, source, amount };
+}
+
+export interface RemoveStackEvent extends AddStackEvent {
   target: Player;
 }
 
-function createDebuffEvent(
+function createRemoveStackEvent(
+  type: Stack,
   source: Player,
   target: Player,
   amount: number,
-): DebuffEvent {
-  return { source, target, amount };
+): RemoveStackEvent {
+  return { type, source, target, amount };
+}
+
+export interface AddStatEvent extends PlayerValueEvent {
+  type: Stat;
+}
+
+function createAddStatEvent(
+  type: Stat,
+  source: Player,
+  amount: number,
+): AddStatEvent {
+  return { type, source, amount };
+}
+
+export interface RemoveStatEvent extends AddStatEvent {
+  target: Player;
+}
+
+function createRemoveStatEvent(
+  type: Stat,
+  source: Player,
+  target: Player,
+  amount: number,
+): RemoveStatEvent {
+  return { type, source, target, amount };
 }
 
 export interface EndGameEvent extends BaseEvent {
@@ -282,22 +290,10 @@ export type GameEvents = {
   // Event for when a player deals damage
   [EventType.Damage]: DamageEvent;
 
-  [EventType.AddHealth]: BuffEvent;
-  [EventType.RemoveHealth]: DebuffEvent;
-  [EventType.AddMana]: BuffEvent;
-  [EventType.RemoveMana]: DebuffEvent;
-  [EventType.AddPoison]: DebuffEvent;
-  [EventType.RemovePoison]: BuffEvent;
-  [EventType.AddArmor]: BuffEvent;
-  [EventType.RemoveArmor]: DebuffEvent;
-  [EventType.AddSpeed]: BuffEvent;
-  [EventType.RemoveSpeed]: DebuffEvent;
-  [EventType.AddEvasion]: BuffEvent;
-  [EventType.RemoveEvasion]: DebuffEvent;
-  [EventType.AddCritical]: BuffEvent;
-  [EventType.RemoveCritical]: DebuffEvent;
-  [EventType.AddLuck]: BuffEvent;
-  [EventType.RemoveLuck]: DebuffEvent;
+  [EventType.AddStack]: AddStackEvent;
+  [EventType.RemoveStack]: RemoveStackEvent;
+  [EventType.AddStat]: AddStatEvent;
+  [EventType.RemoveStat]: RemoveStatEvent;
 
   [EventType.EndGame]: EndGameEvent;
 };
@@ -315,22 +311,10 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.EndGame]: new EventEmitter(),
     [EventType.CastAbility]: new EventEmitter(),
     [EventType.Damage]: new EventEmitter(),
-    [EventType.AddHealth]: new EventEmitter(),
-    [EventType.RemoveHealth]: new EventEmitter(),
-    [EventType.AddMana]: new EventEmitter(),
-    [EventType.RemoveMana]: new EventEmitter(),
-    [EventType.AddPoison]: new EventEmitter(),
-    [EventType.RemovePoison]: new EventEmitter(),
-    [EventType.AddArmor]: new EventEmitter(),
-    [EventType.RemoveArmor]: new EventEmitter(),
-    [EventType.AddSpeed]: new EventEmitter(),
-    [EventType.RemoveSpeed]: new EventEmitter(),
-    [EventType.AddEvasion]: new EventEmitter(),
-    [EventType.RemoveEvasion]: new EventEmitter(),
-    [EventType.AddCritical]: new EventEmitter(),
-    [EventType.RemoveCritical]: new EventEmitter(),
-    [EventType.AddLuck]: new EventEmitter(),
-    [EventType.RemoveLuck]: new EventEmitter(),
+    [EventType.AddStack]: new EventEmitter(),
+    [EventType.RemoveStack]: new EventEmitter(),
+    [EventType.AddStat]: new EventEmitter(),
+    [EventType.RemoveStat]: new EventEmitter(),
   };
 }
 
@@ -390,15 +374,15 @@ export class Game {
     );
   }
 
-  triggerBuff(eventType: BuffEventType, source: Player, amount: number): void {
+  addStack(type: Stack, source: Player, amount: number): void {
     if (amount === 0) {
       return;
     }
-    this.emit(eventType, createBuffEvent(source, amount));
+    this.emit(EventType.AddStack, createAddStackEvent(type, source, amount));
   }
 
-  triggerDebuff(
-    eventType: DebuffEventType,
+  removeStack(
+    type: Stack,
     source: Player,
     target: Player,
     amount: number,
@@ -406,7 +390,27 @@ export class Game {
     if (amount === 0) {
       return;
     }
-    this.emit(eventType, createDebuffEvent(source, target, amount));
+    this.emit(
+      EventType.RemoveStack,
+      createRemoveStackEvent(type, source, target, amount),
+    );
+  }
+
+  addStat(type: Stat, source: Player, amount: number): void {
+    if (amount === 0) {
+      return;
+    }
+    this.emit(EventType.AddStat, createAddStatEvent(type, source, amount));
+  }
+
+  removeStat(type: Stat, source: Player, target: Player, amount: number): void {
+    if (amount === 0) {
+      return;
+    }
+    this.emit(
+      EventType.RemoveStat,
+      createRemoveStatEvent(type, source, target, amount),
+    );
   }
 
   getOppositePlayer(player: Player) {
