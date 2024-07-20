@@ -4,6 +4,5 @@ import createBuffStackBonusEffectCardSource from './template';
 export default createBuffStackBonusEffectCardSource({
   name: 'Card #206',
   tier: 1,
-  buffName: 'Critical',
-  buffType: EventType.AddCritical,
+  buff: EventType.AddCritical,
 });

@@ -1,4 +1,6 @@
 import {
+  BUFF_NAME,
+  BUFF_STACKS,
   type BuffEventType,
   type EffectCardSource,
   createEffectCardSource,
@@ -9,8 +11,7 @@ import { BuffPriority } from '../../priorities';
 export interface BuffStackBonusEffectCardSourceOptions {
   name: string;
   tier: number;
-  buffType: BuffEventType;
-  buffName: string;
+  buff: BuffEventType;
   gainMultiplier?: number;
 }
 
@@ -32,15 +33,15 @@ export default function createBuffStackBonusEffectCardSource(
     getDescription(level) {
       return [
         'Increases ',
-        current.buffName,
-        ' points gained by ',
+        BUFF_NAME[current.buff],
+        ` ${BUFF_STACKS[current.buff]} gained by `,
         getGain(level),
-        ' points.',
+        '.',
       ];
     },
     load(game, player, level) {
       log(`Setting up ${current.name} for ${player.name}`);
-      game.on(current.buffType, BuffPriority.Additive, event => {
+      game.on(current.buff, BuffPriority.Additive, event => {
         if (event.source === player) {
           event.amount += getGain(level);
         }
