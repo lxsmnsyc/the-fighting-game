@@ -1,4 +1,4 @@
-export const enum BuffPriority {
+export const enum StatPriority {
   Initial = 1,
   Additive = 2,
   Multiplicative = 3,
@@ -6,7 +6,7 @@ export const enum BuffPriority {
   Post = 5,
 }
 
-export const enum DebuffPriority {
+export const enum StackPriority {
   Initial = 1,
   Additive = 2,
   Multiplicative = 3,
