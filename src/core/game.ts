@@ -91,6 +91,8 @@ export class Player {
 
   evasionStacks = 0;
 
+  luckStacks = 0;
+
   constructor(public name: string) {}
 
   load(game: Game) {
@@ -131,6 +133,8 @@ export const enum EventType {
   RemoveEvasion = 19,
   AddCritical = 20,
   RemoveCritical = 21,
+  AddLuck = 22,
+  RemoveLuck = 23,
 }
 
 export interface BaseEvent {}
@@ -243,6 +247,8 @@ export type GameEvents = {
   [EventType.RemoveEvasion]: DebuffEvent;
   [EventType.AddCritical]: BuffEvent;
   [EventType.RemoveCritical]: DebuffEvent;
+  [EventType.AddLuck]: BuffEvent;
+  [EventType.RemoveLuck]: DebuffEvent;
 
   [EventType.EndGame]: EndGameEvent;
 };
@@ -274,6 +280,8 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.RemoveEvasion]: new EventEmitter(),
     [EventType.AddCritical]: new EventEmitter(),
     [EventType.RemoveCritical]: new EventEmitter(),
+    [EventType.AddLuck]: new EventEmitter(),
+    [EventType.RemoveLuck]: new EventEmitter(),
   };
 }
 

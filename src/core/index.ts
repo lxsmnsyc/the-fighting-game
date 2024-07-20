@@ -1,11 +1,12 @@
 import { EventType, type Game } from './game';
 import { log } from './log';
 import { setupAbilityMechanics } from './mechanics/ability';
-import { setupEvasionMechanics } from './mechanics/evasion';
 import { setupArmorMechanics } from './mechanics/armor';
 import { setupCriticalMechanics } from './mechanics/critical';
 import { setupDamageMechanics } from './mechanics/damage';
+import { setupEvasionMechanics } from './mechanics/evasion';
 import { setupHealthMechanics } from './mechanics/health';
+import { setupLuckMechanics } from './mechanics/luck';
 import { setupManaMechanics } from './mechanics/mana';
 import { setupPoisonMechanics } from './mechanics/poison';
 import { setupSpeedMechanics } from './mechanics/speed';
@@ -23,6 +24,8 @@ export function setupGame(game: Game): void {
     // Health and Mana
     setupHealthMechanics(game);
     setupManaMechanics(game);
+    // Luck
+    setupLuckMechanics(game);
     // Damage
     setupDamageMechanics(game);
     setupEvasionMechanics(game);
