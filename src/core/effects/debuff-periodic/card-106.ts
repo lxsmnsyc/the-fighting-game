@@ -2,8 +2,8 @@ import { EventType } from '../../game';
 import createPeriodicDebuffEffectCardSource from './template';
 
 export default createPeriodicDebuffEffectCardSource({
-  name: 'Card #101',
+  name: 'Card #106',
   tier: 1,
-  debuffName: 'Poison',
-  debuffType: EventType.AddPoison,
+  debuffName: 'Curse',
+  debuffType: EventType.RemoveLuck,
 });
