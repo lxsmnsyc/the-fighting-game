@@ -1,7 +1,7 @@
 import { DamageType, EventType, type Game, Stack } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
-import { DamagePriority, StatPriority } from '../priorities';
+import { DamagePriority, StackPriority } from '../priorities';
 
 const MIN_EVASION_CHANCE = 0;
 const MAX_EVASION_CHANCE = 100;
@@ -56,14 +56,14 @@ export function setupEvasionMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.SetStack, StatPriority.Exact, event => {
+  game.on(EventType.SetStack, StackPriority.Exact, event => {
     if (event.type === Stack.Evasion) {
       log(`${event.source.name}'s Evasion changed to ${event.amount}`);
       event.source.stacks[Stack.Evasion] = event.amount;
     }
   });
 
-  game.on(EventType.AddStack, StatPriority.Exact, event => {
+  game.on(EventType.AddStack, StackPriority.Exact, event => {
     if (event.type === Stack.Evasion) {
       log(`${event.source.name} gained ${event.amount} stacks of Evasion`);
       game.setStack(
@@ -74,7 +74,7 @@ export function setupEvasionMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStack, StatPriority.Exact, event => {
+  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Evasion) {
       log(`${event.target.name} lost ${event.amount} stacks of Evasion`);
       game.setStack(
