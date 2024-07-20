@@ -150,6 +150,8 @@ export const enum EventType {
   RemoveStack = 9,
   AddStat = 10,
   RemoveStat = 11,
+  SetStack = 12,
+  SetStat = 13,
 }
 
 export const STAT_NAME: Record<Stat, string> = {
@@ -180,7 +182,9 @@ export const REMOVE_STACK_NAME: Record<Stack, string> = {
   [Stack.Speed]: 'Slow',
 };
 
-export interface BaseEvent {}
+export interface BaseEvent {
+  id: string;
+}
 
 export interface PlayerEvent extends BaseEvent {
   source: Player;
@@ -212,22 +216,31 @@ function createDamageEvent(
   amount: number,
   flags: DamageFlags,
 ): DamageEvent {
-  return { type, source, target, amount, flags };
+  return { id: 'DamageEvent', type, source, target, amount, flags };
 }
 
-export interface AddStackEvent extends PlayerValueEvent {
+export interface SetStackEvent extends PlayerValueEvent {
   type: Stack;
 }
+function createSetStackEvent(
+  type: Stack,
+  source: Player,
+  amount: number,
+): SetStackEvent {
+  return { id: 'SetStackEvent', type, source, amount };
+}
+
+export interface AddStackEvent extends SetStackEvent {}
 
 function createAddStackEvent(
   type: Stack,
   source: Player,
   amount: number,
 ): AddStackEvent {
-  return { type, source, amount };
+  return { id: 'AddStackEvent', type, source, amount };
 }
 
-export interface RemoveStackEvent extends AddStackEvent {
+export interface RemoveStackEvent extends SetStackEvent {
   target: Player;
 }
 
@@ -237,19 +250,28 @@ function createRemoveStackEvent(
   target: Player,
   amount: number,
 ): RemoveStackEvent {
-  return { type, source, target, amount };
+  return { id: 'RemoveStackEvent', type, source, target, amount };
 }
 
-export interface AddStatEvent extends PlayerValueEvent {
+export interface SetStatEvent extends PlayerValueEvent {
   type: Stat;
 }
+function createSetStatEvent(
+  type: Stat,
+  source: Player,
+  amount: number,
+): SetStatEvent {
+  return { id: 'SetStatEvent', type, source, amount };
+}
+
+export interface AddStatEvent extends SetStatEvent {}
 
 function createAddStatEvent(
   type: Stat,
   source: Player,
   amount: number,
 ): AddStatEvent {
-  return { type, source, amount };
+  return { id: 'AddStatEvent', type, source, amount };
 }
 
 export interface RemoveStatEvent extends AddStatEvent {
@@ -262,7 +284,7 @@ function createRemoveStatEvent(
   target: Player,
   amount: number,
 ): RemoveStatEvent {
-  return { type, source, target, amount };
+  return { id: 'RemoveStatEvent', type, source, target, amount };
 }
 
 export interface EndGameEvent extends BaseEvent {
@@ -295,6 +317,9 @@ export type GameEvents = {
   [EventType.AddStat]: AddStatEvent;
   [EventType.RemoveStat]: RemoveStatEvent;
 
+  [EventType.SetStat]: SetStatEvent;
+  [EventType.SetStack]: SetStackEvent;
+
   [EventType.EndGame]: EndGameEvent;
 };
 
@@ -315,6 +340,8 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.RemoveStack]: new EventEmitter(),
     [EventType.AddStat]: new EventEmitter(),
     [EventType.RemoveStat]: new EventEmitter(),
+    [EventType.SetStat]: new EventEmitter(),
+    [EventType.SetStack]: new EventEmitter(),
   };
 }
 
@@ -339,23 +366,23 @@ export class Game {
   }
 
   prepare(): void {
-    this.emit(EventType.Prepare, {});
+    this.emit(EventType.Prepare, { id: 'PrepareEvent' });
   }
 
   setup(): void {
-    this.emit(EventType.Setup, {});
+    this.emit(EventType.Setup, { id: 'SetupEvent' });
   }
 
   start(): void {
-    this.emit(EventType.Start, {});
+    this.emit(EventType.Start, { id: 'StartEvent' });
   }
 
   close(): void {
-    this.emit(EventType.Close, {});
+    this.emit(EventType.Close, { id: 'CloseEvent' });
   }
 
   CastAbility(source: Player): void {
-    this.emit(EventType.CastAbility, { source });
+    this.emit(EventType.CastAbility, { id: 'CastAbilityEvent', source });
   }
 
   dealDamage(
@@ -372,6 +399,10 @@ export class Game {
       EventType.Damage,
       createDamageEvent(type, source, target, amount, flags),
     );
+  }
+
+  setStack(type: Stack, source: Player, amount: number): void {
+    this.emit(EventType.SetStack, createSetStackEvent(type, source, amount));
   }
 
   addStack(type: Stack, source: Player, amount: number): void {
@@ -394,6 +425,10 @@ export class Game {
       EventType.RemoveStack,
       createRemoveStackEvent(type, source, target, amount),
     );
+  }
+
+  setStat(type: Stat, source: Player, amount: number): void {
+    this.emit(EventType.SetStat, createSetStatEvent(type, source, amount));
   }
 
   addStat(type: Stat, source: Player, amount: number): void {
@@ -421,6 +456,6 @@ export class Game {
   }
 
   endGame(winner: Player, loser: Player): void {
-    this.emit(EventType.EndGame, { winner, loser });
+    this.emit(EventType.EndGame, { id: 'EndGameEvent', winner, loser });
   }
 }
