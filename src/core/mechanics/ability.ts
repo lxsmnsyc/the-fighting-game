@@ -14,11 +14,6 @@ export function setupAbilityMechanics(game: Game): void {
   });
 
   game.on(EventType.CastAbility, EventPriority.Exact, event => {
-    game.removeStat(
-      Stat.Mana,
-      event.source,
-      event.source,
-      event.source.stats[Stat.MaxMana],
-    );
+    game.setStat(Stat.Mana, event.source, 0);
   });
 }
