@@ -1,7 +1,7 @@
-import { EventType, type Game } from '../game';
+import { EventType, type Game, Stack } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
-import { BuffPriority, DebuffPriority } from '../priorities';
+import { StackPriority } from '../priorities';
 
 const MIN_CRITICAL_CHANCE = 0;
 const MAX_CRITICAL_CHANCE = 100;
@@ -34,13 +34,32 @@ export function getLuckData(stack: number): LuckData {
 
 export function setupLuckMechanics(game: Game): void {
   log('Setting up Luck mechanics.');
-  game.on(EventType.AddLuck, BuffPriority.Exact, event => {
-    log(`${event.source.name} gained ${event.amount} stacks of Luck`);
-    event.source.stacks.luck += event.amount;
+  game.on(EventType.SetStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Luck) {
+      log(`${event.source.name}'s Luck changed to ${event.amount}`);
+      event.source.stacks[Stack.Luck] = event.amount;
+    }
   });
 
-  game.on(EventType.RemoveLuck, DebuffPriority.Exact, event => {
-    log(`${event.target.name} lost ${event.amount} stacks of Luck`);
-    event.target.stacks.luck -= event.amount;
+  game.on(EventType.AddStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Luck) {
+      log(`${event.source.name} gained ${event.amount} stacks of Luck`);
+      game.setStack(
+        Stack.Luck,
+        event.source,
+        event.source.stacks[Stack.Luck] + event.amount,
+      );
+    }
+  });
+
+  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Luck) {
+      log(`${event.target.name} lost ${event.amount} stacks of Luck`);
+      game.setStack(
+        Stack.Luck,
+        event.target,
+        event.target.stacks[Stack.Luck] - event.amount,
+      );
+    }
   });
 }
