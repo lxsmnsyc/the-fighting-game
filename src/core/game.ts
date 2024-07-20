@@ -4,7 +4,7 @@ const DEFAULT_MAX_HEALTH = 1000;
 
 const DEFAULT_MAX_MANA = 100;
 
-const DEFAULT_CRIT_MULTIPLIER = 2.0;
+const DEFAULT_CRIT_MULTIPLIER = 200;
 
 export const enum DamageType {
   Magic = 1,

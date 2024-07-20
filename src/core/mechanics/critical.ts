@@ -36,7 +36,7 @@ export function setupCriticalMechanics(game: Game): void {
         // Push your luck
         const random = Math.random() * 100;
         if (random <= currentCriticalChance) {
-          event.amount *= event.source.stats[Stat.CritMultiplier];
+          event.amount *= event.source.stats[Stat.CritMultiplier] / 100;
           log(`${event.target.name} triggered a ${event.amount} of critical.`);
           event.flags.critical = true;
 
