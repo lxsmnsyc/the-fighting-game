@@ -1,22 +1,22 @@
-import { EventType, createEffectCardSource } from '../../../game';
-import { log } from '../../../log';
-import { DebuffPriority } from '../../../priorities';
+import { EventType, createEffectCardSource } from '../../game';
+import { log } from '../../log';
+import { DebuffPriority } from '../../priorities';
 
 export default createEffectCardSource({
-  name: 'Card #301',
+  name: 'Card #305',
   tier: 1,
   getDescription(level) {
     return [
       'Increases ',
-      'Poison',
+      'Curse',
       ' stacks applied by ',
       5 * level,
       ' points.',
     ];
   },
   load(game, player, level) {
-    log(`Setting up Card 301 for ${player.name}`);
-    game.on(EventType.AddPoison, DebuffPriority.Additive, event => {
+    log(`Setting up Card 305 for ${player.name}`);
+    game.on(EventType.RemoveLuck, DebuffPriority.Additive, event => {
       if (event.source === player) {
         event.amount += 5 * level;
       }
