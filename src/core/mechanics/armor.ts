@@ -19,17 +19,32 @@ export function setupArmorMechanics(game: Game): void {
     }
   });
 
+  game.on(EventType.SetStack, BuffPriority.Exact, event => {
+    if (event.type === Stack.Armor) {
+      log(`${event.source.name}'s Armor stacks changed to ${event.amount}`);
+      event.source.stacks[Stack.Armor] = event.amount;
+    }
+  });
+
   game.on(EventType.AddStack, BuffPriority.Exact, event => {
     if (event.type === Stack.Armor) {
       log(`${event.source.name} gained ${event.amount} stacks of Armor`);
-      event.source.stacks[Stack.Armor] += event.amount;
+      game.setStack(
+        Stack.Armor,
+        event.source,
+        event.source.stacks[Stack.Armor] + event.amount,
+      );
     }
   });
 
   game.on(EventType.RemoveStack, DebuffPriority.Exact, event => {
     if (event.type === Stack.Armor) {
       log(`${event.target.name} lost ${event.amount} stacks of Armor`);
-      event.source.stacks[Stack.Armor] -= event.amount;
+      game.setStack(
+        Stack.Armor,
+        event.source,
+        event.source.stacks[Stack.Armor] - event.amount,
+      );
     }
   });
 }
