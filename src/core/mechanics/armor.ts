@@ -12,7 +12,7 @@ export function setupArmorMechanics(game: Game): void {
       // Get 50% of the armor
       const currentArmor = event.target.stacks[Stack.Armor];
       if (currentArmor > 0) {
-        const consumable = (currentArmor * CONSUMABLE_ARMOR_STACKS) | 0;
+        const consumable = currentArmor * CONSUMABLE_ARMOR_STACKS;
         event.amount -= consumable;
         game.removeStack(Stack.Armor, event.source, event.target, consumable);
       }
