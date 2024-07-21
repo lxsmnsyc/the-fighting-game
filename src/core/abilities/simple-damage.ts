@@ -14,10 +14,7 @@ export default createAbilityCardSource({
           player,
           game.getOppositePlayer(player),
           level * 50,
-          {
-            critical: false,
-            missed: false,
-          },
+          0,
         );
       }
     });

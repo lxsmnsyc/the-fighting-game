@@ -77,12 +77,7 @@ export function createPeriodicRemoveStackEffectCardSource(
           if (elapsed >= period) {
             elapsed -= period;
             period = getPeriod(player.stats[Stack.Speed]);
-            game.removeStack(
-              current.stack,
-              player,
-              game.getOppositePlayer(player),
-              getPeriodicLoss(level),
-            );
+            game.removeStack(current.stack, player, getPeriodicLoss(level));
           }
         });
       });
