@@ -1,3 +1,4 @@
+import { DamageType } from '../damage';
 import { DamageFlags } from '../damage-flags';
 import { EventType, type Game, Stack } from '../game';
 import { log } from '../log';
@@ -9,14 +10,21 @@ export function setupArmorMechanics(game: Game): void {
   log('Setting up Armor mechanics.');
   // Trigger Armor consumption when about to take damage.
   game.on(EventType.Damage, DamagePriority.Armor, event => {
-    if (!(event.flag & (DamageFlags.Missed | DamageFlags.Reduced))) {
-      // Get 50% of the armor
-      const currentArmor = event.target.stacks[Stack.Armor];
-      if (currentArmor > 0) {
-        event.amount = Math.max(0, event.amount - currentArmor);
-        event.flag |= DamageFlags.Reduced;
-        game.consumeStack(Stack.Armor, event.target);
-      }
+    if (event.flag & (DamageFlags.Missed | DamageFlags.Reduced)) {
+      return;
+    }
+    if (event.type === DamageType.Poison) {
+      return;
+    }
+    if (event.type === DamageType.Pure) {
+      return;
+    }
+    // Get 50% of the armor
+    const currentArmor = event.target.stacks[Stack.Armor];
+    if (currentArmor > 0) {
+      event.amount = Math.max(0, event.amount - currentArmor);
+      event.flag |= DamageFlags.Reduced;
+      game.consumeStack(Stack.Armor, event.target);
     }
   });
 
