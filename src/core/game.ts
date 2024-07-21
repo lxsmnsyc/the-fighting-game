@@ -349,6 +349,9 @@ export class Game {
   }
 
   emit<E extends EventType>(type: E, event: GameEvents[E]): void {
+    if (this.closed) {
+      return;
+    }
     this.emitters[type].emit(event);
   }
 
@@ -363,6 +366,8 @@ export class Game {
   start(): void {
     this.emit(EventType.Start, { id: 'StartEvent' });
   }
+
+  closed = false;
 
   close(): void {
     this.emit(EventType.Close, { id: 'CloseEvent' });

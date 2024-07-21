@@ -14,7 +14,7 @@ export default createAbilityCardSource({
           DamageType.Magic,
           player,
           game.getOppositePlayer(player),
-          level * 50,
+          level * 250,
           0,
         );
       }

@@ -15,7 +15,7 @@ export function setupTickMechanics(game: Game): void {
       let diff = current - elapsed;
       elapsed = current;
 
-      while (diff >= FPS_DURATION) {
+      while (diff >= FPS_DURATION && !game.closed) {
         game.tick(FPS_DURATION);
         diff -= FPS_DURATION;
       }

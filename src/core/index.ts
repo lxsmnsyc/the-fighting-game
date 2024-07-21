@@ -57,4 +57,9 @@ export function setupGame(game: Game): void {
   game.on(EventType.Start, EventPriority.Exact, () => {
     log('Game started.');
   });
+
+  game.on(EventType.Close, EventPriority.Exact, () => {
+    log('Game closed.');
+    game.closed = true;
+  });
 }
