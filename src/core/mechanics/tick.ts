@@ -20,7 +20,9 @@ export function setupTickMechanics(game: Game): void {
         diff -= FPS_DURATION;
       }
 
-      game.tick(diff);
+      if (diff > 0) {
+        elapsed -= diff;
+      }
     }
 
     game.on(EventType.Close, EventPriority.Pre, () => {
