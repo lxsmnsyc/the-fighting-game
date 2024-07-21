@@ -24,11 +24,11 @@ export function setupSpeedMechanics(game: Game): void {
 
   game.on(EventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Speed) {
-      log(`${event.target.name} lost ${event.amount} stacks of Speed`);
+      log(`${event.source.name} lost ${event.amount} stacks of Speed`);
       game.setStack(
         Stack.Speed,
-        event.target,
-        event.target.stacks[Stack.Speed] - event.amount,
+        event.source,
+        event.source.stacks[Stack.Speed] - event.amount,
       );
     }
   });

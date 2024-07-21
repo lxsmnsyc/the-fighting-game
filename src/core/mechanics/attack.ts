@@ -24,11 +24,11 @@ export function setupAttackMechanics(game: Game): void {
 
   game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.Attack) {
-      log(`${event.target.name} lost ${event.amount} of Attack`);
+      log(`${event.source.name} lost ${event.amount} of Attack`);
       game.setStat(
         Stat.Attack,
-        event.target,
-        event.target.stats[Stat.Attack] - event.amount,
+        event.source,
+        event.source.stats[Stat.Attack] - event.amount,
       );
     }
   });

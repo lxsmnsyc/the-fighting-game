@@ -25,12 +25,12 @@ export function setupManaMechanics(game: Game): void {
 
   game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.Mana) {
-      log(`${event.target.name} lost ${event.amount} of Mana`);
+      log(`${event.source.name} lost ${event.amount} of Mana`);
 
       game.setStat(
         Stat.Mana,
-        event.target,
-        event.target.stats[Stat.Mana] - event.amount,
+        event.source,
+        event.source.stats[Stat.Mana] - event.amount,
       );
     }
   });
@@ -66,7 +66,7 @@ export function setupManaMechanics(game: Game): void {
 
   game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.MaxMana) {
-      log(`${event.target.name} lost ${event.amount} of Max Mana`);
+      log(`${event.source.name} lost ${event.amount} of Max Mana`);
       // Get the current health percentage
       const currentMana =
         event.source.stats[Stat.Mana] / event.source.stats[Stat.MaxMana];

@@ -14,7 +14,7 @@ export function setupArmorMechanics(game: Game): void {
       if (currentArmor > 0) {
         const consumable = currentArmor * CONSUMABLE_ARMOR_STACKS;
         event.amount -= consumable;
-        game.removeStack(Stack.Armor, event.source, event.target, consumable);
+        game.removeStack(Stack.Armor, event.target, consumable);
       }
     }
   });
@@ -39,11 +39,11 @@ export function setupArmorMechanics(game: Game): void {
 
   game.on(EventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Armor) {
-      log(`${event.target.name} lost ${event.amount} stacks of Armor`);
+      log(`${event.source.name} lost ${event.amount} stacks of Armor`);
       game.setStack(
         Stack.Armor,
-        event.target,
-        event.target.stacks[Stack.Armor] - event.amount,
+        event.source,
+        event.source.stacks[Stack.Armor] - event.amount,
       );
     }
   });

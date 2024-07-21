@@ -9,7 +9,7 @@ export function setupDamageMechanics(game: Game): void {
       log(
         `${event.source.name} dealt ${event.amount} damage to ${event.target.name}`,
       );
-      game.removeStat(Stat.Health, event.source, event.target, event.amount);
+      game.removeStat(Stat.Health, event.target, event.amount);
     }
   });
 }

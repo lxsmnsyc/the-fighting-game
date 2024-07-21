@@ -24,11 +24,11 @@ export function setupMagicMechanics(game: Game): void {
 
   game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.Magic) {
-      log(`${event.target.name} lost ${event.amount} of Magic`);
+      log(`${event.source.name} lost ${event.amount} of Magic`);
       game.setStat(
         Stat.Magic,
-        event.target,
-        event.target.stats[Stat.Magic] - event.amount,
+        event.source,
+        event.source.stats[Stat.Magic] - event.amount,
       );
     }
   });

@@ -153,6 +153,7 @@ export const enum EventType {
   SetStack = 12,
   SetStat = 13,
   Tick = 14,
+  CureTick = 15,
 }
 
 export const STAT_NAME: Record<Stat, string> = {
@@ -235,32 +236,26 @@ function createSetStackEvent(
   return { id: 'SetStackEvent', type, source, amount };
 }
 
-export interface AddStackEvent extends SetStackEvent {}
-
 function createAddStackEvent(
   type: Stack,
   source: Player,
   amount: number,
-): AddStackEvent {
+): SetStackEvent {
   return { id: 'AddStackEvent', type, source, amount };
-}
-
-export interface RemoveStackEvent extends SetStackEvent {
-  target: Player;
 }
 
 function createRemoveStackEvent(
   type: Stack,
   source: Player,
-  target: Player,
   amount: number,
-): RemoveStackEvent {
-  return { id: 'RemoveStackEvent', type, source, target, amount };
+): SetStackEvent {
+  return { id: 'RemoveStackEvent', type, source, amount };
 }
 
 export interface SetStatEvent extends PlayerValueEvent {
   type: Stat;
 }
+
 function createSetStatEvent(
   type: Stat,
   source: Player,
@@ -269,33 +264,28 @@ function createSetStatEvent(
   return { id: 'SetStatEvent', type, source, amount };
 }
 
-export interface AddStatEvent extends SetStatEvent {}
-
-function createAddStatEvent(
+function createStatEvent(
   type: Stat,
   source: Player,
   amount: number,
-): AddStatEvent {
+): SetStatEvent {
   return { id: 'AddStatEvent', type, source, amount };
-}
-
-export interface RemoveStatEvent extends AddStatEvent {
-  target: Player;
 }
 
 function createRemoveStatEvent(
   type: Stat,
   source: Player,
-  target: Player,
   amount: number,
-): RemoveStatEvent {
-  return { id: 'RemoveStatEvent', type, source, target, amount };
+): SetStatEvent {
+  return { id: 'RemoveStatEvent', type, source, amount };
 }
 
 export interface EndGameEvent extends BaseEvent {
   winner: Player;
   loser: Player;
 }
+
+export interface CureTickEvent extends PlayerEvent {}
 
 export type GameEvents = {
   [EventType.Close]: BaseEvent;
@@ -317,16 +307,18 @@ export type GameEvents = {
   // Event for when a player deals damage
   [EventType.Damage]: DamageEvent;
 
-  [EventType.AddStack]: AddStackEvent;
-  [EventType.RemoveStack]: RemoveStackEvent;
-  [EventType.AddStat]: AddStatEvent;
-  [EventType.RemoveStat]: RemoveStatEvent;
-
   [EventType.SetStat]: SetStatEvent;
+  [EventType.AddStat]: SetStatEvent;
+  [EventType.RemoveStat]: SetStatEvent;
+
+  [EventType.AddStack]: SetStackEvent;
+  [EventType.RemoveStack]: SetStackEvent;
   [EventType.SetStack]: SetStackEvent;
 
   [EventType.EndGame]: EndGameEvent;
   [EventType.Tick]: TickEvent;
+
+  [EventType.CureTick]: CureTickEvent;
 };
 
 type GameEventEmitterInstances = {
@@ -349,6 +341,7 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.SetStat]: new EventEmitter(),
     [EventType.SetStack]: new EventEmitter(),
     [EventType.Tick]: new EventEmitter(),
+    [EventType.CureTick]: new EventEmitter(),
   };
 }
 
@@ -427,19 +420,14 @@ export class Game {
     this.emit(EventType.AddStack, createAddStackEvent(type, source, amount));
   }
 
-  removeStack(
-    type: Stack,
-    source: Player,
-    target: Player,
-    amount: number,
-  ): void {
+  removeStack(type: Stack, source: Player, amount: number): void {
     amount |= 0;
     if (amount === 0) {
       return;
     }
     this.emit(
       EventType.RemoveStack,
-      createRemoveStackEvent(type, source, target, amount),
+      createRemoveStackEvent(type, source, amount),
     );
   }
 
@@ -452,18 +440,22 @@ export class Game {
     if (amount === 0) {
       return;
     }
-    this.emit(EventType.AddStat, createAddStatEvent(type, source, amount));
+    this.emit(EventType.AddStat, createStatEvent(type, source, amount));
   }
 
-  removeStat(type: Stat, source: Player, target: Player, amount: number): void {
+  removeStat(type: Stat, source: Player, amount: number): void {
     amount |= 0;
     if (amount === 0) {
       return;
     }
     this.emit(
       EventType.RemoveStat,
-      createRemoveStatEvent(type, source, target, amount),
+      createRemoveStatEvent(type, source, amount),
     );
+  }
+
+  tickPoison(source: Player): void {
+    this.emit(EventType.CureTick, { id: 'CureTick', source });
   }
 
   getOppositePlayer(player: Player) {

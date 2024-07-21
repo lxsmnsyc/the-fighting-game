@@ -54,11 +54,11 @@ export function setupLuckMechanics(game: Game): void {
 
   game.on(EventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Luck) {
-      log(`${event.target.name} lost ${event.amount} stacks of Luck`);
+      log(`${event.source.name} lost ${event.amount} stacks of Luck`);
       game.setStack(
         Stack.Luck,
-        event.target,
-        event.target.stacks[Stack.Luck] - event.amount,
+        event.source,
+        event.source.stacks[Stack.Luck] - event.amount,
       );
     }
   });

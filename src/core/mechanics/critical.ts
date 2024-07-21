@@ -37,18 +37,13 @@ export function setupCriticalMechanics(game: Game): void {
         const random = Math.random() * 100;
         if (random <= currentCriticalChance) {
           event.amount *= event.source.stats[Stat.CritMultiplier] / 100;
-          log(`${event.target.name} triggered a ${event.amount} of critical.`);
+          log(`${event.source.name} triggered a ${event.amount} of critical.`);
           event.flags.critical = true;
 
           const consumable =
             (event.source.stacks[Stack.Critical] * CONSUMABLE_CRITICAL_STACKS) |
             0;
-          game.removeStack(
-            Stack.Critical,
-            event.source,
-            event.target,
-            consumable,
-          );
+          game.removeStack(Stack.Critical, event.source, consumable);
         }
       } else {
         const consumable =
@@ -79,11 +74,11 @@ export function setupCriticalMechanics(game: Game): void {
 
   game.on(EventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Critical) {
-      log(`${event.target.name} lost ${event.amount} stacks of Critical`);
+      log(`${event.source.name} lost ${event.amount} stacks of Critical`);
       game.setStack(
         Stack.Critical,
-        event.target,
-        event.target.stacks[Stack.Critical] - event.amount,
+        event.source,
+        event.source.stacks[Stack.Critical] - event.amount,
       );
     }
   });
@@ -111,11 +106,11 @@ export function setupCriticalMechanics(game: Game): void {
 
   game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
-      log(`${event.target.name} lost ${event.amount} of Critical Multiplier`);
+      log(`${event.source.name} lost ${event.amount} of Critical Multiplier`);
       game.setStat(
         Stat.CritMultiplier,
-        event.target,
-        event.target.stats[Stat.CritMultiplier] - event.amount,
+        event.source,
+        event.source.stats[Stat.CritMultiplier] - event.amount,
       );
     }
   });

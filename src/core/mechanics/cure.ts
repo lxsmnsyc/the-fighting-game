@@ -24,11 +24,11 @@ export function setupCureMechanics(game: Game): void {
 
   game.on(EventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Cure) {
-      log(`${event.target.name} lost ${event.amount} stacks of Cure`);
+      log(`${event.source.name} lost ${event.amount} stacks of Cure`);
       game.setStack(
         Stack.Cure,
-        event.target,
-        event.target.stacks[Stack.Cure] - event.amount,
+        event.source,
+        event.source.stacks[Stack.Cure] - event.amount,
       );
     }
   });

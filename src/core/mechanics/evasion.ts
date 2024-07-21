@@ -42,7 +42,6 @@ export function setupEvasionMechanics(game: Game): void {
           game.removeStack(
             Stack.Evasion,
             event.source,
-            event.target,
             event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
           );
         }
@@ -50,7 +49,7 @@ export function setupEvasionMechanics(game: Game): void {
         game.addStack(
           Stack.Evasion,
           event.target,
-          -event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
+          event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
         );
       }
     }
@@ -76,11 +75,11 @@ export function setupEvasionMechanics(game: Game): void {
 
   game.on(EventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Evasion) {
-      log(`${event.target.name} lost ${event.amount} stacks of Evasion`);
+      log(`${event.source.name} lost ${event.amount} stacks of Evasion`);
       game.setStack(
         Stack.Evasion,
-        event.target,
-        event.target.stacks[Stack.Evasion] - event.amount,
+        event.source,
+        event.source.stacks[Stack.Evasion] - event.amount,
       );
     }
   });

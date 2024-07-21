@@ -25,12 +25,12 @@ export function setupHealthMechanics(game: Game): void {
 
   game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.Health) {
-      log(`${event.target.name} lost ${event.amount} of Health`);
+      log(`${event.source.name} lost ${event.amount} of Health`);
 
       game.setStat(
         Stat.Health,
-        event.target,
-        event.target.stats[Stat.Health] - event.amount,
+        event.source,
+        event.source.stats[Stat.Health] - event.amount,
       );
     }
   });
@@ -74,7 +74,7 @@ export function setupHealthMechanics(game: Game): void {
 
   game.on(EventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.MaxHealth) {
-      log(`${event.target.name} lost ${event.amount} of Max Health`);
+      log(`${event.source.name} lost ${event.amount} of Max Health`);
       // Get the current health percentage
       const currentHealth =
         event.source.stats[Stat.Health] / event.source.stats[Stat.MaxHealth];
