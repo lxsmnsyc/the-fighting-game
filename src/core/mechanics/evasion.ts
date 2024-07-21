@@ -1,3 +1,4 @@
+import { DamageFlags } from '../damage-flags';
 import { DamageType, EventType, type Game, Stack } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
@@ -19,7 +20,7 @@ function getEvasionChance(stack: number): number {
 export function setupEvasionMechanics(game: Game): void {
   log('Setting up Evasion mechanics.');
   game.on(EventType.Damage, DamagePriority.Evasion, event => {
-    if (event.flags.missed) {
+    if (event.flag & DamageFlags.Missed) {
       return;
     }
     // Check if player can evade it
@@ -39,7 +40,7 @@ export function setupEvasionMechanics(game: Game): void {
           return;
         }
         log(`${event.target.name} dodged ${event.amount} of damage.`);
-        event.flags.missed = true;
+        event.flag |= DamageFlags.Missed;
       }
 
       game.removeStack(

@@ -1,3 +1,4 @@
+import { DamageFlags } from '../damage-flags';
 import { DamageType, EventType, type Game, Stack, Stat } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
@@ -19,7 +20,7 @@ function getCriticalChance(stack: number): number {
 export function setupCriticalMechanics(game: Game): void {
   log('Setting up Critical mechanics.');
   game.on(EventType.Damage, DamagePriority.Critical, event => {
-    if (event.flags.missed || event.flags.critical) {
+    if (event.flag & (DamageFlags.Missed | DamageFlags.Critical)) {
       return;
     }
     // Check if player can crit
@@ -35,22 +36,19 @@ export function setupCriticalMechanics(game: Game): void {
         );
         // Push your luck
         const random = Math.random() * 100;
-        if (random <= currentCriticalChance) {
-          event.amount *= event.source.stats[Stat.CritMultiplier] / 100;
-          log(`${event.source.name} triggered a ${event.amount} of critical.`);
-          event.flags.critical = true;
-
-          const consumable =
-            (event.source.stacks[Stack.Critical] * CONSUMABLE_CRITICAL_STACKS) |
-            0;
-          game.removeStack(Stack.Critical, event.source, consumable);
+        if (random > currentCriticalChance) {
+          return;
         }
-      } else {
-        const consumable =
-          (event.source.stacks[Stack.Critical] * CONSUMABLE_CRITICAL_STACKS) |
-          0;
-        game.addStack(Stack.Critical, event.source, -consumable);
+        event.amount *= event.source.stats[Stat.CritMultiplier] / 100;
+        log(`${event.source.name} triggered a ${event.amount} of critical.`);
+        event.flag |= DamageFlags.Critical;
       }
+
+      game.removeStack(
+        Stack.Critical,
+        event.source,
+        event.source.stacks[Stack.Critical] * CONSUMABLE_CRITICAL_STACKS,
+      );
     }
   });
 

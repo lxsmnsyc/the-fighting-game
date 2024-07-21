@@ -38,7 +38,7 @@ export function setupCureMechanics(game: Game): void {
   game.on(EventType.CureTick, EventPriority.Exact, event => {
     if (event.source.stacks[Stack.Cure] !== 0) {
       const consumable =
-        (event.source.stacks[Stack.Cure] * CONSUMABLE_CURE_STACKS) | 0;
+        event.source.stacks[Stack.Cure] * CONSUMABLE_CURE_STACKS;
       game.removeStack(Stack.Cure, event.source, consumable);
       if (consumable < 0) {
         game.dealDamage(
@@ -46,10 +46,7 @@ export function setupCureMechanics(game: Game): void {
           game.getOppositePlayer(event.source),
           event.source,
           consumable,
-          {
-            critical: false,
-            missed: false,
-          },
+          0,
         );
       }
     }

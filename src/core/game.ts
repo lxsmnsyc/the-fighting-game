@@ -204,15 +204,10 @@ export interface PlayerValueEvent extends PlayerEvent {
   amount: number;
 }
 
-export interface DamageFlags {
-  critical: boolean;
-  missed: boolean;
-}
-
 export interface DamageEvent extends PlayerValueEvent {
   type: DamageType;
   target: Player;
-  flags: DamageFlags;
+  flag: number;
 }
 
 function createDamageEvent(
@@ -220,9 +215,9 @@ function createDamageEvent(
   source: Player,
   target: Player,
   amount: number,
-  flags: DamageFlags,
+  flag: number,
 ): DamageEvent {
-  return { id: 'DamageEvent', type, source, target, amount, flags };
+  return { id: 'DamageEvent', type, source, target, amount, flag };
 }
 
 export interface SetStackEvent extends PlayerValueEvent {
@@ -394,14 +389,15 @@ export class Game {
     source: Player,
     target: Player,
     amount: number,
-    flags: DamageFlags,
+    flag: number,
   ): void {
+    amount |= 0;
     if (amount === 0) {
       return;
     }
     this.emit(
       EventType.Damage,
-      createDamageEvent(type, source, target, amount, flags),
+      createDamageEvent(type, source, target, amount, flag),
     );
   }
 
