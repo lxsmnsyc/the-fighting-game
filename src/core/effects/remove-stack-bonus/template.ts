@@ -42,7 +42,7 @@ export function createRemoveStackBonusEffectCardSource(
     load(game, player, level) {
       log(`Setting up ${current.name} for ${player.name}`);
       game.on(EventType.RemoveStack, StackPriority.Additive, event => {
-        if (event.type === current.stat && event.source === player) {
+        if (event.type === current.stat && event.source !== player) {
           event.amount -= getLoss(level);
         }
       });
