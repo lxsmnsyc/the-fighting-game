@@ -174,7 +174,7 @@ export const ADD_STACK_NAME: Record<Stack, string> = {
 };
 
 export const REMOVE_STACK_NAME: Record<Stack, string> = {
-  [Stack.Armor]: 'Armor Decay',
+  [Stack.Armor]: 'Corrosion',
   [Stack.Critical]: 'Critical Decay',
   [Stack.Evasion]: 'Evasion Decay',
   [Stack.Luck]: 'Curse',
