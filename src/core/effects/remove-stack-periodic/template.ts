@@ -8,12 +8,11 @@ import {
 import { lerp } from '../../lerp';
 import { log } from '../../log';
 import { EventPriority } from '../../priorities';
-import { FRAME_DURATION, createTick } from '../../tick';
 
 const DEFAULT_MIN_PERIOD = 5;
 const DEFAULT_MAX_PERIOD = 0.2;
 const DEFAULT_MAX_SPEED = 750;
-const DEFAULT_GAIN_MULTIPLIER = 1;
+const DEFAULT_LOSS_MULTIPLIER = 1;
 
 export interface PeriodicRemoveStackEffectCardSourceOptions {
   name: string;
@@ -30,7 +29,7 @@ export function createPeriodicRemoveStackEffectCardSource(
 ): EffectCardSource {
   const current = Object.assign(
     {
-      multiplier: DEFAULT_GAIN_MULTIPLIER,
+      multiplier: DEFAULT_LOSS_MULTIPLIER,
       maxPeriod: DEFAULT_MAX_PERIOD,
       minPeriod: DEFAULT_MIN_PERIOD,
       maxSpeed: DEFAULT_MAX_SPEED,
@@ -38,7 +37,7 @@ export function createPeriodicRemoveStackEffectCardSource(
     options,
   );
 
-  function getPeriodicGain(level: number) {
+  function getPeriodicLoss(level: number) {
     return current.multiplier * level;
   }
 
@@ -56,7 +55,7 @@ export function createPeriodicRemoveStackEffectCardSource(
     getDescription(level) {
       return [
         'Periodically applies ',
-        getPeriodicGain(level),
+        getPeriodicLoss(level),
         ' points of ',
         STAT_NAME[current.stack],
         ' to the enemy. Period ranges from',
@@ -73,25 +72,18 @@ export function createPeriodicRemoveStackEffectCardSource(
       game.on(EventType.Start, EventPriority.Post, () => {
         let elapsed = 0;
         let period = getPeriod(player.stats[Stack.Speed]);
-
-        const cleanup = createTick(() => {
-          // Calculate period
-          elapsed += FRAME_DURATION;
+        game.on(EventType.Tick, EventPriority.Exact, event => {
+          elapsed += event.delta;
           if (elapsed >= period) {
             elapsed -= period;
             period = getPeriod(player.stats[Stack.Speed]);
-
             game.removeStack(
               current.stack,
               player,
               game.getOppositePlayer(player),
-              getPeriodicGain(level),
+              getPeriodicLoss(level),
             );
           }
-        });
-
-        game.on(EventType.Close, EventPriority.Pre, () => {
-          cleanup();
         });
       });
     },

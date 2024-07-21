@@ -8,7 +8,7 @@ export function setupAbilityMechanics(game: Game): void {
   game.on(EventType.AddStat, EventPriority.Post, event => {
     if (event.type === Stat.Mana) {
       if (event.source.stats[Stat.Mana] === event.source.stats[Stat.MaxMana]) {
-        game.CastAbility(event.source);
+        game.castAbility(event.source);
       }
     }
   });

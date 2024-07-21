@@ -152,6 +152,7 @@ export const enum EventType {
   RemoveStat = 11,
   SetStack = 12,
   SetStat = 13,
+  Tick = 14,
 }
 
 export const STAT_NAME: Record<Stat, string> = {
@@ -184,6 +185,10 @@ export const REMOVE_STACK_NAME: Record<Stack, string> = {
 
 export interface BaseEvent {
   id: string;
+}
+
+export interface TickEvent extends BaseEvent {
+  delta: number;
 }
 
 export interface PlayerEvent extends BaseEvent {
@@ -321,6 +326,7 @@ export type GameEvents = {
   [EventType.SetStack]: SetStackEvent;
 
   [EventType.EndGame]: EndGameEvent;
+  [EventType.Tick]: TickEvent;
 };
 
 type GameEventEmitterInstances = {
@@ -342,6 +348,7 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.RemoveStat]: new EventEmitter(),
     [EventType.SetStat]: new EventEmitter(),
     [EventType.SetStack]: new EventEmitter(),
+    [EventType.Tick]: new EventEmitter(),
   };
 }
 
@@ -381,7 +388,11 @@ export class Game {
     this.emit(EventType.Close, { id: 'CloseEvent' });
   }
 
-  CastAbility(source: Player): void {
+  tick(delta: number): void {
+    this.emit(EventType.Tick, { id: 'TickEvent', delta });
+  }
+
+  castAbility(source: Player): void {
     this.emit(EventType.CastAbility, { id: 'CastAbilityEvent', source });
   }
 

@@ -1,0 +1,30 @@
+import { EventType, type Game } from '../game';
+import { EventPriority } from '../priorities';
+
+const FPS = 60;
+const FPS_DURATION = 1000 / FPS;
+
+export function setupTickMechanics(game: Game): void {
+  game.on(EventType.Start, EventPriority.Post, () => {
+    let elapsed = Date.now();
+    let raf = requestAnimationFrame(update);
+
+    function update() {
+      raf = requestAnimationFrame(update);
+      const current = Date.now();
+      let diff = current - elapsed;
+      elapsed = current;
+
+      while (diff >= FPS_DURATION) {
+        game.tick(FPS_DURATION);
+        diff -= FPS_DURATION;
+      }
+
+      game.tick(diff);
+    }
+
+    game.on(EventType.Close, EventPriority.Pre, () => {
+      cancelAnimationFrame(raf);
+    });
+  });
+}

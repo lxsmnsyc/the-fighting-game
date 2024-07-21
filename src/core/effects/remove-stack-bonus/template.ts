@@ -15,16 +15,16 @@ export interface RemoveStackBonusEffectCardSourceOptions {
   gainMultiplier?: number;
 }
 
-const DEFAULT_GAIN_MULTIPLIER = 5;
+const DEFAULT_LOSS_MULTIPLIER = 5;
 
 export function createRemoveStackBonusEffectCardSource(
   options: RemoveStackBonusEffectCardSourceOptions,
 ): EffectCardSource {
   const current = Object.assign(
-    { gainMultiplier: DEFAULT_GAIN_MULTIPLIER },
+    { gainMultiplier: DEFAULT_LOSS_MULTIPLIER },
     options,
   );
-  function getGain(level: number) {
+  function getLoss(level: number) {
     return current.gainMultiplier * level;
   }
   return createEffectCardSource({
@@ -35,7 +35,7 @@ export function createRemoveStackBonusEffectCardSource(
         'Increases ',
         STAT_NAME[current.stat],
         ' stacks applied by ',
-        getGain(level),
+        getLoss(level),
         '.',
       ];
     },
@@ -43,7 +43,7 @@ export function createRemoveStackBonusEffectCardSource(
       log(`Setting up ${current.name} for ${player.name}`);
       game.on(EventType.RemoveStack, StackPriority.Additive, event => {
         if (event.type === current.stat && event.source === player) {
-          event.amount -= getGain(level);
+          event.amount -= getLoss(level);
         }
       });
     },

@@ -8,7 +8,6 @@ import {
 import { lerp } from '../../lerp';
 import { log } from '../../log';
 import { EventPriority } from '../../priorities';
-import { FRAME_DURATION, createTick } from '../../tick';
 
 const DEFAULT_MIN_PERIOD = 5;
 const DEFAULT_MAX_PERIOD = 0.2;
@@ -70,24 +69,16 @@ export function createPeriodicAddStackEffectCardSource(
     },
     load(game, player, level) {
       log(`Setting up ${current.name} for ${player.name}`);
-      game.on(EventType.Start, EventPriority.Post, () => {
-        let elapsed = 0;
-        let period = getPeriod(player.stats[Stack.Speed]);
 
-        const cleanup = createTick(() => {
-          // Calculate period
-          elapsed += FRAME_DURATION;
-          if (elapsed >= period) {
-            elapsed -= period;
-            period = getPeriod(player.stats[Stack.Speed]);
-
-            game.addStack(current.stack, player, getPeriodicGain(level));
-          }
-        });
-
-        game.on(EventType.Close, EventPriority.Pre, () => {
-          cleanup();
-        });
+      let elapsed = 0;
+      let period = getPeriod(player.stats[Stack.Speed]);
+      game.on(EventType.Tick, EventPriority.Exact, event => {
+        elapsed += event.delta;
+        if (elapsed >= period) {
+          elapsed -= period;
+          period = getPeriod(player.stats[Stack.Speed]);
+          game.addStack(current.stack, player, getPeriodicGain(level));
+        }
       });
     },
   });
