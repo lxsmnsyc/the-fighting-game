@@ -5,9 +5,9 @@ import { EventPriority } from '../priorities';
 export function setupAbilityMechanics(game: Game): void {
   log('Setting up Ability mechanics.');
 
-  game.on(EventType.AddStat, EventPriority.Post, event => {
+  game.on(EventType.SetStat, EventPriority.Post, event => {
     if (event.type === Stat.Mana) {
-      if (event.source.stats[Stat.Mana] === event.source.stats[Stat.MaxMana]) {
+      if (event.source.stats[Stat.Mana] >= event.source.stats[Stat.MaxMana]) {
         game.castAbility(event.source);
       }
     }
