@@ -3,16 +3,16 @@ import { lerp } from '../lerp';
 import { log } from '../log';
 import { StackPriority } from '../priorities';
 
-const MIN_CRITICAL_CHANCE = 0;
-const MAX_CRITICAL_CHANCE = 100;
-const MAX_CRITICAL_STACKS = 750;
+const MIN_LUCK_CHANCE = 0;
+const MAX_LUCK_CHANCE = 100;
+const MAX_LUCK_STACKS = 750;
 const CONSUMABLE_LUCK_STACKS = 0.5;
 
 export function getLuckChance(stack: number): number {
   return lerp(
-    MIN_CRITICAL_CHANCE,
-    MAX_CRITICAL_CHANCE,
-    Math.min(stack / MAX_CRITICAL_STACKS, 1),
+    MIN_LUCK_CHANCE,
+    MAX_LUCK_CHANCE,
+    Math.min(stack / MAX_LUCK_STACKS, 1),
   );
 }
 
