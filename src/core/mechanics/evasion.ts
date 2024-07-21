@@ -35,23 +35,18 @@ export function setupEvasionMechanics(game: Game): void {
         );
         // Push your luck
         const random = Math.random() * 100;
-        if (random <= currentEvasion) {
-          log(`${event.target.name} dodged ${event.amount} of damage.`);
-          event.flags.missed = true;
-
-          game.removeStack(
-            Stack.Evasion,
-            event.source,
-            event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
-          );
+        if (random > currentEvasion) {
+          return;
         }
-      } else {
-        game.addStack(
-          Stack.Evasion,
-          event.target,
-          event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
-        );
+        log(`${event.target.name} dodged ${event.amount} of damage.`);
+        event.flags.missed = true;
       }
+
+      game.removeStack(
+        Stack.Evasion,
+        event.source,
+        event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
+      );
     }
   });
 
