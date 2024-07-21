@@ -12,6 +12,7 @@ import { setupLuckMechanics } from './mechanics/luck';
 import { setupMagicMechanics } from './mechanics/magic';
 import { setupManaMechanics } from './mechanics/mana';
 import { setupSpeedMechanics } from './mechanics/speed';
+import { setupTickMechanics } from './mechanics/tick';
 import { EventPriority } from './priorities';
 
 export function setupGame(game: Game): void {
@@ -38,6 +39,9 @@ export function setupGame(game: Game): void {
     setupArmorMechanics(game);
     // Damage
     setupDamageMechanics(game);
+
+    // Game Tick
+    setupTickMechanics(game);
 
     game.playerA.load(game);
     game.playerB.load(game);
