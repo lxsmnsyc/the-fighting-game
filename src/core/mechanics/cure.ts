@@ -1,8 +1,9 @@
-import { DamageType, EventType, type Game, Stack } from '../game';
+import { DamageType } from '../damage';
+import { EventType, type Game, Stack } from '../game';
 import { log } from '../log';
-import { EventPriority, StackPriority } from '../priorities';
+import { StackPriority } from '../priorities';
 
-const CONSUMABLE_CURE_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.5;
 
 export function setupCureMechanics(game: Game): void {
   log('Setting up Cure mechanics.');
@@ -35,19 +36,24 @@ export function setupCureMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.CureTick, EventPriority.Exact, event => {
-    if (event.source.stacks[Stack.Cure] !== 0) {
-      const consumable =
-        event.source.stacks[Stack.Cure] * CONSUMABLE_CURE_STACKS;
-      game.removeStack(Stack.Cure, event.source, consumable);
-      if (consumable < 0) {
-        game.dealDamage(
-          DamageType.Poison,
-          game.getOppositePlayer(event.source),
+  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Cure) {
+      const stacks = event.source.stacks[Stack.Cure];
+      if (stacks !== 0) {
+        game.removeStack(
+          Stack.Cure,
           event.source,
-          consumable,
-          0,
+          Math.abs(stacks) === 1 ? stacks : stacks * CONSUMABLE_STACKS,
         );
+        if (stacks < 0) {
+          game.dealDamage(
+            DamageType.Poison,
+            game.getOppositePlayer(event.source),
+            event.source,
+            -stacks,
+            0,
+          );
+        }
       }
     }
   });

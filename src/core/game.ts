@@ -1,3 +1,4 @@
+import type { DamageType } from './damage';
 import { EventEmitter, type EventEmitterListener } from './event-emitter';
 
 const DEFAULT_MAX_HEALTH = 1000;
@@ -5,17 +6,6 @@ const DEFAULT_MAX_HEALTH = 1000;
 const DEFAULT_MAX_MANA = 100;
 
 const DEFAULT_CRIT_MULTIPLIER = 200;
-
-export const enum DamageType {
-  Magic = 1,
-  Attack = 2,
-
-  // Can trigger some damage events
-  Pure = 3,
-
-  // Does not trigger normal damage events either
-  Poison = 4,
-}
 
 export interface EffectCardSource {
   name: string;
@@ -153,7 +143,7 @@ export const enum EventType {
   SetStack = 12,
   SetStat = 13,
   Tick = 14,
-  CureTick = 15,
+  ConsumeStack = 15,
 }
 
 export const STAT_NAME: Record<Stat, string> = {
@@ -280,7 +270,9 @@ export interface EndGameEvent extends BaseEvent {
   loser: Player;
 }
 
-export interface CureTickEvent extends PlayerEvent {}
+export interface ConsumeStackEvent extends PlayerEvent {
+  type: Stack;
+}
 
 export type GameEvents = {
   [EventType.Close]: BaseEvent;
@@ -313,7 +305,7 @@ export type GameEvents = {
   [EventType.EndGame]: EndGameEvent;
   [EventType.Tick]: TickEvent;
 
-  [EventType.CureTick]: CureTickEvent;
+  [EventType.ConsumeStack]: ConsumeStackEvent;
 };
 
 type GameEventEmitterInstances = {
@@ -336,7 +328,7 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [EventType.SetStat]: new EventEmitter(),
     [EventType.SetStack]: new EventEmitter(),
     [EventType.Tick]: new EventEmitter(),
-    [EventType.CureTick]: new EventEmitter(),
+    [EventType.ConsumeStack]: new EventEmitter(),
   };
 }
 
@@ -401,6 +393,10 @@ export class Game {
     );
   }
 
+  consumeStack(type: Stack, source: Player): void {
+    this.emit(EventType.ConsumeStack, { id: 'ConsumeStack', type, source });
+  }
+
   setStack(type: Stack, source: Player, amount: number): void {
     this.emit(
       EventType.SetStack,
@@ -448,10 +444,6 @@ export class Game {
       EventType.RemoveStat,
       createRemoveStatEvent(type, source, amount),
     );
-  }
-
-  tickPoison(source: Player): void {
-    this.emit(EventType.CureTick, { id: 'CureTick', source });
   }
 
   getOppositePlayer(player: Player) {

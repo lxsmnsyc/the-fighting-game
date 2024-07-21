@@ -1,5 +1,6 @@
+import { DamageType } from '../damage';
 import { DamageFlags } from '../damage-flags';
-import { DamageType, EventType, type Game, Stack } from '../game';
+import { EventType, type Game, Stack } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
 import { DamagePriority, StackPriority } from '../priorities';
@@ -7,7 +8,8 @@ import { DamagePriority, StackPriority } from '../priorities';
 const MIN_EVASION_CHANCE = 0;
 const MAX_EVASION_CHANCE = 100;
 const MAX_EVASION_STACKS = 750;
-const CONSUMABLE_EVASION_STACKS = 0.5;
+
+const CONSUMABLE_STACKS = 0.5;
 
 function getEvasionChance(stack: number): number {
   return lerp(
@@ -24,16 +26,12 @@ export function setupEvasionMechanics(game: Game): void {
       return;
     }
     // Check if player can evade it
-    if (
-      event.type === DamageType.Attack &&
-      event.target.stacks[Stack.Evasion] !== 0
-    ) {
+    const stacks = event.target.stacks[Stack.Evasion];
+    if (event.type === DamageType.Attack && stacks !== 0) {
       // If there's an evasion stack
-      if (event.target.stacks[Stack.Evasion] > 0) {
+      if (stacks > 0) {
         // Calculat evasion chance
-        const currentEvasion = getEvasionChance(
-          event.target.stacks[Stack.Evasion],
-        );
+        const currentEvasion = getEvasionChance(stacks);
         // Push your luck
         const random = Math.random() * 100;
         if (random > currentEvasion) {
@@ -43,10 +41,17 @@ export function setupEvasionMechanics(game: Game): void {
         event.flag |= DamageFlags.Missed;
       }
 
+      game.consumeStack(Stack.Evasion, event.target);
+    }
+  });
+
+  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Evasion) {
+      const current = event.source.stacks[Stack.Evasion];
       game.removeStack(
         Stack.Evasion,
         event.source,
-        event.target.stacks[Stack.Evasion] * CONSUMABLE_EVASION_STACKS,
+        Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
       );
     }
   });

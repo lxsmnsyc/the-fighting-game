@@ -3,7 +3,7 @@ import { EventType, type Game, Stack } from '../game';
 import { log } from '../log';
 import { DamagePriority, StackPriority } from '../priorities';
 
-const CONSUMABLE_ARMOR_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.5;
 
 export function setupArmorMechanics(game: Game): void {
   log('Setting up Armor mechanics.');
@@ -13,11 +13,21 @@ export function setupArmorMechanics(game: Game): void {
       // Get 50% of the armor
       const currentArmor = event.target.stacks[Stack.Armor];
       if (currentArmor > 0) {
-        const consumable = currentArmor * CONSUMABLE_ARMOR_STACKS;
-        event.amount -= consumable;
+        event.amount = Math.max(0, event.amount - currentArmor);
         event.flag |= DamageFlags.Reduced;
-        game.removeStack(Stack.Armor, event.target, consumable);
+        game.consumeStack(Stack.Armor, event.target);
       }
+    }
+  });
+
+  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Armor) {
+      const current = event.source.stacks[Stack.Armor];
+      game.removeStack(
+        Stack.Armor,
+        event.source,
+        Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
+      );
     }
   });
 

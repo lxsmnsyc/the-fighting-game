@@ -1,4 +1,5 @@
-import { DamageType, EventType, createAbilityCardSource } from '../game';
+import { DamageType } from '../damage';
+import { EventType, createAbilityCardSource } from '../game';
 import { EventPriority } from '../priorities';
 
 export default createAbilityCardSource({

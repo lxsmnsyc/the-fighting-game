@@ -1,5 +1,6 @@
+import { DamageType } from '../damage';
 import { DamageFlags } from '../damage-flags';
-import { DamageType, EventType, type Game, Stack, Stat } from '../game';
+import { EventType, type Game, Stack, Stat } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
 import { DamagePriority, StackPriority, StatPriority } from '../priorities';
@@ -7,7 +8,7 @@ import { DamagePriority, StackPriority, StatPriority } from '../priorities';
 const MIN_CRITICAL_CHANCE = 0;
 const MAX_CRITICAL_CHANCE = 100;
 const MAX_CRITICAL_STACKS = 750;
-const CONSUMABLE_CRITICAL_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.5;
 
 function getCriticalChance(stack: number): number {
   return lerp(
@@ -24,16 +25,16 @@ export function setupCriticalMechanics(game: Game): void {
       return;
     }
     // Check if player can crit
+    const stacks = event.source.stacks[Stack.Critical];
     if (
-      event.type === DamageType.Attack &&
-      event.source.stacks[Stack.Critical] !== 0
+      (event.type === DamageType.Attack ||
+        event.type === DamageType.Physical) &&
+      stacks !== 0
     ) {
       // If there's a critical stack
-      if (event.source.stacks[Stack.Critical] > 0) {
+      if (stacks > 0) {
         // Calculat critical chance
-        const currentCriticalChance = getCriticalChance(
-          event.source.stacks[Stack.Critical],
-        );
+        const currentCriticalChance = getCriticalChance(stacks);
         // Push your luck
         const random = Math.random() * 100;
         if (random > currentCriticalChance) {
@@ -44,10 +45,17 @@ export function setupCriticalMechanics(game: Game): void {
         event.flag |= DamageFlags.Critical;
       }
 
+      game.consumeStack(Stack.Critical, event.target);
+    }
+  });
+
+  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Critical) {
+      const current = event.source.stacks[Stack.Critical];
       game.removeStack(
         Stack.Critical,
         event.source,
-        event.source.stacks[Stack.Critical] * CONSUMABLE_CRITICAL_STACKS,
+        Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
       );
     }
   });

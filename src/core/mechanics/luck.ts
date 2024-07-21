@@ -6,7 +6,7 @@ import { StackPriority } from '../priorities';
 const MIN_LUCK_CHANCE = 0;
 const MAX_LUCK_CHANCE = 100;
 const MAX_LUCK_STACKS = 750;
-const CONSUMABLE_LUCK_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.5;
 
 export function getLuckChance(stack: number): number {
   return lerp(
@@ -16,24 +16,19 @@ export function getLuckChance(stack: number): number {
   );
 }
 
-export interface LuckData {
-  chance: number;
-  consumed: number;
-  retained: number;
-}
-
-export function getLuckData(stack: number): LuckData {
-  const consumable = (stack * CONSUMABLE_LUCK_STACKS) | 0;
-
-  return {
-    chance: getLuckChance(stack),
-    consumed: consumable,
-    retained: stack - consumable,
-  };
-}
-
 export function setupLuckMechanics(game: Game): void {
   log('Setting up Luck mechanics.');
+  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+    if (event.type === Stack.Luck) {
+      const current = event.source.stacks[Stack.Luck];
+      game.removeStack(
+        Stack.Luck,
+        event.source,
+        Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
+      );
+    }
+  });
+
   game.on(EventType.SetStack, StackPriority.Exact, event => {
     if (event.type === Stack.Luck) {
       log(`${event.source.name}'s Luck changed to ${event.amount}`);
