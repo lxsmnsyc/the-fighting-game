@@ -1,6 +1,7 @@
 import { setupGame } from './core';
 import simpleDamage from './core/abilities/simple-damage';
 import card106 from './core/effects/add-stack-periodic/card-106';
+import card302 from './core/effects/add-stat-bonus/card-302';
 import card002 from './core/effects/add-stat-periodic/card-002';
 
 import { Game, Player } from './core/game';
@@ -15,10 +16,12 @@ playerB.AbilityCard = { source: simpleDamage, level: 5 };
 playerA.effects = [
   { source: card106, level: 5 },
   { source: card002, level: 5 },
+  { source: card302, level: 5 },
 ];
 playerB.effects = [
   { source: card106, level: 5 },
   { source: card002, level: 5 },
+  { source: card302, level: 5 },
 ];
 
 playerA.game = game;
