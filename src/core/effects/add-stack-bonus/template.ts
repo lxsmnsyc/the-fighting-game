@@ -1,7 +1,6 @@
 import {
   type EffectCardSource,
   EventType,
-  STAT_NAME,
   type Stack,
   createEffectCardSource,
 } from '../../game';
@@ -30,15 +29,6 @@ export function createAddStackBonusEffectCardSource(
   return createEffectCardSource({
     name: current.name,
     tier: 1,
-    getDescription(level) {
-      return [
-        'Increases ',
-        STAT_NAME[current.stat],
-        ' stacks gained by ',
-        getGain(level),
-        '.',
-      ];
-    },
     load(game, player, level) {
       log(`Setting up ${current.name} for ${player.name}`);
       game.on(EventType.AddStack, StackPriority.Additive, event => {

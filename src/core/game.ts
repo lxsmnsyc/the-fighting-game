@@ -11,13 +11,11 @@ export interface EffectCardSource {
   name: string;
   tier: number;
   load: (game: Game, player: Player, level: number) => void;
-  getDescription: (level: number) => (string | number)[];
 }
 
 export interface AbilityCardSource {
   name: string;
   load: (game: Game, player: Player, level: number) => void;
-  getDescription: (level: number) => (string | number)[];
 }
 
 export function createEffectCardSource(

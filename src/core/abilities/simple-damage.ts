@@ -4,9 +4,6 @@ import { EventPriority } from '../priorities';
 
 export default createAbilityCardSource({
   name: 'Simple Damage',
-  getDescription(level) {
-    return ['Deals ', level * 5, ' Magic damage.'];
-  },
   load(game, player, level) {
     game.on(EventType.CastAbility, EventPriority.Post, event => {
       if (event.source === player) {

@@ -1,7 +1,6 @@
 import {
   type EffectCardSource,
   EventType,
-  STAT_NAME,
   Stack,
   createEffectCardSource,
 } from '../../game';
@@ -52,21 +51,6 @@ export function createPeriodicRemoveStackEffectCardSource(
   return createEffectCardSource({
     name: current.name,
     tier: current.tier,
-    getDescription(level) {
-      return [
-        'Periodically applies ',
-        getPeriodicLoss(level),
-        ' points of ',
-        STAT_NAME[current.stack],
-        ' to the enemy. Period ranges from',
-        current.minPeriod,
-        ' seconds to ',
-        current.maxPeriod,
-        ' seconds based on ',
-        'Speed',
-        '.',
-      ];
-    },
     load(game, player, level) {
       log(`Setting up ${current.name} for ${player.name}`);
       game.on(EventType.Start, EventPriority.Post, () => {
