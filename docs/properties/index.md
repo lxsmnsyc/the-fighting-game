@@ -1,16 +1,20 @@
-# Properties
+# Stats and stacks
 
-## Types of Properties
+## Stats
 
 - Attack
 - Magic
-- Mana
 - Health
-- Heal
-- Critical
-- Evasion
-- Speed
-- Slow
+- Mana
+- Max Health
+- Max Mana
+- Critical Multiplier
+
+## Stacks
+
 - Armor
-- Penetration
-- Poison
+- Evasion
+- Critical
+- Luck
+- Cure
+- Speed
