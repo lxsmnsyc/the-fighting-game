@@ -14,9 +14,8 @@ const DEFAULT_MAX_PERIOD = 0.2;
 const DEFAULT_MAX_SPEED = 750;
 const DEFAULT_GAIN_MULTIPLIER = 1;
 
-export interface PeriodicAddStatEffectCardSourceOptions {
+export interface PeriodicAddStatOptions {
   name: string;
-  tier: number;
   stat: Stat;
   multiplier?: number;
   maxPeriod?: number;
@@ -24,8 +23,8 @@ export interface PeriodicAddStatEffectCardSourceOptions {
   maxSpeed?: number;
 }
 
-export function createPeriodicAddStatEffectCardSource(
-  options: PeriodicAddStatEffectCardSourceOptions,
+export function createPeriodicAddStat(
+  options: PeriodicAddStatOptions,
 ): EffectCardSource {
   const current = Object.assign(
     {
@@ -51,7 +50,7 @@ export function createPeriodicAddStatEffectCardSource(
 
   return createEffectCardSource({
     name: current.name,
-    tier: current.tier,
+    tier: 1,
     load(game, player, level) {
       log(`Setting up ${current.name} for ${player.name}`);
       let elapsed = 0;

@@ -1,8 +1,7 @@
 import { Stat } from '../../game';
-import { createPeriodicAddStatEffectCardSource } from './template';
+import { createPeriodicAddStat } from './template';
 
-export default createPeriodicAddStatEffectCardSource({
+export default createPeriodicAddStat({
   name: 'Card #002',
-  tier: 1,
   stat: Stat.Mana,
 });
