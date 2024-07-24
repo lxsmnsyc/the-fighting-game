@@ -1,8 +1,7 @@
 import { Stack } from '../../game';
-import { createRemoveStackBonusEffectCardSource } from './template';
+import { createRemoveStackBonus } from './template';
 
-export default createRemoveStackBonusEffectCardSource({
+export default createRemoveStackBonus({
   name: 'Card #503',
-  tier: 1,
   stat: Stack.Cure,
 });

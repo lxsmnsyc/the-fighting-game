@@ -7,17 +7,16 @@ import {
 import { log } from '../../log';
 import { StackPriority } from '../../priorities';
 
-export interface RemoveStackBonusEffectCardSourceOptions {
+export interface RemoveStackBonusOptions {
   name: string;
-  tier: number;
   stat: Stack;
   gainMultiplier?: number;
 }
 
 const DEFAULT_LOSS_MULTIPLIER = 5;
 
-export function createRemoveStackBonusEffectCardSource(
-  options: RemoveStackBonusEffectCardSourceOptions,
+export function createRemoveStackBonus(
+  options: RemoveStackBonusOptions,
 ): EffectCardSource {
   const current = Object.assign(
     { gainMultiplier: DEFAULT_LOSS_MULTIPLIER },
