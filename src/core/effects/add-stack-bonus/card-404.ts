@@ -1,8 +1,7 @@
 import { Stack } from '../../game';
-import { createAddStackBonusEffectCardSource } from './template';
+import { createAddStackBonus } from './template';
 
-export default createAddStackBonusEffectCardSource({
+export default createAddStackBonus({
   name: 'Card #404',
-  tier: 1,
   stat: Stack.Evasion,
 });
