@@ -1,8 +1,7 @@
 import { Stat } from '../../game';
-import { createAddStatBonusEffectCardSource } from './template';
+import { createAddStatBonus } from './template';
 
-export default createAddStatBonusEffectCardSource({
+export default createAddStatBonus({
   name: 'Card #302',
-  tier: 1,
   stat: Stat.Mana,
 });

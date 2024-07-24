@@ -7,17 +7,16 @@ import {
 import { log } from '../../log';
 import { StatPriority } from '../../priorities';
 
-export interface AddStatBonusEffectCardSourceOptions {
+export interface AddStatBonusOptions {
   name: string;
-  tier: number;
   stat: Stat;
   gainMultiplier?: number;
 }
 
 const DEFAULT_GAIN_MULTIPLIER = 5;
 
-export function createAddStatBonusEffectCardSource(
-  options: AddStatBonusEffectCardSourceOptions,
+export function createAddStatBonus(
+  options: AddStatBonusOptions,
 ): EffectCardSource {
   const current = Object.assign(
     { gainMultiplier: DEFAULT_GAIN_MULTIPLIER },
