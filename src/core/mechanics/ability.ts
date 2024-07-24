@@ -6,10 +6,11 @@ export function setupAbilityMechanics(game: Game): void {
   log('Setting up Ability mechanics.');
 
   game.on(EventType.SetStat, StatPriority.Post, event => {
-    if (event.type === Stat.Mana) {
-      if (event.source.stats[Stat.Mana] >= event.source.stats[Stat.MaxMana]) {
-        game.castAbility(event.source);
-      }
+    if (
+      event.type === Stat.Mana &&
+      event.source.stats[Stat.Mana] >= event.source.stats[Stat.MaxMana]
+    ) {
+      game.castAbility(event.source);
     }
   });
 
