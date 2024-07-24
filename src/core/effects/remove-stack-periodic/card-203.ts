@@ -1,8 +1,7 @@
 import { Stack } from '../../game';
-import { createPeriodicRemoveStackEffectCardSource } from './template';
+import { createPeriodicRemoveStack } from './template';
 
-export default createPeriodicRemoveStackEffectCardSource({
+export default createPeriodicRemoveStack({
   name: 'Card #203',
-  tier: 1,
   stack: Stack.Cure,
 });
