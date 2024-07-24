@@ -5,7 +5,6 @@ import {
   createEffectCardSource,
 } from '../../game';
 import { lerp } from '../../lerp';
-import { log } from '../../log';
 import { EventPriority } from '../../priorities';
 
 const DEFAULT_MIN_PERIOD = 5;
@@ -51,7 +50,6 @@ export function createPeriodicRemoveStack(
     name: current.name,
     tier: 1,
     load(game, player, level) {
-      log(`Setting up ${current.name} for ${player.name}`);
       game.on(EventType.Start, EventPriority.Post, () => {
         let elapsed = 0;
         let period = getPeriod(player.stats[Stack.Speed]);

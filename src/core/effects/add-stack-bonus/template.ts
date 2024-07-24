@@ -4,7 +4,6 @@ import {
   type Stack,
   createEffectCardSource,
 } from '../../game';
-import { log } from '../../log';
 import { StackPriority } from '../../priorities';
 
 export interface AddStackBonusOptions {
@@ -29,7 +28,6 @@ export function createAddStackBonus(
     name: current.name,
     tier: 1,
     load(game, player, level) {
-      log(`Setting up ${current.name} for ${player.name}`);
       game.on(EventType.AddStack, StackPriority.Additive, event => {
         if (event.type === current.stat && event.source === player) {
           event.amount += getGain(level);

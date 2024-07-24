@@ -1,5 +1,6 @@
 import type { DamageType } from './damage';
 import { EventEmitter, type EventEmitterListener } from './event-emitter';
+import { log } from './log';
 
 const DEFAULT_MAX_HEALTH = 1000;
 
@@ -111,17 +112,19 @@ export class Player {
   constructor(public name: string) {}
 
   load(game: Game) {
-    if (this.AbilityCard) {
-      this.AbilityCard.source.load(game, this, this.AbilityCard.level);
+    if (this.ability) {
+      log(`Setting up ${this.ability.source.name} for ${this.name}`);
+      this.ability.source.load(game, this, this.ability.level);
     }
     if (this.effects) {
       for (const effect of this.effects) {
+        log(`Setting up ${effect.source.name} for ${this.name}`);
         effect.source.load(game, this, effect.level);
       }
     }
   }
 
-  public AbilityCard?: AbilityCard;
+  public ability?: AbilityCard;
   public effects?: EffectCard[];
   public game?: Game;
 }
