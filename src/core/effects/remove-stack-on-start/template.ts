@@ -6,7 +6,7 @@ import {
 } from '../../game';
 import { EventPriority } from '../../priorities';
 
-const DEFAULT_GAIN_MULTIPLIER = 100;
+const DEFAULT_LOSS_MULTIPLIER = 100;
 
 export interface RemoveStackOnStartOptions {
   name: string;
@@ -18,7 +18,7 @@ export function createRemoveStackOnStart(
   options: RemoveStackOnStartOptions,
 ): EffectCardSource {
   const current = Object.assign(
-    { gainMultiplier: DEFAULT_GAIN_MULTIPLIER },
+    { gainMultiplier: DEFAULT_LOSS_MULTIPLIER },
     options,
   );
   return createEffectCardSource({
@@ -29,7 +29,7 @@ export function createRemoveStackOnStart(
         game.removeStack(
           current.stack,
           game.getOppositePlayer(player),
-          level * DEFAULT_GAIN_MULTIPLIER,
+          level * DEFAULT_LOSS_MULTIPLIER,
         );
       });
     },
