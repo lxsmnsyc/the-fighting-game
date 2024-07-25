@@ -10,7 +10,7 @@ import { EventPriority } from '../../priorities';
 const DEFAULT_MIN_PERIOD = 5;
 const DEFAULT_MAX_PERIOD = 0.2;
 const DEFAULT_MAX_SPEED = 750;
-const DEFAULT_LOSS_MULTIPLIER = 1;
+const DEFAULT_MULTIPLIER = 1;
 
 export interface PeriodicRemoveStackOptions {
   name: string;
@@ -26,7 +26,7 @@ export function createPeriodicRemoveStack(
 ): EffectCardSource {
   const current = Object.assign(
     {
-      multiplier: DEFAULT_LOSS_MULTIPLIER,
+      multiplier: DEFAULT_MULTIPLIER,
       maxPeriod: DEFAULT_MAX_PERIOD,
       minPeriod: DEFAULT_MIN_PERIOD,
       maxSpeed: DEFAULT_MAX_SPEED,

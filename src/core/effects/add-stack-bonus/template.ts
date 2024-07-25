@@ -9,20 +9,17 @@ import { StackPriority } from '../../priorities';
 export interface AddStackBonusOptions {
   name: string;
   stat: Stack;
-  gainMultiplier?: number;
+  multiplier?: number;
 }
 
-const DEFAULT_GAIN_MULTIPLIER = 5;
+const DEFAULT_MULTIPLIER = 5;
 
 export function createAddStackBonus(
   options: AddStackBonusOptions,
 ): EffectCardSource {
-  const current = Object.assign(
-    { gainMultiplier: DEFAULT_GAIN_MULTIPLIER },
-    options,
-  );
+  const current = Object.assign({ multiplier: DEFAULT_MULTIPLIER }, options);
   function getGain(level: number) {
-    return current.gainMultiplier * level;
+    return current.multiplier * level;
   }
   return createEffectCardSource({
     name: current.name,

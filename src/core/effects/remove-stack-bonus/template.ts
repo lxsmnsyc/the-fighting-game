@@ -9,20 +9,17 @@ import { StackPriority } from '../../priorities';
 export interface RemoveStackBonusOptions {
   name: string;
   stat: Stack;
-  gainMultiplier?: number;
+  multiplier?: number;
 }
 
-const DEFAULT_LOSS_MULTIPLIER = 5;
+const DEFAULT_MULTIPLIER = 5;
 
 export function createRemoveStackBonus(
   options: RemoveStackBonusOptions,
 ): EffectCardSource {
-  const current = Object.assign(
-    { gainMultiplier: DEFAULT_LOSS_MULTIPLIER },
-    options,
-  );
+  const current = Object.assign({ multiplier: DEFAULT_MULTIPLIER }, options);
   function getLoss(level: number) {
-    return current.gainMultiplier * level;
+    return current.multiplier * level;
   }
   return createEffectCardSource({
     name: current.name,
