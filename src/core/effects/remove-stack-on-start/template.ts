@@ -5,6 +5,7 @@ import {
   createEffectCardSource,
 } from '../../game';
 import { EventPriority } from '../../priorities';
+import { Rarity } from '../../rarities';
 
 const DEFAULT_MULTIPLIER = 100;
 
@@ -20,13 +21,13 @@ export function createRemoveStackOnStart(
   const current = Object.assign({ multiplier: DEFAULT_MULTIPLIER }, options);
   return createEffectCardSource({
     name: current.name,
-    tier: 1,
-    load(game, player, level) {
+    rarity: Rarity.Common,
+    load(game, player) {
       game.on(EventType.Start, EventPriority.Post, () => {
         game.removeStack(
           current.stack,
           game.getOppositePlayer(player),
-          level * DEFAULT_MULTIPLIER,
+          current.multiplier,
         );
       });
     },

@@ -1,6 +1,7 @@
 import type { DamageType } from './damage';
 import { EventEmitter, type EventEmitterListener } from './event-emitter';
 import { log } from './log';
+import type { Edition, Rarity } from './rarities';
 
 const DEFAULT_MAX_HEALTH = 1000;
 
@@ -10,13 +11,13 @@ const DEFAULT_CRIT_MULTIPLIER = 200;
 
 export interface EffectCardSource {
   name: string;
-  tier: number;
-  load: (game: Game, player: Player, level: number) => void;
+  rarity: Rarity;
+  load: (game: Game, player: Player, edition: Edition) => void;
 }
 
 export interface AbilityCardSource {
   name: string;
-  load: (game: Game, player: Player, level: number) => void;
+  load: (game: Game, player: Player, edition: Edition) => void;
 }
 
 export function createEffectCardSource(

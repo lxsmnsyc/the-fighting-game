@@ -6,6 +6,7 @@ import {
 } from '../../game';
 import { lerp } from '../../lerp';
 import { EventPriority } from '../../priorities';
+import { Rarity } from '../../rarities';
 
 const DEFAULT_MIN_PERIOD = 5;
 const DEFAULT_MAX_PERIOD = 0.2;
@@ -34,10 +35,6 @@ export function createPeriodicRemoveStack(
     options,
   );
 
-  function getPeriodicLoss(level: number) {
-    return current.multiplier * level;
-  }
-
   function getPeriod(speed: number): number {
     return lerp(
       current.minPeriod * 1000,
@@ -48,8 +45,8 @@ export function createPeriodicRemoveStack(
 
   return createEffectCardSource({
     name: current.name,
-    tier: 1,
-    load(game, player, level) {
+    rarity: Rarity.Uncommon,
+    load(game, player) {
       game.on(EventType.Start, EventPriority.Post, () => {
         let elapsed = 0;
         let period = getPeriod(player.stats[Stack.Speed]);
@@ -61,7 +58,7 @@ export function createPeriodicRemoveStack(
             game.removeStack(
               current.stack,
               game.getOppositePlayer(player),
-              getPeriodicLoss(level),
+              current.multiplier,
             );
           }
         });

@@ -5,6 +5,7 @@ import {
   createEffectCardSource,
 } from '../../game';
 import { StackPriority } from '../../priorities';
+import { Rarity } from '../../rarities';
 
 export interface AddStackBonusOptions {
   name: string;
@@ -18,16 +19,13 @@ export function createAddStackBonus(
   options: AddStackBonusOptions,
 ): EffectCardSource {
   const current = Object.assign({ multiplier: DEFAULT_MULTIPLIER }, options);
-  function getGain(level: number) {
-    return current.multiplier * level;
-  }
   return createEffectCardSource({
     name: current.name,
-    tier: 1,
-    load(game, player, level) {
+    rarity: Rarity.Common,
+    load(game, player) {
       game.on(EventType.AddStack, StackPriority.Additive, event => {
         if (event.type === current.stat && event.source === player) {
-          event.amount += getGain(level);
+          event.amount += current.multiplier;
         }
       });
     },

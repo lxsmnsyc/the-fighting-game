@@ -5,6 +5,7 @@ import {
   createEffectCardSource,
 } from '../../game';
 import { EventPriority } from '../../priorities';
+import { Rarity } from '../../rarities';
 
 const DEFAULT_MULTIPLIER = 100;
 
@@ -20,7 +21,7 @@ export function createAddStatOnStart(
   const current = Object.assign({ multiplier: DEFAULT_MULTIPLIER }, options);
   return createEffectCardSource({
     name: current.name,
-    tier: 1,
+    rarity: Rarity.Common,
     load(game, player, level) {
       game.on(EventType.Start, EventPriority.Post, () => {
         game.addStat(current.stat, player, level * DEFAULT_MULTIPLIER);
