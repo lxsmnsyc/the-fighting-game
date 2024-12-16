@@ -1,6 +1,6 @@
 import {
   type EffectCardSource,
-  EventType,
+  RoundEventType,
   type Stack,
   createEffectCardSource,
 } from '../../game';
@@ -23,7 +23,7 @@ export function createAddStackOnCastAbility(
     name: current.name,
     rarity: Rarity.Common,
     load(game, player, level) {
-      game.on(EventType.CastAbility, EventPriority.Post, event => {
+      game.on(RoundEventType.CastAbility, EventPriority.Post, event => {
         if (event.source === player) {
           game.addStack(current.stack, player, level * DEFAULT_MULTIPLIER);
         }

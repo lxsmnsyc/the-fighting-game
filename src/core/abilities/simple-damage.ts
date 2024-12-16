@@ -1,11 +1,11 @@
 import { DamageType } from '../damage';
-import { EventType, createAbilityCardSource } from '../game';
+import { RoundEventType, createAbilityCardSource } from '../game';
 import { EventPriority } from '../priorities';
 
 export default createAbilityCardSource({
   name: 'Simple Damage',
   load(game, player, level) {
-    game.on(EventType.CastAbility, EventPriority.Post, event => {
+    game.on(RoundEventType.CastAbility, EventPriority.Post, event => {
       if (event.source === player) {
         game.dealDamage(
           DamageType.Magic,

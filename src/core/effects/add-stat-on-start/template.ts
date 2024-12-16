@@ -1,6 +1,6 @@
 import {
   type EffectCardSource,
-  EventType,
+  RoundEventType,
   type Stat,
   createEffectCardSource,
 } from '../../game';
@@ -23,7 +23,7 @@ export function createAddStatOnStart(
     name: current.name,
     rarity: Rarity.Common,
     load(game, player, level) {
-      game.on(EventType.Start, EventPriority.Post, () => {
+      game.on(RoundEventType.Start, EventPriority.Post, () => {
         game.addStat(current.stat, player, level * DEFAULT_MULTIPLIER);
       });
     },

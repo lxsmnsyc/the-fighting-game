@@ -1,15 +1,14 @@
-import { DamageType } from '../damage';
-import { DamageFlags } from '../damage-flags';
-import { EventType, type Game, Stack } from '../game';
 import { log } from '../log';
 import { DamagePriority, StackPriority } from '../priorities';
+import type { Round } from '../round';
+import { DamageFlags, DamageType, RoundEventType, Stack } from '../types';
 
 const CONSUMABLE_STACKS = 0.5;
 
-export function setupArmorMechanics(game: Game): void {
+export function setupArmorMechanics(round: Round): void {
   log('Setting up Armor mechanics.');
   // Trigger Armor consumption when about to take damage.
-  game.on(EventType.Damage, DamagePriority.Armor, event => {
+  round.on(RoundEventType.Damage, DamagePriority.Armor, event => {
     if (event.flag & (DamageFlags.Missed | DamageFlags.Reduced)) {
       return;
     }
@@ -24,32 +23,34 @@ export function setupArmorMechanics(game: Game): void {
     if (currentArmor > 0) {
       event.amount = Math.max(0, event.amount - currentArmor);
       event.flag |= DamageFlags.Reduced;
-      game.consumeStack(Stack.Armor, event.target);
+      round.consumeStack(Stack.Armor, event.target);
     }
   });
 
-  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+  round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
     if (event.type === Stack.Armor) {
       const current = event.source.stacks[Stack.Armor];
-      game.removeStack(
+      round.removeStack(
         Stack.Armor,
         event.source,
-        Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
+        current === 1 ? current : current * CONSUMABLE_STACKS,
       );
     }
   });
 
-  game.on(EventType.SetStack, StackPriority.Exact, event => {
+  round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
     if (event.type === Stack.Armor) {
-      log(`${event.source.name}'s Armor stacks changed to ${event.amount}`);
+      log(
+        `${event.source.owner.name}'s Armor stacks changed to ${event.amount}`,
+      );
       event.source.stacks[Stack.Armor] = event.amount;
     }
   });
 
-  game.on(EventType.AddStack, StackPriority.Exact, event => {
+  round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
     if (event.type === Stack.Armor) {
-      log(`${event.source.name} gained ${event.amount} stacks of Armor`);
-      game.setStack(
+      log(`${event.source.owner.name} gained ${event.amount} stacks of Armor`);
+      round.setStack(
         Stack.Armor,
         event.source,
         event.source.stacks[Stack.Armor] + event.amount,
@@ -57,10 +58,10 @@ export function setupArmorMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
+  round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Armor) {
-      log(`${event.source.name} lost ${event.amount} stacks of Armor`);
-      game.setStack(
+      log(`${event.source.owner.name} lost ${event.amount} stacks of Armor`);
+      round.setStack(
         Stack.Armor,
         event.source,
         event.source.stacks[Stack.Armor] - event.amount,

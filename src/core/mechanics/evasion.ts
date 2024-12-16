@@ -1,6 +1,6 @@
 import { DamageType } from '../damage';
 import { DamageFlags } from '../damage-flags';
-import { EventType, type Game, Stack } from '../game';
+import { type Game, RoundEventType, Stack } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
 import { DamagePriority, StackPriority } from '../priorities';
@@ -21,7 +21,7 @@ function getEvasionChance(stack: number): number {
 
 export function setupEvasionMechanics(game: Game): void {
   log('Setting up Evasion mechanics.');
-  game.on(EventType.Damage, DamagePriority.Evasion, event => {
+  game.on(RoundEventType.Damage, DamagePriority.Evasion, event => {
     if (event.flag & DamageFlags.Missed) {
       return;
     }
@@ -45,7 +45,7 @@ export function setupEvasionMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
     if (event.type === Stack.Evasion) {
       const current = event.source.stacks[Stack.Evasion];
       game.removeStack(
@@ -56,14 +56,14 @@ export function setupEvasionMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.SetStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.SetStack, StackPriority.Exact, event => {
     if (event.type === Stack.Evasion) {
       log(`${event.source.name}'s Evasion changed to ${event.amount}`);
       event.source.stacks[Stack.Evasion] = event.amount;
     }
   });
 
-  game.on(EventType.AddStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.AddStack, StackPriority.Exact, event => {
     if (event.type === Stack.Evasion) {
       log(`${event.source.name} gained ${event.amount} stacks of Evasion`);
       game.setStack(
@@ -74,7 +74,7 @@ export function setupEvasionMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Evasion) {
       log(`${event.source.name} lost ${event.amount} stacks of Evasion`);
       game.setStack(

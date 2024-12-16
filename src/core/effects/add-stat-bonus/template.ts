@@ -1,6 +1,6 @@
 import {
   type EffectCardSource,
-  EventType,
+  RoundEventType,
   type Stat,
   createEffectCardSource,
 } from '../../game';
@@ -23,7 +23,7 @@ export function createAddStatBonus(
     name: current.name,
     rarity: Rarity.Common,
     load(game, player) {
-      game.on(EventType.AddStat, StatPriority.Additive, event => {
+      game.on(RoundEventType.AddStat, StatPriority.Additive, event => {
         if (event.type === current.stat && event.source === player) {
           event.amount += current.multiplier;
         }

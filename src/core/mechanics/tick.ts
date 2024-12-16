@@ -1,11 +1,11 @@
-import { EventType, type Game } from '../game';
+import { type Game, RoundEventType } from '../game';
 import { EventPriority } from '../priorities';
 
 const FPS = 60;
 const FPS_DURATION = 1000 / FPS;
 
 export function setupTickMechanics(game: Game): void {
-  game.on(EventType.Start, EventPriority.Post, () => {
+  game.on(RoundEventType.Start, EventPriority.Post, () => {
     let elapsed = Date.now();
     let raf = requestAnimationFrame(update);
 
@@ -25,7 +25,7 @@ export function setupTickMechanics(game: Game): void {
       }
     }
 
-    game.on(EventType.Close, EventPriority.Pre, () => {
+    game.on(RoundEventType.Close, EventPriority.Pre, () => {
       cancelAnimationFrame(raf);
     });
   });

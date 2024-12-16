@@ -1,6 +1,6 @@
 import { DamageType } from '../damage';
 import { DamageFlags } from '../damage-flags';
-import { EventType, type Game, Stack, Stat } from '../game';
+import { type Game, RoundEventType, Stack, Stat } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
 import { DamagePriority, StackPriority, StatPriority } from '../priorities';
@@ -20,7 +20,7 @@ function getCriticalChance(stack: number): number {
 
 export function setupCriticalMechanics(game: Game): void {
   log('Setting up Critical mechanics.');
-  game.on(EventType.Damage, DamagePriority.Critical, event => {
+  game.on(RoundEventType.Damage, DamagePriority.Critical, event => {
     if (event.flag & (DamageFlags.Missed | DamageFlags.Critical)) {
       return;
     }
@@ -49,7 +49,7 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
     if (event.type === Stack.Critical) {
       const current = event.source.stacks[Stack.Critical];
       game.removeStack(
@@ -60,14 +60,14 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.SetStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.SetStack, StackPriority.Exact, event => {
     if (event.type === Stack.Critical) {
       log(`${event.source.name}'s Critical stacks changed to ${event.amount}`);
       event.source.stacks[Stack.Critical] = event.amount;
     }
   });
 
-  game.on(EventType.AddStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.AddStack, StackPriority.Exact, event => {
     if (event.type === Stack.Critical) {
       log(`${event.source.name} gained ${event.amount} stacks of Critical`);
       game.setStack(
@@ -78,7 +78,7 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Critical) {
       log(`${event.source.name} lost ${event.amount} stacks of Critical`);
       game.setStack(
@@ -90,7 +90,7 @@ export function setupCriticalMechanics(game: Game): void {
   });
 
   log('Setting up Critical Multiplier mechanics.');
-  game.on(EventType.SetStat, StatPriority.Exact, event => {
+  game.on(RoundEventType.SetStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
       log(
         `${event.source.name}'s Critical Multiplier changed to ${event.amount}`,
@@ -99,7 +99,7 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.AddStat, StatPriority.Exact, event => {
+  game.on(RoundEventType.AddStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
       log(`${event.source.name} gained ${event.amount} of Critical Multiplier`);
       game.setStat(
@@ -110,7 +110,7 @@ export function setupCriticalMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStat, StatPriority.Exact, event => {
+  game.on(RoundEventType.RemoveStat, StatPriority.Exact, event => {
     if (event.type === Stat.CritMultiplier) {
       log(`${event.source.name} lost ${event.amount} of Critical Multiplier`);
       game.setStat(

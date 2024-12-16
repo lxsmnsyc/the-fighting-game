@@ -1,6 +1,6 @@
 import {
   type EffectCardSource,
-  EventType,
+  RoundEventType,
   type Stack,
   createEffectCardSource,
 } from '../../game';
@@ -23,7 +23,7 @@ export function createAddStackBonus(
     name: current.name,
     rarity: Rarity.Common,
     load(game, player) {
-      game.on(EventType.AddStack, StackPriority.Additive, event => {
+      game.on(RoundEventType.AddStack, StackPriority.Additive, event => {
         if (event.type === current.stat && event.source === player) {
           event.amount += current.multiplier;
         }

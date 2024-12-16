@@ -1,4 +1,3 @@
-import { EventType, type Game } from './game';
 import { log } from './log';
 import { setupAbilityMechanics } from './mechanics/ability';
 import { setupArmorMechanics } from './mechanics/armor';
@@ -16,12 +15,12 @@ import { setupTickMechanics } from './mechanics/tick';
 import { EventPriority } from './priorities';
 
 export function setupGame(game: Game): void {
-  game.on(EventType.Prepare, EventPriority.Exact, () => {
+  game.on(RoundEventType.Prepare, EventPriority.Exact, () => {
     log('Preparing game.');
     game.setup();
   });
 
-  game.on(EventType.Setup, EventPriority.Exact, () => {
+  game.on(RoundEventType.Setup, EventPriority.Exact, () => {
     log('Setting up game.');
     setupAbilityMechanics(game);
     // Health and Mana
@@ -42,24 +41,5 @@ export function setupGame(game: Game): void {
 
     // Game Tick
     setupTickMechanics(game);
-
-    game.playerA.load(game);
-    game.playerB.load(game);
-
-    game.start();
-  });
-
-  game.on(EventType.EndGame, EventPriority.Exact, event => {
-    log(`Winner is ${event.winner.name}`);
-    game.close();
-  });
-
-  game.on(EventType.Start, EventPriority.Exact, () => {
-    log('Game started.');
-  });
-
-  game.on(EventType.Close, EventPriority.Exact, () => {
-    log('Game closed.');
-    game.closed = true;
   });
 }

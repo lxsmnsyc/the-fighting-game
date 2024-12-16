@@ -1,6 +1,6 @@
 import {
   type EffectCardSource,
-  EventType,
+  RoundEventType,
   type Stack,
   createEffectCardSource,
 } from '../../game';
@@ -23,7 +23,7 @@ export function createRemoveStackOnStart(
     name: current.name,
     rarity: Rarity.Common,
     load(game, player) {
-      game.on(EventType.Start, EventPriority.Post, () => {
+      game.on(RoundEventType.Start, EventPriority.Post, () => {
         game.removeStack(
           current.stack,
           game.getOppositePlayer(player),

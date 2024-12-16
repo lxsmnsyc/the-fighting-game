@@ -1,5 +1,5 @@
 import { DamageType } from '../damage';
-import { EventType, type Game, Stack } from '../game';
+import { type Game, RoundEventType, Stack } from '../game';
 import { log } from '../log';
 import { StackPriority } from '../priorities';
 
@@ -7,14 +7,14 @@ const CONSUMABLE_STACKS = 0.5;
 
 export function setupCureMechanics(game: Game): void {
   log('Setting up Cure mechanics.');
-  game.on(EventType.SetStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.SetStack, StackPriority.Exact, event => {
     if (event.type === Stack.Cure) {
       log(`${event.source.name}'s Cure changed to ${event.amount}`);
       event.source.stacks[Stack.Cure] = event.amount;
     }
   });
 
-  game.on(EventType.AddStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.AddStack, StackPriority.Exact, event => {
     if (event.type === Stack.Cure) {
       log(`${event.source.name} gained ${event.amount} stacks of Cure`);
       game.setStack(
@@ -25,7 +25,7 @@ export function setupCureMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Cure) {
       log(`${event.source.name} lost ${event.amount} stacks of Cure`);
       game.setStack(
@@ -36,7 +36,7 @@ export function setupCureMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+  game.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
     if (event.type === Stack.Cure) {
       const stacks = event.source.stacks[Stack.Cure];
       if (stacks !== 0) {

@@ -1,6 +1,6 @@
 import {
   type EffectCardSource,
-  EventType,
+  RoundEventType,
   Stack,
   createEffectCardSource,
 } from '../../game';
@@ -46,18 +46,22 @@ export function createPeriodicRemoveStack(
   return createEffectCardSource({
     name: current.name,
     rarity: Rarity.Uncommon,
-    load(game, player) {
-      game.on(EventType.Start, EventPriority.Post, () => {
+    load(context) {
+      // Start the timer only when game starts
+      context.game.on(RoundEventType.Start, EventPriority.Post, () => {
         let elapsed = 0;
-        let period = getPeriod(player.stats[Stack.Speed]);
-        game.on(EventType.Tick, EventPriority.Exact, event => {
+        // Get the initial period
+        let period = getPeriod(context.player.stats[Stack.Speed]);
+        context.game.on(RoundEventType.Tick, EventPriority.Exact, event => {
           elapsed += event.delta;
           if (elapsed >= period) {
             elapsed -= period;
-            period = getPeriod(player.stats[Stack.Speed]);
-            game.removeStack(
+            period = getPeriod(context.player.stats[Stack.Speed]);
+
+            // Remove stack from the opposite player
+            context.game.removeStack(
               current.stack,
-              game.getOppositePlayer(player),
+              context.game.getOppositePlayer(context.player),
               current.multiplier,
             );
           }

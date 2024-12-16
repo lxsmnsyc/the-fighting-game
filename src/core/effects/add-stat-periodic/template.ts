@@ -1,6 +1,6 @@
 import {
   type EffectCardSource,
-  EventType,
+  RoundEventType,
   Stack,
   type Stat,
   createEffectCardSource,
@@ -50,7 +50,7 @@ export function createPeriodicAddStat(
     load(game, player) {
       let elapsed = 0;
       let period = getPeriod(player.stats[Stack.Speed]);
-      game.on(EventType.Tick, EventPriority.Exact, event => {
+      game.on(RoundEventType.Tick, EventPriority.Exact, event => {
         elapsed += event.delta;
         if (elapsed >= period) {
           elapsed -= period;

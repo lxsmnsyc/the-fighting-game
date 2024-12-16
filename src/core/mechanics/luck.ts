@@ -1,7 +1,8 @@
-import { EventType, type Game, Stack } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
 import { StackPriority } from '../priorities';
+import type { Round } from '../round';
+import { RoundEventType, Stack } from '../types';
 
 const MIN_LUCK_CHANCE = 0;
 const MAX_LUCK_CHANCE = 100;
@@ -16,12 +17,12 @@ export function getLuckChance(stack: number): number {
   );
 }
 
-export function setupLuckMechanics(game: Game): void {
+export function setupLuckMechanics(round: Round): void {
   log('Setting up Luck mechanics.');
-  game.on(EventType.ConsumeStack, StackPriority.Exact, event => {
+  round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
     if (event.type === Stack.Luck) {
       const current = event.source.stacks[Stack.Luck];
-      game.removeStack(
+      round.removeStack(
         Stack.Luck,
         event.source,
         Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
@@ -29,17 +30,17 @@ export function setupLuckMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.SetStack, StackPriority.Exact, event => {
+  round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
     if (event.type === Stack.Luck) {
-      log(`${event.source.name}'s Luck changed to ${event.amount}`);
+      log(`${event.source.owner.name}'s Luck changed to ${event.amount}`);
       event.source.stacks[Stack.Luck] = event.amount;
     }
   });
 
-  game.on(EventType.AddStack, StackPriority.Exact, event => {
+  round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
     if (event.type === Stack.Luck) {
-      log(`${event.source.name} gained ${event.amount} stacks of Luck`);
-      game.setStack(
+      log(`${event.source.owner.name} gained ${event.amount} stacks of Luck`);
+      round.setStack(
         Stack.Luck,
         event.source,
         event.source.stacks[Stack.Luck] + event.amount,
@@ -47,10 +48,10 @@ export function setupLuckMechanics(game: Game): void {
     }
   });
 
-  game.on(EventType.RemoveStack, StackPriority.Exact, event => {
+  round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
     if (event.type === Stack.Luck) {
-      log(`${event.source.name} lost ${event.amount} stacks of Luck`);
-      game.setStack(
+      log(`${event.source.owner.name} lost ${event.amount} stacks of Luck`);
+      round.setStack(
         Stack.Luck,
         event.source,
         event.source.stacks[Stack.Luck] - event.amount,
