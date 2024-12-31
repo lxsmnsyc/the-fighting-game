@@ -2,8 +2,8 @@ import type { PrintSpawnChanceMultiplier } from '../../card';
 import { Stack } from '../../types';
 import { AddStackBonusCard } from './template';
 
-export class AddCurseStackBonusCard extends AddStackBonusCard {
+export class AddPlagueStackBonusCard extends AddStackBonusCard {
   constructor(print: PrintSpawnChanceMultiplier) {
-    super(print, Stack.Curse);
+    super(print, Stack.Plague);
   }
 }

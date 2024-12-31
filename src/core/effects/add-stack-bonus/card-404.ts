@@ -1,7 +1,9 @@
-import { Stack } from '../../game';
-import { createAddStackBonus } from './template';
+import type { PrintSpawnChanceMultiplier } from '../../card';
+import { Stack } from '../../types';
+import { AddStackBonusCard } from './template';
 
-export default createAddStackBonus({
-  name: 'Card #404',
-  stat: Stack.Evasion,
-});
+export class AddPoisonStackBonusCard extends AddStackBonusCard {
+  constructor(print: PrintSpawnChanceMultiplier) {
+    super(print, Stack.Poison);
+  }
+}
