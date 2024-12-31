@@ -55,7 +55,6 @@ export const enum DamagePriority {
   InitialAdditive = 2,
   InitialMultiplicative = 3,
   Critical = 3,
-  Evasion = 4,
   Custom = 5,
   CustomAdditive = 6,
   CustomMultiplicative = 7,
@@ -94,7 +93,6 @@ export const enum RoundEventType {
   Setup = 3,
   Start = 4,
   End = 5,
-  CastAbility = 6,
   Damage = 7,
   AddStack = 8,
   RemoveStack = 9,
@@ -117,10 +115,12 @@ export const enum DamageType {
   Magical = 4,
 
   // Can trigger some damage events
-  Pure = 3,
+  Pure = 5,
+  // Does not trigger damage events
+  HealthLoss = 6,
 
   // Does not trigger normal damage events either
-  Poison = 4,
+  Poison = 7,
 }
 
 /**
@@ -135,11 +135,9 @@ export const enum DamageFlags {
 export const enum Stat {
   MaxHealth = 1,
   Health = 2,
-  MaxMana = 3,
-  Mana = 4,
-  Attack = 5,
-  Magic = 6,
-  CritMultiplier = 7,
+  Attack = 3,
+  Magic = 4,
+  CritMultiplier = 5,
 }
 
 export const enum Stack {
@@ -155,11 +153,12 @@ export const enum Stack {
   Speed = 5,
   // Counters Slow
   Slow = 6,
-  // Chance to perform a Critical
-  Critical = 7,
-  // Chance to dodge a damage
-  Evasion = 8,
-  //
-  Luck = 9,
-  Curse = 10,
+  // Improves chances
+  Luck = 7,
+  // Counters Luck
+  Curse = 8,
+  // Healing
+  Recovery = 9,
+  // Counters Recovery
+  Plague = 10,
 }
