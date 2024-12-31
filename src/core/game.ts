@@ -1,18 +1,22 @@
+import { AleaRNG } from './alea';
 import { EventEmitter, type EventEmitterListener } from './event-emitter';
 import { Player } from './player';
+import type { Round } from './round';
 import { GameEventType } from './types';
 
 export interface BaseGameEvent {
   id: string;
 }
 
-export interface NextRoundGameEvent extends BaseGameEvent {}
+export interface NextRoundGameEvent extends BaseGameEvent {
+  round: Round;
+}
 
 export type GameEvents = {
   [GameEventType.Setup]: BaseGameEvent;
   [GameEventType.Start]: BaseGameEvent;
   [GameEventType.End]: BaseGameEvent;
-  [GameEventType.NextRound]: BaseGameEvent;
+  [GameEventType.NextRound]: NextRoundGameEvent;
   [GameEventType.OpenShop]: BaseGameEvent;
 };
 
@@ -35,7 +39,13 @@ export class Game {
 
   public player: Player;
 
-  constructor(name: string) {
+  public rng: AleaRNG;
+
+  constructor(
+    public seed: string,
+    name: string,
+  ) {
+    this.rng = new AleaRNG(seed);
     this.player = new Player(name);
   }
 
@@ -59,11 +69,15 @@ export class Game {
     this.emit(GameEventType.Start, { id: 'StartEvent' });
   }
 
-  nextRound() {
-    this.emit(GameEventType.NextRound, { id: 'NextRoundEvent' });
+  nextRound(round: Round) {
+    this.emit(GameEventType.NextRound, { id: 'NextRoundEvent', round });
   }
 
   end() {
     this.emit(GameEventType.End, { id: 'EndEvent' });
+  }
+
+  openShop() {
+    this.emit(GameEventType.OpenShop, { id: 'OpenShopEvent' });
   }
 }
