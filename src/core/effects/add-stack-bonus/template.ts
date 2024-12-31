@@ -1,8 +1,4 @@
-import {
-  Card,
-  type CardContext,
-  type PrintSpawnChanceMultiplier,
-} from '../../card';
+import { Card, type CardContext, type CardManipulator } from '../../card';
 import {
   EventPriority,
   GameEventType,
@@ -16,12 +12,12 @@ const DEFAULT_MULTIPLIER = 5;
 
 export class AddStackBonusCard extends Card {
   constructor(
-    print: PrintSpawnChanceMultiplier,
+    manipulator: CardManipulator,
     public stack: Stack,
     public multiplier = DEFAULT_MULTIPLIER,
     public rarity = Rarity.Common,
   ) {
-    super(print);
+    super(manipulator);
   }
 
   load(context: CardContext): void {
