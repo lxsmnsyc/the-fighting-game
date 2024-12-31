@@ -65,4 +65,8 @@ export class AleaRNG {
 
     return this.s2;
   }
+
+  int32() {
+    return this.random() * 0x100000000;
+  }
 }
