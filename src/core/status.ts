@@ -62,8 +62,4 @@ export const enum DebuffFlags {
    * - Temporary.
    */
   Weakened = 1 << 9,
-  /**
-   * - Cannot recover Health
-   */
-  Plagued = 1 << 10,
 }
