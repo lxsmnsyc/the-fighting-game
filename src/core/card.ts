@@ -1,60 +1,90 @@
+import type { AleaRNG } from './alea';
+import type { Game } from './game';
 import type { Player } from './player';
-import type { Round, Unit } from './round';
-import type { Edition, Rarity } from './types';
+import { Edition, Print, type Rarity } from './types';
 
-export interface LoadContext {
-  round: Round;
+export interface CardContext {
+  game: Game;
   player: Player;
-  unit: Unit;
+  card: Card;
 }
 
-export interface EffectCardSourceContext extends LoadContext {
-  card: EffectCard;
+export interface PrintSpawnChanceMultiplier {
+  [Print.Error]: number;
+  [Print.Monotone]: number;
+  [Print.Negative]: number;
+  [Print.Signed]: number;
 }
 
-export interface EffectCardSource {
-  name: string;
-  load: (context: EffectCardSourceContext) => void;
+export const DEFAULT_PRINT_SPAWN_CHANCE_MULTIPLIER = {
+  [Print.Error]: 0.1,
+  [Print.Monotone]: 0.1,
+  [Print.Negative]: 0.1,
+  [Print.Signed]: 0.1,
+};
+
+export function getRandomPrint(
+  rng: AleaRNG,
+  multiplier: PrintSpawnChanceMultiplier,
+): number {
+  let print = 0;
+
+  if (multiplier[Print.Error] > rng.random()) {
+    print |= Print.Error;
+  }
+
+  if (multiplier[Print.Monotone] > rng.random()) {
+    print |= Print.Monotone;
+  }
+
+  if (multiplier[Print.Negative] > rng.random()) {
+    print |= Print.Negative;
+  }
+
+  if (multiplier[Print.Signed] > rng.random()) {
+    print |= Print.Signed;
+  }
+  return print;
 }
 
-export interface AbilityCardSourceContext extends LoadContext {
-  card: AbilityCard;
+export interface CardManipulator {
+  rng: AleaRNG;
+  print: PrintSpawnChanceMultiplier;
+  edition: number;
 }
 
-export interface AbilityCardSource {
-  name: string;
-  load: (context: AbilityCardSourceContext) => void;
-}
+export abstract class Card {
+  static name: string;
 
-export interface EffectCard {
-  source: EffectCardSource;
-  rarity: Rarity;
-  edition: Edition;
-  print: number;
-}
+  static rarity: Rarity;
 
-export interface AbilityCard {
-  source: AbilityCardSource;
-  edition: Edition;
-  print: number;
-}
+  public print: number;
 
-export function createEffectCardSource(
-  source: EffectCardSource,
-): EffectCardSource {
-  return source;
-}
+  public edition: Edition;
 
-export function createAbilityCardSource(
-  source: AbilityCardSource,
-): AbilityCardSource {
-  return source;
-}
+  constructor(manipulator: CardManipulator) {
+    this.print = getRandomPrint(manipulator.rng, manipulator.print);
+    this.edition = Edition.Common;
+  }
 
-export function createEffectCard(source: EffectCard): EffectCard {
-  return source;
-}
+  getMultiplier(): number {
+    let mult = 1;
 
-export function createAbilityCard(source: AbilityCard): AbilityCard {
-  return source;
+    if (this.print & Print.Error) {
+      mult++;
+    }
+    if (this.print & Print.Monotone) {
+      mult++;
+    }
+    if (this.print & Print.Negative) {
+      mult++;
+    }
+    if (this.print & Print.Signed) {
+      mult++;
+    }
+
+    return mult;
+  }
+
+  abstract load(context: CardContext): void;
 }
