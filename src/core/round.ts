@@ -1,3 +1,4 @@
+import { AleaRNG } from './alea';
 import { EventEmitter, type EventEmitterListener } from './event-emitter';
 import type { Player, PlayerStats } from './player';
 import { type DamageType, RoundEventType, Stack, type Stat } from './types';
@@ -112,9 +113,6 @@ export type RoundEvents = {
   // be applied here (e.g. Poison damage)
   [RoundEventType.Start]: BaseRoundEvent;
 
-  // Event for when a player casts their AbilityCard.
-  [RoundEventType.CastAbility]: AbilityCardEvent;
-
   // Event for when a player deals damage
   [RoundEventType.Damage]: DamageEvent;
 
@@ -141,7 +139,6 @@ function createRoundEventEmitterInstances(): RoundEventEmitterInstances {
     [RoundEventType.Setup]: new EventEmitter(),
     [RoundEventType.Start]: new EventEmitter(),
     [RoundEventType.End]: new EventEmitter(),
-    [RoundEventType.CastAbility]: new EventEmitter(),
     [RoundEventType.Damage]: new EventEmitter(),
     [RoundEventType.AddStack]: new EventEmitter(),
     [RoundEventType.RemoveStack]: new EventEmitter(),
@@ -163,8 +160,8 @@ export interface UnitStacks {
   [Stack.Slow]: number;
   [Stack.Luck]: number;
   [Stack.Curse]: number;
-  [Stack.Critical]: number;
-  [Stack.Evasion]: number;
+  [Stack.Plague]: number;
+  [Stack.Recovery]: number;
 }
 
 export class Unit {
@@ -184,18 +181,23 @@ export class Unit {
     [Stack.Slow]: 0,
     [Stack.Luck]: 0,
     [Stack.Curse]: 0,
-    [Stack.Critical]: 0,
-    [Stack.Evasion]: 0,
+    [Stack.Recovery]: 0,
+    [Stack.Plague]: 0,
   };
 }
 
 export class Round {
   private emitters = createRoundEventEmitterInstances();
 
+  public rng: AleaRNG;
+
   constructor(
+    public seed: number,
     public unitA: Unit,
     public unitB: Unit,
-  ) {}
+  ) {
+    this.rng = new AleaRNG(seed.toString());
+  }
 
   on<E extends RoundEventType>(
     type: E,
@@ -224,10 +226,6 @@ export class Round {
 
   tick(delta: number): void {
     this.emit(RoundEventType.Tick, { id: 'TickEvent', delta });
-  }
-
-  castAbility(source: Unit): void {
-    this.emit(RoundEventType.CastAbility, { id: 'CastAbilityEvent', source });
   }
 
   dealDamage(
