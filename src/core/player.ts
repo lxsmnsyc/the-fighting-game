@@ -5,6 +5,7 @@ import {
   DEFAULT_MAGIC,
   DEFAULT_MAX_HEALTH,
 } from './constants';
+import type { Unit } from './round';
 import { Stat } from './types';
 
 export interface PlayerStats {
@@ -29,6 +30,8 @@ export class Player {
   cloneStats(): PlayerStats {
     return Object.assign({}, this.stats);
   }
+
+  currentUnit: Unit | undefined;
 
   cards: Card[] = [];
 }
