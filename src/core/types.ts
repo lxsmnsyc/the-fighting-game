@@ -100,6 +100,10 @@ export const enum GameEventType {
   End = 3,
   NextRound = 4,
   OpenShop = 5,
+  AcquireCard = 6,
+  SellCard = 7,
+  EnableCard = 8,
+  DisableCard = 9,
 }
 
 /**
