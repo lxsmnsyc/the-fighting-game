@@ -152,7 +152,6 @@ function createRoundEventEmitterInstances(): RoundEventEmitterInstances {
 }
 
 export interface UnitStacks {
-  [Stack.Cure]: number;
   [Stack.Poison]: number;
   [Stack.Armor]: number;
   [Stack.Corrosion]: number;
@@ -160,20 +159,24 @@ export interface UnitStacks {
   [Stack.Slow]: number;
   [Stack.Luck]: number;
   [Stack.Curse]: number;
-  [Stack.Plague]: number;
   [Stack.Recovery]: number;
 }
 
 export class Unit {
   public stats: PlayerStats;
 
-  constructor(public owner: Player) {
+  public rng: AleaRNG;
+
+  constructor(
+    public seed: number,
+    public owner: Player,
+  ) {
     this.stats = owner.cloneStats();
+    this.rng = new AleaRNG(seed.toString());
   }
 
   // Stacks
   stacks: UnitStacks = {
-    [Stack.Cure]: 0,
     [Stack.Poison]: 0,
     [Stack.Armor]: 0,
     [Stack.Corrosion]: 0,
@@ -182,7 +185,6 @@ export class Unit {
     [Stack.Luck]: 0,
     [Stack.Curse]: 0,
     [Stack.Recovery]: 0,
-    [Stack.Plague]: 0,
   };
 }
 
