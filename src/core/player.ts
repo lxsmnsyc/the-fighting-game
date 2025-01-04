@@ -1,9 +1,6 @@
+import { AleaRNG } from './alea';
 import type { Card } from './card';
-import {
-  DEFAULT_ATTACK,
-  DEFAULT_MAGIC,
-  DEFAULT_MAX_HEALTH,
-} from './constants';
+import { DEFAULT_ATTACK, DEFAULT_MAGIC, DEFAULT_MAX_HEALTH } from './constants';
 import type { Unit } from './round';
 import { Stat } from './types';
 
@@ -22,7 +19,14 @@ export class Player {
     [Stat.Magic]: DEFAULT_MAGIC,
   };
 
-  constructor(public name: string) {}
+  public rng: AleaRNG;
+
+  constructor(
+    seed: number,
+    public name: string,
+  ) {
+    this.rng = new AleaRNG(seed.toString());
+  }
 
   cloneStats(): PlayerStats {
     return Object.assign({}, this.stats);
