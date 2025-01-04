@@ -3,11 +3,18 @@ export type EventEmitterListener<T> = (event: T) => void;
 export class EventEmitter<T> {
   queue: Set<EventEmitterListener<T>>[] = [];
 
-  on(priority: number, listener: EventEmitterListener<T>): void {
+  on(priority: number, listener: EventEmitterListener<T>): () => void {
     if (!(priority in this.queue)) {
       this.queue[priority] = new Set();
     }
     this.queue[priority].add(listener);
+    return this.off.bind(this, priority, listener);
+  }
+
+  off(priority: number, listener: EventEmitterListener<T>): void {
+    if (priority in this.queue) {
+      this.queue[priority].delete(listener);
+    }
   }
 
   emit(event: T): void {
