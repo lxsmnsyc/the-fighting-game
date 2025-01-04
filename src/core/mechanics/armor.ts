@@ -28,7 +28,7 @@ export function setupArmorMechanics(game: Game): void {
       if (event.type === DamageType.Pure) {
         return;
       }
-      // Get 50% of the armor
+      // Get 50% of the stacks
       const currentArmor = event.target.stacks[Stack.Armor];
       if (currentArmor > 0) {
         event.amount = Math.max(0, event.amount - currentArmor);
