@@ -5,7 +5,6 @@ import { type Aspect, Edition, Print, type Rarity } from './types';
 
 export interface CardContext {
   game: Game;
-  player: Player;
   card: CardInstance;
 }
 
@@ -53,14 +52,22 @@ export interface CardManipulator {
   edition: number;
 }
 
-export abstract class Card {
-  static name: string;
+export interface Card {
+  id: number;
 
-  static rarity: Rarity;
+  name: string;
 
-  static aspect: Aspect[];
+  rarity: Rarity;
 
-  abstract load(context: CardContext): void;
+  aspect: Aspect[];
+
+  load(context: CardContext): void;
+}
+
+let ID = 0;
+
+export function createCard(card: Omit<Card, 'id'>): Card {
+  return Object.assign({}, card, { id: ID++ });
 }
 
 export class CardInstance {
@@ -68,10 +75,11 @@ export class CardInstance {
 
   public print: number;
 
-  public disabled = false;
+  public enabled = true;
 
   constructor(
-    public card: Card,
+    public owner: Player,
+    public source: Card,
     manipulator: CardManipulator,
   ) {
     this.print = getRandomPrint(manipulator.rng, manipulator.print);
