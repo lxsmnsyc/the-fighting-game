@@ -19,10 +19,26 @@ export const enum Print {
  * Rarity of a card
  */
 export const enum Rarity {
-  Common = 1,
-  Uncommon = 2,
-  Rare = 3,
-  Secret = 4,
+  // Starter cards are the cards that are offered
+  // initially by the card pool. Purchasing a starter
+  // card of an aspect unlocks Common cards of the same
+  // aspect
+  Starter = 1,
+  // 5 copies of Common cards are added to the card pool after being
+  // unlocked by the starter card of the same aspect.
+  // Unlocks Uncommon cards.
+  Common = 2,
+  // 3 copies of Uncommon cards are added to the card pool after
+  // purchasing a common card.
+  // Unlocks rare cards.
+  Uncommon = 3,
+  // A single copy of rare card is added to the card pool
+  // after purchasing an uncommon card.
+  // Unlocks secret card.
+  Rare = 4,
+  // Only a selected set of secret cards is added to the card pool
+  // (not all of the secret cards of the same aspect).
+  Secret = 5,
 }
 
 /**
@@ -137,28 +153,23 @@ export const enum Stat {
   Health = 2,
   Attack = 3,
   Magic = 4,
-  CritMultiplier = 5,
 }
 
 export const enum Stack {
-  // Counters Poison
-  Cure = 1,
   // Deals poison damage
-  Poison = 2,
+  Poison = 1,
   // Blocks attack/magic damage
-  Armor = 3,
+  Armor = 2,
   // Counters Armor
-  Corrosion = 4,
+  Corrosion = 3,
   // Speeds up cycles of cards/abilities
-  Speed = 5,
+  Speed = 4,
   // Counters Slow
-  Slow = 6,
+  Slow = 5,
   // Improves chances
-  Luck = 7,
+  Luck = 6,
   // Counters Luck
-  Curse = 8,
+  Curse = 7,
   // Healing
-  Recovery = 9,
-  // Counters Recovery
-  Plague = 10,
+  Recovery = 8,
 }

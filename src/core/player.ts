@@ -1,7 +1,6 @@
 import type { Card } from './card';
 import {
   DEFAULT_ATTACK,
-  DEFAULT_CRIT_MULTIPLIER,
   DEFAULT_MAGIC,
   DEFAULT_MAX_HEALTH,
 } from './constants';
@@ -13,7 +12,6 @@ export interface PlayerStats {
   [Stat.Health]: number;
   [Stat.Attack]: number;
   [Stat.Magic]: number;
-  [Stat.CritMultiplier]: number;
 }
 
 export class Player {
@@ -22,7 +20,6 @@ export class Player {
     [Stat.Health]: DEFAULT_MAX_HEALTH,
     [Stat.Attack]: DEFAULT_ATTACK,
     [Stat.Magic]: DEFAULT_MAGIC,
-    [Stat.CritMultiplier]: DEFAULT_CRIT_MULTIPLIER,
   };
 
   constructor(public name: string) {}
