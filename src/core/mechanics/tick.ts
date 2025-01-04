@@ -57,7 +57,7 @@ export interface UsePeriodOptions {
   run(): void;
 }
 
-export function usePeriod(options: UsePeriodOptions): void {
+export function useScalingPeriod(options: UsePeriodOptions): void {
   let elapsed = 0;
   let period = getPeriod(
     options.player.stats[Stack.Speed],
