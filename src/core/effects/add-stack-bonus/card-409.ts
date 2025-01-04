@@ -1,8 +1,4 @@
-import { Stack } from '../../types';
-import { AddStackBonusCard } from './template';
+import { Aspect, Stack } from '../../types';
+import createAddStackBonusCard from './template';
 
-export class AddRecoveryStackBonusCard extends AddStackBonusCard {
-  constructor() {
-    super(Stack.Recovery);
-  }
-}
+export default createAddStackBonusCard('', Stack.Recovery, [Aspect.Recovery]);

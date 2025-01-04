@@ -1,8 +1,4 @@
-import { Stack } from '../../types';
-import { AddStackBonusCard } from './template';
+import { Aspect, Stack } from '../../types';
+import createAddStackBonusCard from './template';
 
-export class AddLuckStackBonusCard extends AddStackBonusCard {
-  constructor() {
-    super(Stack.Luck);
-  }
-}
+export default createAddStackBonusCard('', Stack.Luck, [Aspect.Luck]);

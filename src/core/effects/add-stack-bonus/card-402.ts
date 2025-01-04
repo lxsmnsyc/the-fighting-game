@@ -1,8 +1,4 @@
-import { Stack } from '../../types';
-import { AddStackBonusCard } from './template';
+import { Aspect, Stack } from '../../types';
+import createAddStackBonusCard from './template';
 
-export class AddCorrosionStackBonusCard extends AddStackBonusCard {
-  constructor() {
-    super(Stack.Corrosion);
-  }
-}
+export default createAddStackBonusCard('', Stack.Corrosion, [Aspect.Corrosion]);
