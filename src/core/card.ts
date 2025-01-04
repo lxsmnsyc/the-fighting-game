@@ -1,12 +1,12 @@
 import type { AleaRNG } from './alea';
 import type { Game } from './game';
 import type { Player } from './player';
-import { Edition, Print, type Rarity } from './types';
+import { type Aspect, Edition, Print, type Rarity } from './types';
 
 export interface CardContext {
   game: Game;
   player: Player;
-  card: Card;
+  card: CardInstance;
 }
 
 export interface PrintSpawnChanceMultiplier {
@@ -58,11 +58,22 @@ export abstract class Card {
 
   static rarity: Rarity;
 
-  public print: number;
+  static aspect: Aspect[];
 
+  abstract load(context: CardContext): void;
+}
+
+export class CardInstance {
   public edition: Edition;
 
-  constructor(manipulator: CardManipulator) {
+  public print: number;
+
+  public disabled = false;
+
+  constructor(
+    public card: Card,
+    manipulator: CardManipulator,
+  ) {
     this.print = getRandomPrint(manipulator.rng, manipulator.print);
     this.edition = Edition.Common;
   }
@@ -85,6 +96,4 @@ export abstract class Card {
 
     return mult;
   }
-
-  abstract load(context: CardContext): void;
 }

@@ -1,31 +1,38 @@
+import { Card, type CardContext } from '../../card';
 import {
-  type EffectCardSource,
+  EventPriority,
+  GameEventType,
+  Rarity,
   RoundEventType,
   type Stack,
-  createEffectCardSource,
-} from '../../game';
-import { EventPriority } from '../../priorities';
-import { Rarity } from '../../rarities';
+} from '../../types';
 
-const DEFAULT_MULTIPLIER = 100;
+const DEFAULT_MULTIPLIER = 25;
 
-export interface AddStackOnStartOptions {
-  name: string;
-  stack: Stack;
-  multiplier?: number;
-}
+export class AddStackOnStart extends Card {
+  constructor(
+    public stack: Stack,
+    public multiplier = DEFAULT_MULTIPLIER,
+    public rarity = Rarity.Common,
+  ) {
+    super();
+  }
 
-export function createAddStackOnStart(
-  options: AddStackOnStartOptions,
-): EffectCardSource {
-  const current = Object.assign({ multiplier: DEFAULT_MULTIPLIER }, options);
-  return createEffectCardSource({
-    name: current.name,
-    rarity: Rarity.Common,
-    load(game, player, level) {
-      game.on(RoundEventType.Start, EventPriority.Post, () => {
-        game.addStack(current.stack, player, level * DEFAULT_MULTIPLIER);
-      });
-    },
-  });
+  load(context: CardContext): void {
+    context.game.on(
+      GameEventType.NextRound,
+      EventPriority.Exact,
+      ({ round }) => {
+        round.on(RoundEventType.Start, EventPriority.Post, () => {
+          if (context.player.currentUnit) {
+            round.addStack(
+              this.stack,
+              context.player.currentUnit,
+              this.multiplier * context.card.getMultiplier(),
+            );
+          }
+        });
+      },
+    );
+  }
 }

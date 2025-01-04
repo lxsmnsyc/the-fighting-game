@@ -1,4 +1,4 @@
-import { Card, type CardContext, type CardManipulator } from '../../card';
+import { Card, type CardContext } from '../../card';
 import {
   EventPriority,
   GameEventType,
@@ -12,12 +12,11 @@ const DEFAULT_MULTIPLIER = 5;
 
 export class AddStackBonusCard extends Card {
   constructor(
-    manipulator: CardManipulator,
     public stack: Stack,
     public multiplier = DEFAULT_MULTIPLIER,
     public rarity = Rarity.Common,
   ) {
-    super(manipulator);
+    super();
   }
 
   load(context: CardContext): void {
@@ -27,10 +26,11 @@ export class AddStackBonusCard extends Card {
       ({ round }) => {
         round.on(RoundEventType.AddStack, StackPriority.Additive, event => {
           if (
+            !context.card.disabled &&
             event.type === this.stack &&
             event.source.owner === context.player
           ) {
-            event.amount += this.multiplier * this.getMultiplier();
+            event.amount += this.multiplier * context.card.getMultiplier();
           }
         });
       },

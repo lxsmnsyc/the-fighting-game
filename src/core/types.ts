@@ -173,3 +173,18 @@ export const enum Stack {
   // Healing
   Recovery = 8,
 }
+
+export const enum Aspect {
+  Universal = 1,
+  Health = 2,
+  Attack = 3,
+  Magic = 4,
+  Poison = 5,
+  Armor = 6,
+  Corrosion = 7,
+  Speed = 8,
+  Slow = 9,
+  Luck = 10,
+  Curse = 11,
+  Recovery = 12,
+}
