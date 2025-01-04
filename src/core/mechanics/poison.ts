@@ -45,31 +45,14 @@ export function setupPoisonMechanics(game: Game): void {
 
     round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
       if (event.type === Stack.Poison) {
-        /**
-         * Counter Cure by removing stacks from it
-         */
-        if (event.source.stacks[Stack.Cure] > 0) {
-          const diff = event.source.stacks[Stack.Cure] - event.amount;
-          round.removeStack(Stack.Cure, event.source, event.amount);
-
-          if (diff < 0) {
-            log(`${event.source.owner.name} gained ${-diff} stacks of Poison`);
-            round.setStack(
-              Stack.Poison,
-              event.source,
-              event.source.stacks[Stack.Poison] - diff,
-            );
-          }
-        } else {
-          log(
-            `${event.source.owner.name} gained ${event.amount} stacks of Poison`,
-          );
-          round.setStack(
-            Stack.Poison,
-            event.source,
-            event.source.stacks[Stack.Poison] + event.amount,
-          );
-        }
+        log(
+          `${event.source.owner.name} gained ${event.amount} stacks of Poison`,
+        );
+        round.setStack(
+          Stack.Poison,
+          event.source,
+          event.source.stacks[Stack.Poison] + event.amount,
+        );
       }
     });
 
