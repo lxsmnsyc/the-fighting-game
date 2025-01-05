@@ -68,18 +68,14 @@ export const enum StackPriority {
  */
 export const enum DamagePriority {
   Initial = 1,
-  InitialAdditive = 2,
-  InitialMultiplicative = 3,
-  Critical = 3,
-  Custom = 5,
-  CustomAdditive = 6,
-  CustomMultiplicative = 7,
-  Armor = 8,
-  Pre = 9,
-  PreAdditive = 10,
-  PreMultiplicative = 11,
-  Exact = 12,
-  Post = 13,
+  Additive = 2,
+  Multiplicative = 3,
+  Dodge = 4,
+  Armor = 5,
+  Corrosion = 6,
+  Pre = 7,
+  Exact = 8,
+  Post = 9,
 }
 
 /**
@@ -147,9 +143,9 @@ export const enum DamageType {
  * Damage flags
  */
 export const enum DamageFlags {
-  Critical = 0b0001,
-  Missed = 0b0010,
-  Reduced = 0b0100,
+  Dodged = 0b0001,
+  Armor = 0b0010,
+  Corrosion = 0b0100,
 }
 
 export const enum Stat {
