@@ -1,8 +1,8 @@
 import { AleaRNG } from './alea';
-import type { Card } from './card';
+import type { Card, CardInstance } from './card';
 import { DEFAULT_ATTACK, DEFAULT_MAGIC, DEFAULT_MAX_HEALTH } from './constants';
 import type { Unit } from './round';
-import { Stat } from './types';
+import { Print, type PrintSpawnChance, Stat } from './types';
 
 export interface PlayerStats {
   [Stat.MaxHealth]: number;
@@ -17,6 +17,13 @@ export class Player {
     [Stat.Health]: DEFAULT_MAX_HEALTH,
     [Stat.Attack]: DEFAULT_ATTACK,
     [Stat.Magic]: DEFAULT_MAGIC,
+  };
+
+  printSpawnChance: PrintSpawnChance = {
+    [Print.Error]: 0.1,
+    [Print.Monotone]: 0.1,
+    [Print.Negative]: 0.1,
+    [Print.Signed]: 0.1,
   };
 
   public rng: AleaRNG;
@@ -34,5 +41,7 @@ export class Player {
 
   currentUnit: Unit | undefined;
 
-  cards: Card[] = [];
+  deck: CardInstance[] = [];
+
+  cardPool: Card[] = [];
 }
