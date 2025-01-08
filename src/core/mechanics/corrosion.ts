@@ -11,15 +11,15 @@ import {
   StackPriority,
 } from '../types';
 
-const CONSUMABLE_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.25;
 
 export function setupCorrosionMechanics(game: Game): void {
   game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Corrosion mechanics.');
 
     // Trigger Corrosion consumption when about to take damage.
-    round.on(RoundEventType.Damage, DamagePriority.Armor, event => {
-      if (event.flag & (DamageFlags.Missed | DamageFlags.Reduced)) {
+    round.on(RoundEventType.Damage, DamagePriority.Corrosion, event => {
+      if (event.flag & (DamageFlags.Dodged | DamageFlags.Corrosion)) {
         return;
       }
       if (event.type === DamageType.Poison) {
@@ -28,11 +28,10 @@ export function setupCorrosionMechanics(game: Game): void {
       if (event.type === DamageType.Pure) {
         return;
       }
-      // Get 50% of the Corrosion
       const currentCorrosion = event.target.stacks[Stack.Corrosion];
       if (currentCorrosion > 0) {
         event.amount = Math.max(0, event.amount - currentCorrosion);
-        event.flag |= DamageFlags.Reduced;
+        event.flag |= DamageFlags.Corrosion;
         round.consumeStack(Stack.Corrosion, event.target);
       }
     });
