@@ -27,7 +27,10 @@ export class AleaRNG {
   private s2: number;
   private c: number;
 
-  constructor(seed: string) {
+  constructor(
+    seed: string,
+    public steps = 0,
+  ) {
     const instance = new Mash();
 
     // internal state of generator
@@ -53,9 +56,15 @@ export class AleaRNG {
         this.s2 += 1;
       }
     }
+
+    for (let i = 0; i < steps; i++) {
+      this.random();
+    }
   }
 
   random() {
+    this.steps++;
+
     const t = 2091639 * this.s0 + this.c * 2.3283064365386963e-10; // 2^-32
 
     this.s0 = this.s1;
