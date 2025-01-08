@@ -60,14 +60,23 @@ export class Game {
 
   public player: Player;
 
-  public rng: AleaRNG;
+  public rng: {
+    world: AleaRNG;
+    shop: AleaRNG;
+    boss: AleaRNG;
+  };
 
   constructor(
     public seed: string,
     name: string,
   ) {
-    this.rng = new AleaRNG(seed);
-    this.player = new Player(this.rng.int32(), name);
+    const world = new AleaRNG(seed);
+    this.rng = {
+      world,
+      shop: new AleaRNG(world.int32().toString()),
+      boss: new AleaRNG(world.int32().toString()),
+    };
+    this.player = new Player(world.int32(), name);
   }
 
   on<E extends GameEventType>(
