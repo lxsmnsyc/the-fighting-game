@@ -1,30 +1,22 @@
 import type { AleaRNG } from './alea';
 import type { Game } from './game';
 import type { Player } from './player';
-import { type Aspect, Edition, Print, type Rarity } from './types';
+import {
+  type Aspect,
+  Edition,
+  Print,
+  type PrintSpawnChance,
+  type Rarity,
+} from './types';
 
 export interface CardContext {
   game: Game;
   card: CardInstance;
 }
 
-export interface PrintSpawnChanceMultiplier {
-  [Print.Error]: number;
-  [Print.Monotone]: number;
-  [Print.Negative]: number;
-  [Print.Signed]: number;
-}
-
-export const DEFAULT_PRINT_SPAWN_CHANCE_MULTIPLIER = {
-  [Print.Error]: 0.1,
-  [Print.Monotone]: 0.1,
-  [Print.Negative]: 0.1,
-  [Print.Signed]: 0.1,
-};
-
 export function getRandomPrint(
   rng: AleaRNG,
-  multiplier: PrintSpawnChanceMultiplier,
+  multiplier: PrintSpawnChance,
 ): number {
   let print = 0;
 
@@ -44,12 +36,6 @@ export function getRandomPrint(
     print |= Print.Signed;
   }
   return print;
-}
-
-export interface CardManipulator {
-  rng: AleaRNG;
-  print: PrintSpawnChanceMultiplier;
-  edition: number;
 }
 
 export interface Card {
@@ -80,9 +66,8 @@ export class CardInstance {
   constructor(
     public owner: Player,
     public source: Card,
-    manipulator: CardManipulator,
   ) {
-    this.print = getRandomPrint(manipulator.rng, manipulator.print);
+    this.print = getRandomPrint(owner.rng, owner.printSpawnChance);
     this.edition = Edition.Common;
   }
 
