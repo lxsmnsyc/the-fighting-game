@@ -11,7 +11,7 @@ import {
   StackPriority,
 } from '../types';
 
-const CONSUMABLE_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.25;
 
 export function setupArmorMechanics(game: Game): void {
   game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
@@ -19,7 +19,7 @@ export function setupArmorMechanics(game: Game): void {
 
     // Trigger Armor consumption when about to take damage.
     round.on(RoundEventType.Damage, DamagePriority.Armor, event => {
-      if (event.flag & (DamageFlags.Missed | DamageFlags.Reduced)) {
+      if (event.flag & (DamageFlags.Dodged | DamageFlags.Armor)) {
         return;
       }
       if (event.type === DamageType.Poison) {
@@ -28,11 +28,10 @@ export function setupArmorMechanics(game: Game): void {
       if (event.type === DamageType.Pure) {
         return;
       }
-      // Get 50% of the stacks
       const currentArmor = event.target.stacks[Stack.Armor];
       if (currentArmor > 0) {
         event.amount = Math.max(0, event.amount - currentArmor);
-        event.flag |= DamageFlags.Reduced;
+        event.flag |= DamageFlags.Armor;
         round.consumeStack(Stack.Armor, event.target);
       }
     });
