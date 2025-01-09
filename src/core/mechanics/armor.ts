@@ -19,7 +19,7 @@ export function setupArmorMechanics(game: Game): void {
 
     // Trigger Armor consumption when about to take damage.
     round.on(RoundEventType.Damage, DamagePriority.Armor, event => {
-      if (event.flag & (DamageFlags.Dodged | DamageFlags.Armor)) {
+      if (event.flag & (DamageFlags.Missed | DamageFlags.Armor)) {
         return;
       }
       if (event.type === DamageType.Poison) {
