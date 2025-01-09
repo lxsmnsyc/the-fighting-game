@@ -68,14 +68,17 @@ export const enum StackPriority {
  */
 export const enum DamagePriority {
   Initial = 1,
-  Additive = 2,
-  Multiplicative = 3,
-  Dodge = 4,
-  Armor = 5,
-  Corrosion = 6,
-  Pre = 7,
-  Exact = 8,
-  Post = 9,
+  AmplificationAdd = 2,
+  AmplificationMult = 3,
+  Critical = 4,
+  Evasion = 5,
+  Armor = 6,
+  Corrosion = 7,
+  ReductionAdditive = 8,
+  ReductionMult = 9,
+  Pre = 10,
+  Exact = 11,
+  Post = 12,
 }
 
 /**
@@ -143,7 +146,7 @@ export const enum DamageType {
  * Damage flags
  */
 export const enum DamageFlags {
-  Dodged = 0b0001,
+  Missed = 0b0001,
   Armor = 0b0010,
   Corrosion = 0b0100,
 }
@@ -167,9 +170,9 @@ export const enum Stack {
   // Counters Slow
   Slow = 5,
   // Improves chances
-  Luck = 6,
-  // Counters Luck
-  Curse = 7,
+  Evasion = 6,
+  // Counters Evasion
+  Critical = 7,
   // Healing
   Recovery = 8,
 }
@@ -184,7 +187,14 @@ export const enum Aspect {
   Corrosion = 7,
   Speed = 8,
   Slow = 9,
-  Luck = 10,
-  Curse = 11,
+  Evasion = 10,
+  Critical = 11,
   Recovery = 12,
+}
+
+export interface PrintSpawnChance {
+  [Print.Error]: number;
+  [Print.Monotone]: number;
+  [Print.Negative]: number;
+  [Print.Signed]: number;
 }

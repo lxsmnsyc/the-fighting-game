@@ -1,7 +1,14 @@
 import { AleaRNG } from './alea';
 import { EventEmitter, type EventEmitterListener } from './event-emitter';
+import type { Game } from './game';
 import type { Player, PlayerStats } from './player';
-import { type DamageType, RoundEventType, Stack, type Stat } from './types';
+import {
+  type DamageType,
+  EventPriority,
+  RoundEventType,
+  Stack,
+  type Stat,
+} from './types';
 
 export interface BaseRoundEvent {
   id: string;
@@ -157,8 +164,8 @@ export interface UnitStacks {
   [Stack.Corrosion]: number;
   [Stack.Speed]: number;
   [Stack.Slow]: number;
-  [Stack.Luck]: number;
-  [Stack.Curse]: number;
+  [Stack.Evasion]: number;
+  [Stack.Critical]: number;
   [Stack.Recovery]: number;
 }
 
@@ -167,12 +174,9 @@ export class Unit {
 
   public rng: AleaRNG;
 
-  constructor(
-    public seed: number,
-    public owner: Player,
-  ) {
+  constructor(public owner: Player) {
     this.stats = owner.cloneStats();
-    this.rng = new AleaRNG(seed.toString());
+    this.rng = new AleaRNG(owner.rng.int32().toString());
   }
 
   // Stacks
@@ -182,8 +186,8 @@ export class Unit {
     [Stack.Corrosion]: 0,
     [Stack.Speed]: 0,
     [Stack.Slow]: 0,
-    [Stack.Luck]: 0,
-    [Stack.Curse]: 0,
+    [Stack.Evasion]: 0,
+    [Stack.Critical]: 0,
     [Stack.Recovery]: 0,
   };
 }
@@ -191,15 +195,11 @@ export class Unit {
 export class Round {
   private emitters = createRoundEventEmitterInstances();
 
-  public rng: AleaRNG;
-
   constructor(
-    public seed: number,
+    public game: Game,
     public unitA: Unit,
     public unitB: Unit,
-  ) {
-    this.rng = new AleaRNG(seed.toString());
-  }
+  ) {}
 
   on<E extends RoundEventType>(
     type: E,
@@ -321,4 +321,14 @@ export class Round {
     this.emit(RoundEventType.End, { id: 'EndRoundEvent', winner, loser });
     this.closed = true;
   }
+}
+
+export function setupRound(round: Round): void {
+  round.on(RoundEventType.Setup, EventPriority.Exact, () => {
+    round.start();
+  });
+
+  round.on(RoundEventType.Start, EventPriority.Exact, () => {
+    console.log('Game started');
+  });
 }
