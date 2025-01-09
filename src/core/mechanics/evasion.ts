@@ -1,9 +1,16 @@
-import { DamageType } from '../damage';
-import { DamageFlags } from '../damage-flags';
-import { type Game, RoundEventType, Stack } from '../game';
+import type { Game } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
-import { DamagePriority, StackPriority } from '../priorities';
+import {
+  DamageFlags,
+  DamagePriority,
+  DamageType,
+  EventPriority,
+  GameEventType,
+  RoundEventType,
+  Stack,
+  StackPriority,
+} from '../types';
 
 const MIN_EVASION_CHANCE = 0;
 const MAX_EVASION_CHANCE = 100;
@@ -20,68 +27,74 @@ function getEvasionChance(stack: number): number {
 }
 
 export function setupEvasionMechanics(game: Game): void {
-  log('Setting up Evasion mechanics.');
-  game.on(RoundEventType.Damage, DamagePriority.Evasion, event => {
-    if (event.flag & DamageFlags.Missed) {
-      return;
-    }
-    // Check if player can evade it
-    const stacks = event.target.stacks[Stack.Evasion];
-    if (event.type === DamageType.Attack && stacks !== 0) {
-      // If there's an evasion stack
-      if (stacks > 0) {
+  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+    log('Setting up Evasion mechanics.');
+    round.on(RoundEventType.Damage, DamagePriority.Evasion, event => {
+      if (event.flag & DamageFlags.Missed) {
+        return;
+      }
+      // Check if player can evade it
+      const stacks = event.target.stacks[Stack.Evasion];
+      if (event.type === DamageType.Attack && stacks !== 0) {
+        // If there's an evasion stack
+        if (stacks === 0) {
+          return;
+        }
         // Calculat evasion chance
         const currentEvasion = getEvasionChance(stacks);
         // Push your luck
-        const random = Math.random() * 100;
+        const random = event.target.rng.random() * 100;
         if (random > currentEvasion) {
           return;
         }
-        log(`${event.target.name} dodged ${event.amount} of damage.`);
+        log(`${event.target.owner.name} dodged ${event.amount} of damage.`);
         event.flag |= DamageFlags.Missed;
+        round.consumeStack(Stack.Evasion, event.target);
       }
+    });
 
-      game.consumeStack(Stack.Evasion, event.target);
-    }
-  });
+    round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
+      if (event.type === Stack.Evasion) {
+        const current = event.source.stacks[Stack.Evasion];
+        round.removeStack(
+          Stack.Evasion,
+          event.source,
+          Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
+        );
+      }
+    });
 
-  game.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
-    if (event.type === Stack.Evasion) {
-      const current = event.source.stacks[Stack.Evasion];
-      game.removeStack(
-        Stack.Evasion,
-        event.source,
-        Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
-      );
-    }
-  });
+    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+      if (event.type === Stack.Evasion) {
+        log(`${event.source.owner.name}'s Evasion changed to ${event.amount}`);
+        event.source.stacks[Stack.Evasion] = event.amount;
+      }
+    });
 
-  game.on(RoundEventType.SetStack, StackPriority.Exact, event => {
-    if (event.type === Stack.Evasion) {
-      log(`${event.source.name}'s Evasion changed to ${event.amount}`);
-      event.source.stacks[Stack.Evasion] = event.amount;
-    }
-  });
+    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+      if (event.type === Stack.Evasion) {
+        log(
+          `${event.source.owner.name} gained ${event.amount} stacks of Evasion`,
+        );
+        round.setStack(
+          Stack.Evasion,
+          event.source,
+          event.source.stacks[Stack.Evasion] + event.amount,
+        );
+      }
+    });
 
-  game.on(RoundEventType.AddStack, StackPriority.Exact, event => {
-    if (event.type === Stack.Evasion) {
-      log(`${event.source.name} gained ${event.amount} stacks of Evasion`);
-      game.setStack(
-        Stack.Evasion,
-        event.source,
-        event.source.stacks[Stack.Evasion] + event.amount,
-      );
-    }
-  });
-
-  game.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
-    if (event.type === Stack.Evasion) {
-      log(`${event.source.name} lost ${event.amount} stacks of Evasion`);
-      game.setStack(
-        Stack.Evasion,
-        event.source,
-        event.source.stacks[Stack.Evasion] - event.amount,
-      );
-    }
+    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+      if (event.type === Stack.Evasion) {
+        log(
+          `${event.source.owner.name} lost ${event.amount} stacks of Evasion`,
+        );
+        round.setStack(
+          Stack.Evasion,
+          event.source,
+          event.source.stacks[Stack.Evasion] - event.amount,
+        );
+      }
+    });
   });
 }
