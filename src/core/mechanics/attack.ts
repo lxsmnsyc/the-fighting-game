@@ -1,41 +1,68 @@
 import type { Game } from '../game';
 import { log } from '../log';
 import {
+  DamageType,
   EventPriority,
   GameEventType,
   RoundEventType,
-  Stat,
-  StatPriority,
+  Stack,
+  StackPriority,
 } from '../types';
+
+const CONSUMABLE_STACKS = 0.4;
 
 export function setupAttackMechanics(game: Game): void {
   game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Attack mechanics.');
-    round.on(RoundEventType.SetStat, StatPriority.Exact, event => {
-      if (event.type === Stat.Attack) {
-        log(`${event.source.owner.name}'s Attack changed to ${event.amount}`);
-        event.source.stats[Stat.Attack] = Math.max(0, event.amount);
-      }
-    });
 
-    round.on(RoundEventType.AddStat, StatPriority.Exact, event => {
-      if (event.type === Stat.Attack) {
-        log(`${event.source.owner.name} gained ${event.amount} of Attack`);
-        round.setStat(
-          Stat.Attack,
+    round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
+      if (event.type === Stack.Attack) {
+        const current = event.source.stacks[Stack.Attack];
+        if (current > 0) {
+          round.dealDamage(
+            DamageType.Attack,
+            event.source,
+            round.getEnemyUnit(event.source),
+            current,
+            0,
+          );
+        }
+        round.removeStack(
+          Stack.Attack,
           event.source,
-          event.source.stats[Stat.Attack] + event.amount,
+          current === 1 ? current : current * CONSUMABLE_STACKS,
         );
       }
     });
 
-    round.on(RoundEventType.RemoveStat, StatPriority.Exact, event => {
-      if (event.type === Stat.Attack) {
-        log(`${event.source.owner.name} lost ${event.amount} of Attack`);
-        round.setStat(
-          Stat.Attack,
+    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+      if (event.type === Stack.Attack) {
+        const clamped = Math.max(0, event.amount);
+        log(`${event.source.owner.name}'s Attack stacks changed to ${clamped}`);
+        event.source.stacks[Stack.Attack] = clamped;
+      }
+    });
+
+    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+      if (event.type === Stack.Attack) {
+        log(
+          `${event.source.owner.name} gained ${event.amount} stacks of Attack`,
+        );
+        round.setStack(
+          Stack.Attack,
           event.source,
-          event.source.stats[Stat.Attack] - event.amount,
+          event.source.stacks[Stack.Attack] + event.amount,
+        );
+      }
+    });
+
+    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+      if (event.type === Stack.Attack) {
+        log(`${event.source.owner.name} lost ${event.amount} stacks of Attack`);
+        round.setStack(
+          Stack.Attack,
+          event.source,
+          event.source.stacks[Stack.Attack] - event.amount,
         );
       }
     });
