@@ -19,7 +19,7 @@ export function setupCorrosionMechanics(game: Game): void {
 
     // Trigger Corrosion consumption when about to take damage.
     round.on(RoundEventType.Damage, DamagePriority.Corrosion, event => {
-      if (event.flag & (DamageFlags.Dodged | DamageFlags.Corrosion)) {
+      if (event.flag & (DamageFlags.Missed | DamageFlags.Corrosion)) {
         return;
       }
       if (event.type === DamageType.Poison) {
