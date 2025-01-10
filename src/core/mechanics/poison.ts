@@ -9,7 +9,7 @@ import {
   StackPriority,
 } from '../types';
 
-const CONSUMABLE_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.4;
 
 export function setupPoisonMechanics(game: Game): void {
   game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
@@ -21,8 +21,8 @@ export function setupPoisonMechanics(game: Game): void {
         if (current > 0) {
           round.dealDamage(
             DamageType.Poison,
-            event.source,
             round.getEnemyUnit(event.source),
+            event.source,
             current,
             0,
           );
