@@ -159,6 +159,8 @@ function createRoundEventEmitterInstances(): RoundEventEmitterInstances {
 }
 
 export interface UnitStacks {
+  [Stack.Attack]: number;
+  [Stack.Magic]: number;
   [Stack.Poison]: number;
   [Stack.Armor]: number;
   [Stack.Corrosion]: number;
@@ -181,7 +183,11 @@ export class Unit {
 
   // Stacks
   stacks: UnitStacks = {
+    // Offensive
+    [Stack.Attack]: 0,
+    [Stack.Magic]: 0,
     [Stack.Poison]: 0,
+    // Supporting
     [Stack.Armor]: 0,
     [Stack.Corrosion]: 0,
     [Stack.Speed]: 0,
