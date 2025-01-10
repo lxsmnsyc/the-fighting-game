@@ -15,7 +15,7 @@ import {
 const MIN_CRITICAL_CHANCE = 0;
 const MAX_CRITICAL_CHANCE = 100;
 const MAX_CRITICAL_STACKS = 750;
-const CONSUMABLE_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.4;
 
 function getCriticalChance(stack: number): number {
   return lerp(
