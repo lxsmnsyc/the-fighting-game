@@ -16,7 +16,7 @@ const MIN_EVASION_CHANCE = 0;
 const MAX_EVASION_CHANCE = 100;
 const MAX_EVASION_STACKS = 750;
 
-const CONSUMABLE_STACKS = 0.5;
+const CONSUMABLE_STACKS = 0.4;
 
 function getEvasionChance(stack: number): number {
   return lerp(
