@@ -2,19 +2,22 @@
 
 ## Stats
 
-- Attack
-- Magic
 - Health
-- Mana
-- Max Health
-- Max Mana
-- Critical Multiplier
 
 ## Stacks
 
+### Offensive
+
+- Attack
+- Magic
+- Poison
+
+### Supportive
+
 - Armor
+- Corrosion
+- Speed
+- Slow
 - Evasion
 - Critical
-- Luck
-- Cure
-- Speed
+- Healing
