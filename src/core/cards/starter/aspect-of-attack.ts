@@ -15,8 +15,8 @@ const DEFAULT_AMOUNT = 5;
 const DEFAULT_PERIOD = 1000;
 
 export default createCard({
-  name: 'Dagger',
-  rarity: Rarity.Common,
+  name: 'Aspect of Attack',
+  rarity: Rarity.Starter,
   aspect: [Aspect.Attack],
   load(context) {
     context.card.on(CardEventType.Trigger, EventPriority.Exact, event => {
