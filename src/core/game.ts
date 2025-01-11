@@ -1,5 +1,4 @@
 import { AleaRNG } from './alea';
-import type { CardInstance } from './card';
 import { EventEmitter, type EventEmitterListener } from './event-emitter';
 import { Player } from './player';
 import type { Round } from './round';
@@ -13,28 +12,12 @@ export interface NextRoundGameEvent extends BaseGameEvent {
   round: Round;
 }
 
-export interface CardGameEvent extends BaseGameEvent {
-  card: CardInstance;
-}
-
-export interface CardGameEvent extends BaseGameEvent {
-  card: CardInstance;
-}
-
-export interface CardGameEvent extends BaseGameEvent {
-  card: CardInstance;
-}
-
 export type GameEvents = {
   [GameEventType.Setup]: BaseGameEvent;
   [GameEventType.Start]: BaseGameEvent;
   [GameEventType.End]: BaseGameEvent;
   [GameEventType.NextRound]: NextRoundGameEvent;
   [GameEventType.OpenShop]: BaseGameEvent;
-  [GameEventType.SellCard]: CardGameEvent;
-  [GameEventType.AcquireCard]: CardGameEvent;
-  [GameEventType.EnableCard]: CardGameEvent;
-  [GameEventType.DisableCard]: CardGameEvent;
 };
 
 type GameEventEmitterInstances = {
@@ -48,10 +31,6 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [GameEventType.End]: new EventEmitter(),
     [GameEventType.NextRound]: new EventEmitter(),
     [GameEventType.OpenShop]: new EventEmitter(),
-    [GameEventType.SellCard]: new EventEmitter(),
-    [GameEventType.AcquireCard]: new EventEmitter(),
-    [GameEventType.EnableCard]: new EventEmitter(),
-    [GameEventType.DisableCard]: new EventEmitter(),
   };
 }
 
@@ -117,21 +96,5 @@ export class Game {
 
   openShop() {
     this.emit(GameEventType.OpenShop, { id: 'OpenShop' });
-  }
-
-  sellCard(card: CardInstance) {
-    this.emit(GameEventType.SellCard, { id: 'SellCard', card });
-  }
-
-  acquireCard(card: CardInstance) {
-    this.emit(GameEventType.AcquireCard, { id: 'AcquireCard', card });
-  }
-
-  enableCard(card: CardInstance) {
-    this.emit(GameEventType.EnableCard, { id: 'EnableCard', card });
-  }
-
-  disableCard(card: CardInstance) {
-    this.emit(GameEventType.DisableCard, { id: 'DisableCard', card });
   }
 }
