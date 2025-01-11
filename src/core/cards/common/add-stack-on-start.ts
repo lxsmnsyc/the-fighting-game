@@ -1,9 +1,4 @@
-import {
-  type Card,
-  type CardContext,
-  type TriggerCardEvent,
-  createCard,
-} from '../../card';
+import { type Card, type CardContext, createCard } from '../../card';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
@@ -40,18 +35,14 @@ function createAddStackOnStartCard(
     rarity: Rarity.Common,
     aspect,
     load(context: CardContext): void {
-      context.card.on(
-        CardEventType.Trigger,
-        EventPriority.Exact,
-        ({ data }: TriggerCardEvent) => {
-          const { round, target } = data as { round: Round; target: Unit };
-          round.addStack(
-            stack,
-            target,
-            DEFAULT_MULTIPLIER * context.card.getMultiplier(),
-          );
-        },
-      );
+      context.card.on(CardEventType.Trigger, EventPriority.Exact, event => {
+        const { round, target } = event.data as { round: Round; target: Unit };
+        round.addStack(
+          stack,
+          target,
+          DEFAULT_MULTIPLIER * context.card.getMultiplier(),
+        );
+      });
       context.game.on(
         GameEventType.NextRound,
         EventPriority.Exact,
