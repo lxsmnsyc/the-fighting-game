@@ -99,10 +99,6 @@ export const enum GameEventType {
   End = 3,
   NextRound = 4,
   OpenShop = 5,
-  AcquireCard = 6,
-  SellCard = 7,
-  EnableCard = 8,
-  DisableCard = 9,
 }
 
 /**
@@ -121,6 +117,15 @@ export const enum RoundEventType {
   SetStat = 13,
   Tick = 14,
   ConsumeStack = 15,
+  Heal = 16,
+}
+
+export const enum CardEventType {
+  Trigger = 1,
+  Enable = 2,
+  Disable = 3,
+  Acquire = 4,
+  Sell = 5,
 }
 
 /**
@@ -130,16 +135,12 @@ export const enum DamageType {
   Magic = 1,
   Attack = 2,
 
-  Physical = 3,
-  Magical = 4,
-
-  // Can trigger some damage events
-  Pure = 5,
-  // Does not trigger damage events
-  HealthLoss = 6,
-
   // Does not trigger normal damage events either
-  Poison = 7,
+  Poison = 3,
+  // Can trigger some damage events
+  Pure = 4,
+  // Does not trigger damage events
+  HealthLoss = 5,
 }
 
 /**
@@ -149,32 +150,37 @@ export const enum DamageFlags {
   Missed = 0b0001,
   Armor = 0b0010,
   Corrosion = 0b0100,
+  Critical = 0b1000,
+}
+
+export const enum HealingFlags {
+  Missed = 0b0001,
 }
 
 export const enum Stat {
   MaxHealth = 1,
   Health = 2,
-  Attack = 3,
-  Magic = 4,
 }
 
 export const enum Stack {
+  Attack = 1,
+  Magic = 2,
   // Deals poison damage
-  Poison = 1,
+  Poison = 3,
   // Blocks attack/magic damage
-  Armor = 2,
+  Armor = 4,
   // Counters Armor
-  Corrosion = 3,
+  Corrosion = 5,
   // Speeds up cycles of cards/abilities
-  Speed = 4,
+  Speed = 6,
   // Counters Slow
-  Slow = 5,
-  // Improves chances
-  Evasion = 6,
-  // Counters Evasion
-  Critical = 7,
+  Slow = 7,
+  // Dodges attacks
+  Evasion = 8,
+  // amplifies attacks
+  Critical = 9,
   // Healing
-  Recovery = 8,
+  Healing = 10,
 }
 
 export const enum Aspect {
@@ -189,7 +195,7 @@ export const enum Aspect {
   Slow = 9,
   Evasion = 10,
   Critical = 11,
-  Recovery = 12,
+  Healing = 12,
 }
 
 export interface PrintSpawnChance {
