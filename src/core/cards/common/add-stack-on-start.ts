@@ -64,7 +64,7 @@ function createAddStackOnStartCard(
   });
 }
 
-export default [
+export const ADD_STACK_ON_START_CARDS = [
   // Offensive cards
   createAddStackOnStartCard('', Stack.Attack, [Aspect.Attack]),
   createAddStackOnStartCard('', Stack.Magic, [Aspect.Magic]),
