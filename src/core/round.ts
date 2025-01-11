@@ -46,6 +46,18 @@ function createDamageEvent(
   return { id: 'DamageEvent', type, source, target, amount, flag };
 }
 
+export interface HealEvent extends UnitValueEvent {
+  flag: number;
+}
+
+function createHealEvent(
+  source: Unit,
+  amount: number,
+  flag: number,
+): HealEvent {
+  return { id: 'HealEvent', source, amount, flag };
+}
+
 export interface SetStackEvent extends UnitValueEvent {
   type: Stack;
 }
@@ -135,6 +147,8 @@ export type RoundEvents = {
   [RoundEventType.Tick]: TickEvent;
 
   [RoundEventType.ConsumeStack]: ConsumeStackEvent;
+
+  [RoundEventType.Heal]: HealEvent;
 };
 
 type RoundEventEmitterInstances = {
@@ -155,6 +169,7 @@ function createRoundEventEmitterInstances(): RoundEventEmitterInstances {
     [RoundEventType.SetStack]: new EventEmitter(),
     [RoundEventType.Tick]: new EventEmitter(),
     [RoundEventType.ConsumeStack]: new EventEmitter(),
+    [RoundEventType.Heal]: new EventEmitter(),
   };
 }
 
@@ -168,7 +183,7 @@ export interface UnitStacks {
   [Stack.Slow]: number;
   [Stack.Evasion]: number;
   [Stack.Critical]: number;
-  [Stack.Recovery]: number;
+  [Stack.Healing]: number;
 }
 
 export class Unit {
@@ -194,7 +209,7 @@ export class Unit {
     [Stack.Slow]: 0,
     [Stack.Evasion]: 0,
     [Stack.Critical]: 0,
-    [Stack.Recovery]: 0,
+    [Stack.Healing]: 0,
   };
 }
 
@@ -234,6 +249,14 @@ export class Round {
 
   tick(delta: number): void {
     this.emit(RoundEventType.Tick, { id: 'TickEvent', delta });
+  }
+
+  heal(source: Unit, amount: number, flag: number): void {
+    amount |= 0;
+    if (amount === 0) {
+      return;
+    }
+    this.emit(RoundEventType.Heal, createHealEvent(source, amount, flag));
   }
 
   dealDamage(
@@ -325,7 +348,6 @@ export class Round {
 
   end(winner: Unit, loser: Unit): void {
     this.emit(RoundEventType.End, { id: 'EndRoundEvent', winner, loser });
-    this.closed = true;
   }
 }
 
@@ -336,5 +358,9 @@ export function setupRound(round: Round): void {
 
   round.on(RoundEventType.Start, EventPriority.Exact, () => {
     console.log('Game started');
+  });
+
+  round.on(RoundEventType.End, EventPriority.Exact, () => {
+    round.closed = true;
   });
 }
