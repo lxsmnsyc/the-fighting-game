@@ -1,9 +1,10 @@
 import type { Game } from './game';
-import { EventPriority, GameEventType } from './types';
+import { setupGameMechanics } from './mechanics';
+import { EventPriority, GameEventType, RoundEventType } from './types';
 
 export function setupGame(game: Game): void {
   game.on(GameEventType.Setup, EventPriority.Exact, () => {
-    console.log('Setup');
+    setupGameMechanics(game);
 
     game.start();
   });
@@ -16,24 +17,16 @@ export function setupGame(game: Game): void {
     // do stuff
   });
 
-  game.on(GameEventType.AcquireCard, EventPriority.Exact, () => {
-    // do stuff
-  });
+  game.on(GameEventType.NextRound, EventPriority.Exact, ({ round }) => {
+    round.setup();
 
-  game.on(GameEventType.SellCard, EventPriority.Exact, () => {
-    // do stuff
-  });
-
-  game.on(GameEventType.EnableCard, EventPriority.Exact, ({ card }) => {
-    card.enabled = true;
-  });
-
-  game.on(GameEventType.EnableCard, EventPriority.Exact, ({ card }) => {
-    card.enabled = false;
-  });
-
-  game.on(GameEventType.NextRound, EventPriority.Exact, () => {
-    // do stuff
+    round.on(RoundEventType.End, EventPriority.Exact, event => {
+      if (event.winner.owner === game.player) {
+        game.openShop();
+      } else {
+        game.end();
+      }
+    });
   });
 
   game.on(GameEventType.End, EventPriority.Exact, () => {
