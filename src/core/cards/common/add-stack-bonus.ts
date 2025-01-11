@@ -63,7 +63,7 @@ function createAddStackBonusCard(
   });
 }
 
-export default [
+export const ADD_STACK_BONUS_CARDS = [
   // Offensive cards
   createAddStackBonusCard('', Stack.Attack, [Aspect.Attack]),
   createAddStackBonusCard('', Stack.Magic, [Aspect.Magic]),
