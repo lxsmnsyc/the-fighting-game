@@ -14,7 +14,7 @@ import {
 const CONSUMABLE_STACKS = 0.25;
 
 export function setupCorrosionMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Corrosion mechanics.');
 
     // Trigger Corrosion consumption when about to take damage.

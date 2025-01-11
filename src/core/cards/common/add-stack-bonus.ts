@@ -1,5 +1,5 @@
 import { type Card, type CardContext, createCard } from '../../card';
-import type { NextRoundGameEvent } from '../../game';
+import type { StartRoundGameEvent } from '../../game';
 import type { SetStackEvent } from '../../round';
 import {
   Aspect,
@@ -46,9 +46,9 @@ function createAddStackBonusCard(
         },
       );
       context.game.on(
-        GameEventType.NextRound,
+        GameEventType.StartRound,
         EventPriority.Exact,
-        ({ round }: NextRoundGameEvent) => {
+        ({ round }: StartRoundGameEvent) => {
           round.on(RoundEventType.AddStack, StackPriority.Additive, event => {
             const target = SELF_STACK[stack]
               ? event.source.owner

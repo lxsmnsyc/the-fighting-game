@@ -24,12 +24,11 @@ export class Player {
 
   public rng: AleaRNG;
 
-  constructor(
-    seed: number,
-    public name: string,
-  ) {
+  constructor(seed: number) {
     this.rng = new AleaRNG(seed.toString());
   }
+
+  public name: string | undefined;
 
   cloneStats(): PlayerStats {
     return Object.assign({}, this.stats);

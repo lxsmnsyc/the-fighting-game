@@ -8,7 +8,7 @@ const FPS = 60;
 const FPS_DURATION = 1000 / FPS;
 
 export function setupTickMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Post, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Post, ({ round }) => {
     round.on(RoundEventType.Start, EventPriority.Post, () => {
       let elapsed = Date.now();
       let raf = requestAnimationFrame(update);

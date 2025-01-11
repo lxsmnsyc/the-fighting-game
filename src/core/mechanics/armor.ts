@@ -14,7 +14,7 @@ import {
 const CONSUMABLE_STACKS = 0.25;
 
 export function setupArmorMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Armor mechanics.');
 
     // Trigger Armor consumption when about to take damage.

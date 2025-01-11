@@ -12,7 +12,7 @@ import {
 const CONSUMABLE_STACKS = 0.4;
 
 export function setupAttackMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Attack mechanics.');
 
     round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {

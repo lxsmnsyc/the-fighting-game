@@ -1,5 +1,5 @@
 import { createCard } from '../../card';
-import type { NextRoundGameEvent } from '../../game';
+import type { StartRoundGameEvent } from '../../game';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
@@ -25,9 +25,9 @@ export default createCard({
       round.consumeStack(Stack.Attack, target);
     });
     context.game.on(
-      GameEventType.NextRound,
+      GameEventType.StartRound,
       EventPriority.Post,
-      ({ round }: NextRoundGameEvent) => {
+      ({ round }: StartRoundGameEvent) => {
         let elapsed = 0;
         let ready = true;
         round.on(RoundEventType.Tick, EventPriority.Exact, event => {

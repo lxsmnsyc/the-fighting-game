@@ -9,7 +9,7 @@ import {
 } from '../types';
 
 export function setupSpeedMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Speed mechanics.');
 
     round.on(RoundEventType.SetStack, StackPriority.Exact, event => {

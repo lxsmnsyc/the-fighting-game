@@ -9,7 +9,7 @@ import {
 } from '../types';
 
 export function setupHealthMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Health mechanics.');
     round.on(RoundEventType.SetStat, StatPriority.Exact, event => {
       if (event.type === Stat.Health) {

@@ -10,19 +10,15 @@ export function setupGame(game: Game): void {
   });
 
   game.on(GameEventType.Start, EventPriority.Exact, () => {
-    // Display the starter card selection
+    game.nextRound();
   });
 
-  game.on(GameEventType.OpenShop, EventPriority.Exact, () => {
-    // do stuff
-  });
-
-  game.on(GameEventType.NextRound, EventPriority.Exact, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Exact, ({ round }) => {
     round.setup();
 
     round.on(RoundEventType.End, EventPriority.Exact, event => {
       if (event.winner.owner === game.player) {
-        game.openShop();
+        game.nextRound();
       } else {
         game.end();
       }
@@ -30,6 +26,6 @@ export function setupGame(game: Game): void {
   });
 
   game.on(GameEventType.End, EventPriority.Exact, () => {
-    // do stuff
+    // game over :(
   });
 }

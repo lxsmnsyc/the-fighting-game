@@ -26,7 +26,7 @@ function getCriticalChance(stack: number): number {
 }
 
 export function setupCriticalMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Critical mechanics.');
 
     round.on(RoundEventType.Damage, DamagePriority.Critical, event => {

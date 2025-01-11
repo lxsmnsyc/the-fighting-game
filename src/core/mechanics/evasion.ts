@@ -27,7 +27,7 @@ function getEvasionChance(stack: number): number {
 }
 
 export function setupEvasionMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Evasion mechanics.');
     round.on(RoundEventType.Damage, DamagePriority.Evasion, event => {
       if (event.flag & DamageFlags.Missed) {

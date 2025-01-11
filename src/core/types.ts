@@ -98,7 +98,7 @@ export const enum GameEventType {
   Start = 2,
   End = 3,
   NextRound = 4,
-  OpenShop = 5,
+  StartRound = 5,
 }
 
 /**
@@ -126,6 +126,11 @@ export const enum CardEventType {
   Disable = 3,
   Acquire = 4,
   Sell = 5,
+}
+
+export const enum ShopEventType {
+  Reroll = 1,
+  Lock = 2,
 }
 
 /**

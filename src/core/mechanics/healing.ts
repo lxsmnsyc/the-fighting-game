@@ -13,7 +13,7 @@ import {
 const CONSUMABLE_STACKS = 0.4;
 
 export function setupHealingMechanics(game: Game): void {
-  game.on(GameEventType.NextRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Healing mechanics.');
 
     round.on(RoundEventType.Heal, EventPriority.Exact, event => {

@@ -8,7 +8,7 @@ export interface BaseGameEvent {
   id: string;
 }
 
-export interface NextRoundGameEvent extends BaseGameEvent {
+export interface StartRoundGameEvent extends BaseGameEvent {
   round: Round;
 }
 
@@ -16,8 +16,8 @@ export type GameEvents = {
   [GameEventType.Setup]: BaseGameEvent;
   [GameEventType.Start]: BaseGameEvent;
   [GameEventType.End]: BaseGameEvent;
-  [GameEventType.NextRound]: NextRoundGameEvent;
-  [GameEventType.OpenShop]: BaseGameEvent;
+  [GameEventType.NextRound]: BaseGameEvent;
+  [GameEventType.StartRound]: StartRoundGameEvent;
 };
 
 type GameEventEmitterInstances = {
@@ -30,7 +30,7 @@ function createGameEventEmitterInstances(): GameEventEmitterInstances {
     [GameEventType.Start]: new EventEmitter(),
     [GameEventType.End]: new EventEmitter(),
     [GameEventType.NextRound]: new EventEmitter(),
-    [GameEventType.OpenShop]: new EventEmitter(),
+    [GameEventType.StartRound]: new EventEmitter(),
   };
 }
 
@@ -86,15 +86,15 @@ export class Game {
     this.emit(GameEventType.Start, { id: 'Start' });
   }
 
-  nextRound(round: Round) {
-    this.emit(GameEventType.NextRound, { id: 'NextRound', round });
+  nextRound() {
+    this.emit(GameEventType.NextRound, { id: 'NextRound' });
+  }
+
+  startRound(round: Round) {
+    this.emit(GameEventType.StartRound, { id: 'StartRound', round });
   }
 
   end() {
     this.emit(GameEventType.End, { id: 'End' });
-  }
-
-  openShop() {
-    this.emit(GameEventType.OpenShop, { id: 'OpenShop' });
   }
 }

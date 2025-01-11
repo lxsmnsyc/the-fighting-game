@@ -44,7 +44,7 @@ function createAddStackOnStartCard(
         );
       });
       context.game.on(
-        GameEventType.NextRound,
+        GameEventType.StartRound,
         EventPriority.Exact,
         ({ round }) => {
           round.on(RoundEventType.Start, EventPriority.Post, () => {
