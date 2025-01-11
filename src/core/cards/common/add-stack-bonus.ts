@@ -1,7 +1,9 @@
 import { type Card, type CardContext, createCard } from '../../card';
 import type { NextRoundGameEvent } from '../../game';
+import type { SetStackEvent } from '../../round';
 import {
   Aspect,
+  CardEventType,
   EventPriority,
   GameEventType,
   Rarity,
@@ -35,6 +37,14 @@ function createAddStackBonusCard(
     rarity: Rarity.Common,
     aspect,
     load(context: CardContext): void {
+      context.card.on(
+        CardEventType.Trigger,
+        EventPriority.Exact,
+        ({ data }) => {
+          (data as SetStackEvent).amount +=
+            DEFAULT_MULTIPLIER * context.card.getMultiplier();
+        },
+      );
       context.game.on(
         GameEventType.NextRound,
         EventPriority.Exact,
@@ -43,12 +53,8 @@ function createAddStackBonusCard(
             const target = SELF_STACK[stack]
               ? event.source.owner
               : round.getEnemyUnit(event.source).owner;
-            if (
-              context.card.enabled &&
-              event.type === stack &&
-              target === context.card.owner
-            ) {
-              event.amount += DEFAULT_MULTIPLIER * context.card.getMultiplier();
+            if (event.type === stack && target === context.card.owner) {
+              context.card.trigger(event);
             }
           });
         },
