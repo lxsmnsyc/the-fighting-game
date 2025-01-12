@@ -25,16 +25,16 @@ function getPeriod(speed: number): number {
 }
 
 export default createCard({
-  name: 'Aspect of Attack',
+  name: 'Aspect of Poison',
   rarity: Rarity.Starter,
-  aspect: [Aspect.Attack],
+  aspect: [Aspect.Poison],
   load(context) {
     // Trigger card
     context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
       if (event.card === context.card) {
-        const { round, source } = event.data as { round: Round; source: Unit };
-        round.addStack(Stack.Attack, source, DEFAULT_AMOUNT);
-        round.consumeStack(Stack.Attack, source);
+        const { round, target } = event.data as { round: Round; target: Unit };
+        round.addStack(Stack.Poison, target, DEFAULT_AMOUNT);
+        round.consumeStack(Stack.Poison, target);
       }
     });
     // Trigger condition
@@ -60,7 +60,8 @@ export default createCard({
           }
           if (ready && !context.card.enabled) {
             ready = false;
-            context.game.triggerCard(context.card, { round, source });
+            const target = round.getEnemyUnit(source);
+            context.game.triggerCard(context.card, { round, target });
           }
         });
       },

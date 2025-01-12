@@ -18,6 +18,6 @@
 - Corrosion
 - Speed
 - Slow
-- Evasion
+- Dodge
 - Critical
 - Healing

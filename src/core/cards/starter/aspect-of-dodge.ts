@@ -25,16 +25,15 @@ function getPeriod(speed: number): number {
 }
 
 export default createCard({
-  name: 'Aspect of Attack',
+  name: 'Aspect of Dodge',
   rarity: Rarity.Starter,
-  aspect: [Aspect.Attack],
+  aspect: [Aspect.Dodge],
   load(context) {
     // Trigger card
     context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
       if (event.card === context.card) {
         const { round, source } = event.data as { round: Round; source: Unit };
-        round.addStack(Stack.Attack, source, DEFAULT_AMOUNT);
-        round.consumeStack(Stack.Attack, source);
+        round.addStack(Stack.Dodge, source, DEFAULT_AMOUNT);
       }
     });
     // Trigger condition
@@ -46,7 +45,7 @@ export default createCard({
           round.unitA.owner === context.card.owner ? round.unitA : round.unitB;
 
         let elapsed = 0;
-        let period = getPeriod(source.stacks[Stack.Speed]);
+        let period = getPeriod(source.stacks[Stack.Dodge]);
         let ready = true;
 
         round.on(RoundEvents.Tick, EventPriority.Exact, event => {
@@ -54,7 +53,7 @@ export default createCard({
             elapsed += event.delta;
             if (elapsed >= period) {
               elapsed -= period;
-              period = getPeriod(source.stacks[Stack.Speed]);
+              period = getPeriod(source.stacks[Stack.Dodge]);
               ready = true;
             }
           }

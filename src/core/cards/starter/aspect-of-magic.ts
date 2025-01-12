@@ -25,16 +25,16 @@ function getPeriod(speed: number): number {
 }
 
 export default createCard({
-  name: 'Aspect of Attack',
+  name: 'Aspect of Magic',
   rarity: Rarity.Starter,
-  aspect: [Aspect.Attack],
+  aspect: [Aspect.Magic],
   load(context) {
     // Trigger card
     context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
       if (event.card === context.card) {
         const { round, source } = event.data as { round: Round; source: Unit };
-        round.addStack(Stack.Attack, source, DEFAULT_AMOUNT);
-        round.consumeStack(Stack.Attack, source);
+        round.addStack(Stack.Magic, source, DEFAULT_AMOUNT);
+        round.consumeStack(Stack.Magic, source);
       }
     });
     // Trigger condition

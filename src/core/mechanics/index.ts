@@ -4,7 +4,7 @@ import { setupAttackMechanics } from './attack';
 import { setupCorrosionMechanics } from './corrosion';
 import { setupCriticalMechanics } from './critical';
 import { setupDamageMechanics } from './damage';
-import { setupEvasionMechanics } from './evasion';
+import { setupDodgeMechanics } from './evasion';
 import { setupHealingMechanics } from './healing';
 import { setupHealthMechanics } from './health';
 import { setupMagicMechanics } from './magic';
@@ -29,7 +29,7 @@ export function setupGameMechanics(game: Game): void {
   // Setup supportive stacks
   setupArmorMechanics(game);
   setupCorrosionMechanics(game);
-  setupEvasionMechanics(game);
+  setupDodgeMechanics(game);
   setupCriticalMechanics(game);
   setupSpeedMechanics(game);
   setupSlowMechanics(game);

@@ -1,22 +1,22 @@
 export const enum DebuffFlags {
   /**
-   * - Speed and Evasion reset to 0.
-   * - Cannot gain Speed and Evasion.
+   * - Speed and Dodge reset to 0.
+   * - Cannot gain Speed and Dodge.
    * - Cannot cast Ability.
    * - Temporary.
    */
   Stunned = 1,
   /**
-   * - Speed and Evasion reset to 0.
-   * - Cannot gain Speed and Evasion.
+   * - Speed and Dodge reset to 0.
+   * - Cannot gain Speed and Dodge.
    * - Cannot cast Ability.
    * - Indefinite.
    * - Chance to be removed when taking damage (based on Luck.)
    */
   Sleeping = 1 << 1,
   /**
-   * - Speed and Evasion reset to 0.
-   * - Cannot gain Speed and Evasion.
+   * - Speed and Dodge reset to 0.
+   * - Cannot gain Speed and Dodge.
    * - Cannot cast Ability.
    * - Indefinite.
    * - Every second, chance to be removed (based on Luck.)
@@ -51,8 +51,8 @@ export const enum DebuffFlags {
    */
   Cursed = 1 << 7,
   /**
-   * - Speed and Evasion reset to 0.
-   * - Cannot gain Speed and Evasion.
+   * - Speed and Dodge reset to 0.
+   * - Cannot gain Speed and Dodge.
    * - Temporary.
    */
   Trapped = 1 << 8,

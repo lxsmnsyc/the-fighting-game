@@ -159,7 +159,7 @@ export interface UnitStacks {
   [Stack.Corrosion]: number;
   [Stack.Speed]: number;
   [Stack.Slow]: number;
-  [Stack.Evasion]: number;
+  [Stack.Dodge]: number;
   [Stack.Critical]: number;
   [Stack.Healing]: number;
 }
@@ -185,7 +185,7 @@ export class Unit {
     [Stack.Corrosion]: 0,
     [Stack.Speed]: 0,
     [Stack.Slow]: 0,
-    [Stack.Evasion]: 0,
+    [Stack.Dodge]: 0,
     [Stack.Critical]: 0,
     [Stack.Healing]: 0,
   };
@@ -259,10 +259,7 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(
-      RoundEvents.AddStack,
-      createAddStackEvent(type, source, amount),
-    );
+    this.emit(RoundEvents.AddStack, createAddStackEvent(type, source, amount));
   }
 
   removeStack(type: Stack, source: Unit, amount: number): void {
@@ -288,10 +285,7 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(
-      RoundEvents.AddStat,
-      createStatEvent(type, source, amount),
-    );
+    this.emit(RoundEvents.AddStat, createStatEvent(type, source, amount));
   }
 
   removeStat(type: Stat, source: Unit, amount: number): void {

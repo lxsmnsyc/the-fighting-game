@@ -71,7 +71,7 @@ export const enum DamagePriority {
   AmplificationAdd = 2,
   AmplificationMult = 3,
   Critical = 4,
-  Evasion = 5,
+  Dodge = 5,
   Armor = 6,
   Corrosion = 7,
   ReductionAdditive = 8,
@@ -175,7 +175,7 @@ export const enum Stack {
   // Counters Slow
   Slow = 7,
   // Dodges attacks
-  Evasion = 8,
+  Dodge = 8,
   // amplifies attacks
   Critical = 9,
   // Healing
@@ -192,7 +192,7 @@ export const enum Aspect {
   Corrosion = 7,
   Speed = 8,
   Slow = 9,
-  Evasion = 10,
+  Dodge = 10,
   Critical = 11,
   Healing = 12,
 }

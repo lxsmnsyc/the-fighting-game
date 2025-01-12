@@ -1,3 +1,4 @@
-import common from './common';
+import { COMMON_CARDS } from './common';
+import { STARTER_CARDS } from './starter';
 
-export default [...common];
+export default [...STARTER_CARDS, ...COMMON_CARDS];

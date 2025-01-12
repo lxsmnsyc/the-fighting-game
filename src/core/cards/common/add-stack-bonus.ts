@@ -19,7 +19,7 @@ const SELF_STACK: Record<Stack, boolean> = {
   [Stack.Armor]: true,
   [Stack.Corrosion]: false,
   [Stack.Critical]: true,
-  [Stack.Evasion]: true,
+  [Stack.Dodge]: true,
   [Stack.Poison]: false,
   [Stack.Healing]: true,
   [Stack.Slow]: false,
@@ -76,7 +76,7 @@ export const ADD_STACK_BONUS_CARDS = [
   createAddStackBonusCard('', Stack.Corrosion, [Aspect.Corrosion]),
   createAddStackBonusCard('', Stack.Speed, [Aspect.Speed]),
   createAddStackBonusCard('', Stack.Slow, [Aspect.Slow]),
-  createAddStackBonusCard('', Stack.Evasion, [Aspect.Evasion]),
+  createAddStackBonusCard('', Stack.Dodge, [Aspect.Dodge]),
   createAddStackBonusCard('', Stack.Critical, [Aspect.Critical]),
   createAddStackBonusCard('', Stack.Healing, [Aspect.Healing]),
 ];
