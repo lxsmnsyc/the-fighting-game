@@ -5,8 +5,8 @@ import {
   DamagePriority,
   DamageType,
   EventPriority,
-  GameEventType,
-  RoundEventType,
+  GameEvents,
+  RoundEvents,
   Stack,
   StackPriority,
 } from '../types';
@@ -14,11 +14,11 @@ import {
 const CONSUMABLE_STACKS = 0.25;
 
 export function setupCorrosionMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Corrosion mechanics.');
 
     // Trigger Corrosion consumption when about to take damage.
-    round.on(RoundEventType.Damage, DamagePriority.Corrosion, event => {
+    round.on(RoundEvents.Damage, DamagePriority.Corrosion, event => {
       if (event.flag & (DamageFlags.Missed | DamageFlags.Corrosion)) {
         return;
       }
@@ -36,7 +36,7 @@ export function setupCorrosionMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Corrosion) {
         const current = event.source.stacks[Stack.Corrosion];
         round.removeStack(
@@ -47,7 +47,7 @@ export function setupCorrosionMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Corrosion) {
         const clamped = Math.max(0, event.amount);
         log(
@@ -57,7 +57,7 @@ export function setupCorrosionMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
       if (event.type === Stack.Corrosion) {
         /**
          * Counter Armor by removing stacks from it
@@ -89,7 +89,7 @@ export function setupCorrosionMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
       if (event.type === Stack.Corrosion) {
         log(
           `${event.source.owner.name} lost ${event.amount} stacks of Corrosion`,

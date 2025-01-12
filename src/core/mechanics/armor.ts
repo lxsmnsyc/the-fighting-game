@@ -5,8 +5,8 @@ import {
   DamagePriority,
   DamageType,
   EventPriority,
-  GameEventType,
-  RoundEventType,
+  GameEvents,
+  RoundEvents,
   Stack,
   StackPriority,
 } from '../types';
@@ -14,11 +14,11 @@ import {
 const CONSUMABLE_STACKS = 0.25;
 
 export function setupArmorMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Armor mechanics.');
 
     // Trigger Armor consumption when about to take damage.
-    round.on(RoundEventType.Damage, DamagePriority.Armor, event => {
+    round.on(RoundEvents.Damage, DamagePriority.Armor, event => {
       if (event.flag & (DamageFlags.Missed | DamageFlags.Armor)) {
         return;
       }
@@ -36,7 +36,7 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Armor) {
         const current = event.source.stacks[Stack.Armor];
         round.removeStack(
@@ -47,7 +47,7 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Armor) {
         const clamped = Math.max(0, event.amount);
         log(`${event.source.owner.name}'s Armor stacks changed to ${clamped}`);
@@ -55,7 +55,7 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
       if (event.type === Stack.Armor) {
         /**
          * Counter Corrosion by removing stacks from it
@@ -85,7 +85,7 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
       if (event.type === Stack.Armor) {
         log(`${event.source.owner.name} lost ${event.amount} stacks of Armor`);
         round.setStack(

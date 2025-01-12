@@ -1,51 +1,67 @@
 import { createCard } from '../../card';
 import type { StartRoundGameEvent } from '../../game';
+import { lerp } from '../../lerp';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
-  CardEventType,
   EventPriority,
-  GameEventType,
+  GameEvents,
   Rarity,
-  RoundEventType,
+  RoundEvents,
   Stack,
 } from '../../types';
 
 const DEFAULT_AMOUNT = 5;
-const DEFAULT_PERIOD = 1000;
+const MIN_PERIOD = 0.25;
+const MAX_PERIOD = 2.5;
+const MAX_SPEED = 750;
+
+function getPeriod(speed: number): number {
+  return lerp(
+    MIN_PERIOD * 1000,
+    MAX_PERIOD * 1000,
+    Math.min(speed / MAX_SPEED, 1),
+  );
+}
 
 export default createCard({
   name: 'Aspect of Attack',
   rarity: Rarity.Starter,
   aspect: [Aspect.Attack],
   load(context) {
-    context.card.on(CardEventType.Trigger, EventPriority.Exact, event => {
-      const { round, target } = event.data as { round: Round; target: Unit };
-      round.addStack(Stack.Attack, target, DEFAULT_AMOUNT);
-      round.consumeStack(Stack.Attack, target);
+    // Trigger card
+    context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
+      if (event.card === context.card) {
+        const { round, target } = event.data as { round: Round; target: Unit };
+        round.addStack(Stack.Attack, target, DEFAULT_AMOUNT);
+        round.consumeStack(Stack.Attack, target);
+      }
     });
+    // Trigger condition
     context.game.on(
-      GameEventType.StartRound,
+      GameEvents.StartRound,
       EventPriority.Post,
       ({ round }: StartRoundGameEvent) => {
+        const source =
+          round.unitA.owner === context.card.owner ? round.unitA : round.unitB;
+
         let elapsed = 0;
+        let period = getPeriod(source.stacks[Stack.Speed]);
         let ready = true;
-        round.on(RoundEventType.Tick, EventPriority.Exact, event => {
+
+        round.on(RoundEvents.Tick, EventPriority.Exact, event => {
           if (!ready) {
             elapsed += event.delta;
-            if (elapsed >= DEFAULT_PERIOD) {
-              elapsed -= DEFAULT_PERIOD;
+            if (elapsed >= period) {
+              elapsed -= period;
+              period = getPeriod(source.stacks[Stack.Speed]);
               ready = true;
             }
           }
           if (ready && !context.card.enabled) {
             ready = false;
-            const source =
-              round.unitA.owner === context.card.owner
-                ? round.unitA
-                : round.unitB;
             const target = round.getEnemyUnit(source);
-            context.card.trigger({ round, target });
+            context.game.triggerCard(context.card, { round, target });
           }
         });
       },

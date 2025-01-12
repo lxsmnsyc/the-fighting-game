@@ -1,33 +1,40 @@
-import { setupGame } from './core';
-import simpleDamage from './core/abilities/simple-damage';
-import card106 from './core/effects/add-stack-periodic/card-106';
-import card302 from './core/effects/add-stat-bonus/card-302';
-import card002 from './core/effects/add-stat-periodic/card-002';
+import {
+  CardInstance,
+  DEFAULT_PRINT_SPAWN_CHANCE_MULTIPLIER,
+} from './core/card';
+import dagger from './core/effects/starter/dagger';
+import { Game } from './core/game';
+import { Player } from './core/player';
+import { Round, Unit } from './core/round';
+import { Edition } from './core/types';
 
-import { Game, Player } from './core/game';
+const game = new Game('ALEXIS', 'Alexis');
 
-const playerA = new Player('Player A');
-const playerB = new Player('Player B');
-const game = new Game(playerA, playerB);
+const enemy = new Player(game.rng.int32(), 'Enemy');
 
-playerA.AbilityCard = { source: simpleDamage, level: 5 };
-playerB.AbilityCard = { source: simpleDamage, level: 5 };
-
-playerA.effects = [
-  { source: card106, level: 5 },
-  { source: card002, level: 5 },
-  { source: card302, level: 5 },
-];
-playerB.effects = [
-  { source: card106, level: 5 },
-  { source: card002, level: 5 },
-  { source: card302, level: 5 },
+game.player.cards = [
+  new CardInstance(game.player, dagger, {
+    edition: Edition.Common,
+    print: DEFAULT_PRINT_SPAWN_CHANCE_MULTIPLIER,
+    rng: game.player.rng,
+  }),
 ];
 
-playerA.game = game;
-playerB.game = game;
+enemy.cards = [
+  new CardInstance(enemy, dagger, {
+    edition: Edition.Common,
+    print: DEFAULT_PRINT_SPAWN_CHANCE_MULTIPLIER,
+    rng: enemy.rng,
+  }),
+];
 
-console.log('Test :)');
+for (const card of game.player.cards) {
+  card.source.load({ game, card });
+}
+for (const card of enemy.cards) {
+  card.source.load({ game, card });
+}
 
-setupGame(game);
-game.prepare();
+game.nextRound(
+  new Round(game.rng.int32(), new Unit(game.player), new Unit(enemy)),
+);

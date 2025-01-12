@@ -4,15 +4,15 @@ import {
   DamageFlags,
   DamagePriority,
   EventPriority,
-  GameEventType,
-  RoundEventType,
+  GameEvents,
+  RoundEvents,
   Stat,
 } from '../types';
 
 export function setupDamageMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Damage mechanics.');
-    round.on(RoundEventType.Damage, DamagePriority.Exact, event => {
+    round.on(RoundEvents.Damage, DamagePriority.Exact, event => {
       if (!(event.flag & DamageFlags.Missed)) {
         log(
           `${event.source.owner.name} dealt ${event.amount} damage to ${event.target.owner.name}`,

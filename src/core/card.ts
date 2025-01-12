@@ -1,12 +1,9 @@
 import type { AleaRNG } from './alea';
-import { EventEmitter, type EventEmitterListener } from './event-emitter';
 import type { Game } from './game';
 import type { Player } from './player';
 import {
   type Aspect,
-  CardEventType,
   Edition,
-  EventPriority,
   Print,
   type PrintSpawnChance,
   type Rarity,
@@ -67,31 +64,7 @@ export interface TriggerCardEvent extends BaseCardEvent {
   data: unknown;
 }
 
-export type CardEvents = {
-  [CardEventType.Trigger]: TriggerCardEvent;
-  [CardEventType.Enable]: BaseCardEvent;
-  [CardEventType.Disable]: BaseCardEvent;
-  [CardEventType.Acquire]: BaseCardEvent;
-  [CardEventType.Sell]: BaseCardEvent;
-};
-
-type GameEventEmitterInstances = {
-  [key in keyof CardEvents]: EventEmitter<CardEvents[key]>;
-};
-
-function createGameEventEmitterInstances(): GameEventEmitterInstances {
-  return {
-    [CardEventType.Trigger]: new EventEmitter(),
-    [CardEventType.Enable]: new EventEmitter(),
-    [CardEventType.Disable]: new EventEmitter(),
-    [CardEventType.Acquire]: new EventEmitter(),
-    [CardEventType.Sell]: new EventEmitter(),
-  };
-}
-
 export class CardInstance {
-  private emitters = createGameEventEmitterInstances();
-
   public edition: Edition;
 
   public print: number;
@@ -104,66 +77,6 @@ export class CardInstance {
   ) {
     this.print = getRandomPrint(owner.rng, owner.printSpawnChance);
     this.edition = Edition.Common;
-  }
-
-  on<E extends CardEventType>(
-    type: E,
-    priority: number,
-    listener: EventEmitterListener<CardEvents[E]>,
-  ): () => void {
-    return this.emitters[type].on(priority, listener);
-  }
-
-  off<E extends CardEventType>(
-    type: E,
-    priority: number,
-    listener: EventEmitterListener<CardEvents[E]>,
-  ): void {
-    this.emitters[type].off(priority, listener);
-  }
-
-  setup(): void {
-    this.on(CardEventType.Acquire, EventPriority.Exact, () => {
-      this.enable();
-    });
-
-    this.on(CardEventType.Sell, EventPriority.Exact, () => {
-      this.disable();
-    });
-
-    this.on(CardEventType.Enable, EventPriority.Exact, () => {
-      this.enabled = true;
-    });
-
-    this.on(CardEventType.Disable, EventPriority.Exact, () => {
-      this.enabled = false;
-    });
-  }
-
-  emit<E extends CardEventType>(type: E, event: CardEvents[E]): void {
-    this.emitters[type].emit(event);
-  }
-
-  sell() {
-    this.emit(CardEventType.Sell, { id: 'SellCard' });
-  }
-
-  acquire() {
-    this.emit(CardEventType.Acquire, { id: 'AcquireCard' });
-  }
-
-  enable() {
-    this.emit(CardEventType.Enable, { id: 'EnableCard' });
-  }
-
-  disable() {
-    this.emit(CardEventType.Disable, { id: 'DisableCard' });
-  }
-
-  trigger<T>(data: T): void {
-    if (this.enabled) {
-      this.emit(CardEventType.Trigger, { id: 'TriggerCard', data });
-    }
   }
 
   getMultiplier(): number {

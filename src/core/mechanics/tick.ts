@@ -2,14 +2,14 @@ import type { Game } from '../game';
 import { lerp } from '../lerp';
 import type { Player } from '../player';
 import type { Round } from '../round';
-import { EventPriority, GameEventType, RoundEventType, Stack } from '../types';
+import { EventPriority, GameEvents, RoundEvents, Stack } from '../types';
 
 const FPS = 60;
 const FPS_DURATION = 1000 / FPS;
 
 export function setupTickMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Post, ({ round }) => {
-    round.on(RoundEventType.Start, EventPriority.Post, () => {
+  game.on(GameEvents.StartRound, EventPriority.Post, ({ round }) => {
+    round.on(RoundEvents.Start, EventPriority.Post, () => {
       let elapsed = Date.now();
       let raf = requestAnimationFrame(update);
 
@@ -29,7 +29,7 @@ export function setupTickMechanics(game: Game): void {
         }
       }
 
-      round.on(RoundEventType.End, EventPriority.Pre, () => {
+      round.on(RoundEvents.End, EventPriority.Pre, () => {
         cancelAnimationFrame(raf);
       });
     });
@@ -64,7 +64,7 @@ export function useScalingPeriod(options: UsePeriodOptions): void {
     options.period.min,
     options.period.max,
   );
-  options.round.on(RoundEventType.Tick, EventPriority.Exact, event => {
+  options.round.on(RoundEvents.Tick, EventPriority.Exact, event => {
     elapsed += event.delta;
     if (elapsed >= period) {
       elapsed -= period;

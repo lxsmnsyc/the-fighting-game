@@ -1,11 +1,11 @@
 import { AleaRNG } from './alea';
-import { EventEmitter, type EventEmitterListener } from './event-emitter';
+import { EventEngine } from './event-engine';
 import type { Game } from './game';
 import type { Player, PlayerStats } from './player';
 import {
   type DamageType,
   EventPriority,
-  RoundEventType,
+  RoundEvents,
   Stack,
   type Stat,
 } from './types';
@@ -122,56 +122,34 @@ export interface ConsumeStackEvent extends UnitEvent {
   type: Stack;
 }
 
-export type RoundEvents = {
+export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
-  [RoundEventType.Setup]: BaseRoundEvent;
+  [RoundEvents.Setup]: BaseRoundEvent;
 
   // Start event begins the game.
   // Timeout events for the entire game should
   // be applied here (e.g. Poison damage)
-  [RoundEventType.Start]: BaseRoundEvent;
+  [RoundEvents.Start]: BaseRoundEvent;
 
   // Event for when a player deals damage
-  [RoundEventType.Damage]: DamageEvent;
+  [RoundEvents.Damage]: DamageEvent;
 
-  [RoundEventType.SetStat]: SetStatEvent;
-  [RoundEventType.AddStat]: SetStatEvent;
-  [RoundEventType.RemoveStat]: SetStatEvent;
+  [RoundEvents.SetStat]: SetStatEvent;
+  [RoundEvents.AddStat]: SetStatEvent;
+  [RoundEvents.RemoveStat]: SetStatEvent;
 
-  [RoundEventType.AddStack]: SetStackEvent;
-  [RoundEventType.RemoveStack]: SetStackEvent;
-  [RoundEventType.SetStack]: SetStackEvent;
+  [RoundEvents.AddStack]: SetStackEvent;
+  [RoundEvents.RemoveStack]: SetStackEvent;
+  [RoundEvents.SetStack]: SetStackEvent;
 
-  [RoundEventType.End]: EndRoundEvent;
-  [RoundEventType.Tick]: TickEvent;
+  [RoundEvents.End]: EndRoundEvent;
+  [RoundEvents.Tick]: TickEvent;
 
-  [RoundEventType.ConsumeStack]: ConsumeStackEvent;
+  [RoundEvents.ConsumeStack]: ConsumeStackEvent;
 
-  [RoundEventType.Heal]: HealEvent;
+  [RoundEvents.Heal]: HealEvent;
 };
-
-type RoundEventEmitterInstances = {
-  [key in keyof RoundEvents]: EventEmitter<RoundEvents[key]>;
-};
-
-function createRoundEventEmitterInstances(): RoundEventEmitterInstances {
-  return {
-    [RoundEventType.Setup]: new EventEmitter(),
-    [RoundEventType.Start]: new EventEmitter(),
-    [RoundEventType.End]: new EventEmitter(),
-    [RoundEventType.Damage]: new EventEmitter(),
-    [RoundEventType.AddStack]: new EventEmitter(),
-    [RoundEventType.RemoveStack]: new EventEmitter(),
-    [RoundEventType.AddStat]: new EventEmitter(),
-    [RoundEventType.RemoveStat]: new EventEmitter(),
-    [RoundEventType.SetStat]: new EventEmitter(),
-    [RoundEventType.SetStack]: new EventEmitter(),
-    [RoundEventType.Tick]: new EventEmitter(),
-    [RoundEventType.ConsumeStack]: new EventEmitter(),
-    [RoundEventType.Heal]: new EventEmitter(),
-  };
-}
 
 export interface UnitStacks {
   [Stack.Attack]: number;
@@ -213,42 +191,27 @@ export class Unit {
   };
 }
 
-export class Round {
-  private emitters = createRoundEventEmitterInstances();
-
+export class Round extends EventEngine<RoundEvent> {
   constructor(
     public game: Game,
     public unitA: Unit,
     public unitB: Unit,
-  ) {}
-
-  on<E extends RoundEventType>(
-    type: E,
-    priority: number,
-    listener: EventEmitterListener<RoundEvents[E]>,
-  ): void {
-    this.emitters[type].on(priority, listener);
-  }
-
-  emit<E extends RoundEventType>(type: E, event: RoundEvents[E]): void {
-    if (this.closed) {
-      return;
-    }
-    this.emitters[type].emit(event);
+  ) {
+    super();
   }
 
   setup(): void {
-    this.emit(RoundEventType.Setup, { id: 'SetupEvent' });
+    this.emit(RoundEvents.Setup, { id: 'SetupEvent' });
   }
 
   start(): void {
-    this.emit(RoundEventType.Start, { id: 'StartEvent' });
+    this.emit(RoundEvents.Start, { id: 'StartEvent' });
   }
 
   closed = false;
 
   tick(delta: number): void {
-    this.emit(RoundEventType.Tick, { id: 'TickEvent', delta });
+    this.emit(RoundEvents.Tick, { id: 'TickEvent', delta });
   }
 
   heal(source: Unit, amount: number, flag: number): void {
@@ -256,7 +219,7 @@ export class Round {
     if (amount === 0) {
       return;
     }
-    this.emit(RoundEventType.Heal, createHealEvent(source, amount, flag));
+    this.emit(RoundEvents.Heal, createHealEvent(source, amount, flag));
   }
 
   dealDamage(
@@ -271,13 +234,13 @@ export class Round {
       return;
     }
     this.emit(
-      RoundEventType.Damage,
+      RoundEvents.Damage,
       createDamageEvent(type, source, target, amount, flag),
     );
   }
 
   consumeStack(type: Stack, source: Unit): void {
-    this.emit(RoundEventType.ConsumeStack, {
+    this.emit(RoundEvents.ConsumeStack, {
       id: 'ConsumeStack',
       type,
       source,
@@ -286,7 +249,7 @@ export class Round {
 
   setStack(type: Stack, source: Unit, amount: number): void {
     this.emit(
-      RoundEventType.SetStack,
+      RoundEvents.SetStack,
       createSetStackEvent(type, source, amount | 0),
     );
   }
@@ -297,7 +260,7 @@ export class Round {
       return;
     }
     this.emit(
-      RoundEventType.AddStack,
+      RoundEvents.AddStack,
       createAddStackEvent(type, source, amount),
     );
   }
@@ -308,14 +271,14 @@ export class Round {
       return;
     }
     this.emit(
-      RoundEventType.RemoveStack,
+      RoundEvents.RemoveStack,
       createRemoveStackEvent(type, source, amount),
     );
   }
 
   setStat(type: Stat, source: Unit, amount: number): void {
     this.emit(
-      RoundEventType.SetStat,
+      RoundEvents.SetStat,
       createSetStatEvent(type, source, amount | 0),
     );
   }
@@ -325,7 +288,10 @@ export class Round {
     if (amount === 0) {
       return;
     }
-    this.emit(RoundEventType.AddStat, createStatEvent(type, source, amount));
+    this.emit(
+      RoundEvents.AddStat,
+      createStatEvent(type, source, amount),
+    );
   }
 
   removeStat(type: Stat, source: Unit, amount: number): void {
@@ -334,7 +300,7 @@ export class Round {
       return;
     }
     this.emit(
-      RoundEventType.RemoveStat,
+      RoundEvents.RemoveStat,
       createRemoveStatEvent(type, source, amount),
     );
   }
@@ -347,20 +313,20 @@ export class Round {
   }
 
   end(winner: Unit, loser: Unit): void {
-    this.emit(RoundEventType.End, { id: 'EndRoundEvent', winner, loser });
+    this.emit(RoundEvents.End, { id: 'EndRoundEvent', winner, loser });
   }
 }
 
 export function setupRound(round: Round): void {
-  round.on(RoundEventType.Setup, EventPriority.Exact, () => {
+  round.on(RoundEvents.Setup, EventPriority.Exact, () => {
     round.start();
   });
 
-  round.on(RoundEventType.Start, EventPriority.Exact, () => {
+  round.on(RoundEvents.Start, EventPriority.Exact, () => {
     console.log('Game started');
   });
 
-  round.on(RoundEventType.End, EventPriority.Exact, () => {
+  round.on(RoundEvents.End, EventPriority.Exact, () => {
     round.closed = true;
   });
 }

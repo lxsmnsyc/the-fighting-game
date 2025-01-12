@@ -3,8 +3,8 @@ import { log } from '../log';
 import {
   DamageType,
   EventPriority,
-  GameEventType,
-  RoundEventType,
+  GameEvents,
+  RoundEvents,
   Stack,
   StackPriority,
 } from '../types';
@@ -12,10 +12,10 @@ import {
 const CONSUMABLE_STACKS = 0.4;
 
 export function setupPoisonMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Poison mechanics.');
 
-    round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Poison) {
         const current = event.source.stacks[Stack.Poison];
         if (current > 0) {
@@ -35,7 +35,7 @@ export function setupPoisonMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Poison) {
         const clamped = Math.max(0, event.amount);
         log(`${event.source.owner.name}'s Poison stacks changed to ${clamped}`);
@@ -43,7 +43,7 @@ export function setupPoisonMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
       if (event.type === Stack.Poison) {
         log(
           `${event.source.owner.name} gained ${event.amount} stacks of Poison`,
@@ -56,7 +56,7 @@ export function setupPoisonMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
       if (event.type === Stack.Poison) {
         log(`${event.source.owner.name} lost ${event.amount} stacks of Poison`);
         round.setStack(

@@ -6,8 +6,8 @@ import {
   DamagePriority,
   DamageType,
   EventPriority,
-  GameEventType,
-  RoundEventType,
+  GameEvents,
+  RoundEvents,
   Stack,
   StackPriority,
 } from '../types';
@@ -26,10 +26,10 @@ function getCriticalChance(stack: number): number {
 }
 
 export function setupCriticalMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Critical mechanics.');
 
-    round.on(RoundEventType.Damage, DamagePriority.Critical, event => {
+    round.on(RoundEvents.Damage, DamagePriority.Critical, event => {
       if (event.flag & (DamageFlags.Missed | DamageFlags.Critical)) {
         return;
       }
@@ -55,7 +55,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Critical) {
         const current = event.source.stacks[Stack.Critical];
         round.removeStack(
@@ -66,7 +66,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Critical) {
         log(
           `${event.source.owner.name}'s Critical stacks changed to ${event.amount}`,
@@ -75,7 +75,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
       if (event.type === Stack.Critical) {
         log(
           `${event.source.owner.name} gained ${event.amount} stacks of Critical`,
@@ -88,7 +88,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
       if (event.type === Stack.Critical) {
         log(
           `${event.source.owner.name} lost ${event.amount} stacks of Critical`,

@@ -6,8 +6,8 @@ import {
   DamagePriority,
   DamageType,
   EventPriority,
-  GameEventType,
-  RoundEventType,
+  GameEvents,
+  RoundEvents,
   Stack,
   StackPriority,
 } from '../types';
@@ -27,9 +27,9 @@ function getEvasionChance(stack: number): number {
 }
 
 export function setupEvasionMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Evasion mechanics.');
-    round.on(RoundEventType.Damage, DamagePriority.Evasion, event => {
+    round.on(RoundEvents.Damage, DamagePriority.Evasion, event => {
       if (event.flag & DamageFlags.Missed) {
         return;
       }
@@ -53,7 +53,7 @@ export function setupEvasionMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Evasion) {
         const current = event.source.stacks[Stack.Evasion];
         round.removeStack(
@@ -64,14 +64,14 @@ export function setupEvasionMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Evasion) {
         log(`${event.source.owner.name}'s Evasion changed to ${event.amount}`);
         event.source.stacks[Stack.Evasion] = event.amount;
       }
     });
 
-    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
       if (event.type === Stack.Evasion) {
         log(
           `${event.source.owner.name} gained ${event.amount} stacks of Evasion`,
@@ -84,7 +84,7 @@ export function setupEvasionMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
       if (event.type === Stack.Evasion) {
         log(
           `${event.source.owner.name} lost ${event.amount} stacks of Evasion`,

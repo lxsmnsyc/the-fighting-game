@@ -4,7 +4,6 @@ class Mash {
   mash(data: string | number) {
     const current = '' + data;
 
-    // cache the length
     for (let i = 0, l = current.length; i < l; i++) {
       this.n += current.charCodeAt(i);
 
@@ -33,7 +32,6 @@ export class AleaRNG {
   ) {
     const instance = new Mash();
 
-    // internal state of generator
     this.s0 = instance.mash(' ');
     this.s1 = instance.mash(' ');
     this.s2 = instance.mash(' ');

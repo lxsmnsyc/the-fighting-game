@@ -90,21 +90,28 @@ export const enum EventPriority {
   Post = 3,
 }
 
-/**
- *
- */
-export const enum GameEventType {
-  Setup = 1,
-  Start = 2,
-  End = 3,
-  NextRound = 4,
-  StartRound = 5,
+export const enum GameEvents {
+  // Game
+  Setup = 0,
+  Start = 1,
+  NextRound = 2,
+  StartRound = 3,
+  End = 4,
+  // Card
+  TriggerCard = 5,
+  AcquireCard = 6,
+  SellCard = 7,
+  EnableCard = 8,
+  DisableCard = 9,
+  // Shop
+  LockShop = 10,
+  RerollShop = 11,
 }
 
 /**
  * Round Event types
  */
-export const enum RoundEventType {
+export const enum RoundEvents {
   Setup = 3,
   Start = 4,
   End = 5,
@@ -118,19 +125,6 @@ export const enum RoundEventType {
   Tick = 14,
   ConsumeStack = 15,
   Heal = 16,
-}
-
-export const enum CardEventType {
-  Trigger = 1,
-  Enable = 2,
-  Disable = 3,
-  Acquire = 4,
-  Sell = 5,
-}
-
-export const enum ShopEventType {
-  Reroll = 1,
-  Lock = 2,
 }
 
 /**

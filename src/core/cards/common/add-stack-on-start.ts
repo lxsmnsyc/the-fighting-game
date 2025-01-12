@@ -2,11 +2,10 @@ import { type Card, type CardContext, createCard } from '../../card';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
-  CardEventType,
   EventPriority,
-  GameEventType,
+  GameEvents,
   Rarity,
-  RoundEventType,
+  RoundEvents,
   Stack,
 } from '../../types';
 
@@ -35,25 +34,32 @@ function createAddStackOnStartCard(
     rarity: Rarity.Common,
     aspect,
     load(context: CardContext): void {
-      context.card.on(CardEventType.Trigger, EventPriority.Exact, event => {
-        const { round, target } = event.data as { round: Round; target: Unit };
-        round.addStack(
-          stack,
-          target,
-          DEFAULT_MULTIPLIER * context.card.getMultiplier(),
-        );
+      // Trigger card
+      context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
+        if (event.card === context.card) {
+          const { round, target } = event.data as {
+            round: Round;
+            target: Unit;
+          };
+          round.addStack(
+            stack,
+            target,
+            DEFAULT_MULTIPLIER * context.card.getMultiplier(),
+          );
+        }
       });
+      // Trigger condition
       context.game.on(
-        GameEventType.StartRound,
+        GameEvents.StartRound,
         EventPriority.Exact,
         ({ round }) => {
-          round.on(RoundEventType.Start, EventPriority.Post, () => {
+          round.on(RoundEvents.Start, EventPriority.Post, () => {
             const unit =
               context.card.owner === round.unitA.owner
                 ? round.unitA
                 : round.unitB;
             const target = SELF_STACK[stack] ? unit : round.getEnemyUnit(unit);
-            context.card.trigger({
+            context.game.triggerCard(context.card, {
               round,
               target,
             });

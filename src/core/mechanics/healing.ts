@@ -2,9 +2,9 @@ import type { Game } from '../game';
 import { log } from '../log';
 import {
   EventPriority,
-  GameEventType,
+  GameEvents,
   HealingFlags,
-  RoundEventType,
+  RoundEvents,
   Stack,
   StackPriority,
   Stat,
@@ -13,17 +13,17 @@ import {
 const CONSUMABLE_STACKS = 0.4;
 
 export function setupHealingMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Healing mechanics.');
 
-    round.on(RoundEventType.Heal, EventPriority.Exact, event => {
+    round.on(RoundEvents.Heal, EventPriority.Exact, event => {
       if (!(event.flag & HealingFlags.Missed)) {
         log(`${event.source.owner.name} healed ${event.amount} of Health`);
         round.addStat(Stat.Health, event.source, event.amount);
       }
     });
 
-    round.on(RoundEventType.ConsumeStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Healing) {
         const current = event.source.stacks[Stack.Healing];
         if (current > 0) {
@@ -37,7 +37,7 @@ export function setupHealingMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Healing) {
         const clamped = Math.max(0, event.amount);
         log(
@@ -47,7 +47,7 @@ export function setupHealingMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
       if (event.type === Stack.Healing) {
         log(
           `${event.source.owner.name} gained ${event.amount} stacks of Healing`,
@@ -60,7 +60,7 @@ export function setupHealingMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
       if (event.type === Stack.Healing) {
         log(
           `${event.source.owner.name} lost ${event.amount} stacks of Healing`,

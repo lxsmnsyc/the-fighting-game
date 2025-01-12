@@ -2,24 +2,24 @@ import type { Game } from '../game';
 import { log } from '../log';
 import {
   EventPriority,
-  GameEventType,
-  RoundEventType,
+  GameEvents,
+  RoundEvents,
   Stack,
   StackPriority,
 } from '../types';
 
 export function setupSpeedMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Speed mechanics.');
 
-    round.on(RoundEventType.SetStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Speed) {
         log(`${event.source.owner.name}'s Speed changed to ${event.amount}`);
         event.source.stacks[Stack.Speed] = event.amount;
       }
     });
 
-    round.on(RoundEventType.AddStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
       if (event.type === Stack.Speed) {
         /**
          * Counter Slow by removing stacks from it
@@ -49,7 +49,7 @@ export function setupSpeedMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStack, StackPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
       if (event.type === Stack.Speed) {
         log(`${event.source.owner.name} lost ${event.amount} stacks of Speed`);
         round.setStack(

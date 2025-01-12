@@ -2,23 +2,23 @@ import type { Game } from '../game';
 import { log } from '../log';
 import {
   EventPriority,
-  GameEventType,
-  RoundEventType,
+  GameEvents,
+  RoundEvents,
   Stat,
   StatPriority,
 } from '../types';
 
 export function setupHealthMechanics(game: Game): void {
-  game.on(GameEventType.StartRound, EventPriority.Pre, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Health mechanics.');
-    round.on(RoundEventType.SetStat, StatPriority.Exact, event => {
+    round.on(RoundEvents.SetStat, StatPriority.Exact, event => {
       if (event.type === Stat.Health) {
         log(`${event.source.owner.name}'s Health changed to ${event.amount}`);
         event.source.stats[Stat.Health] = Math.max(0, event.amount);
       }
     });
 
-    round.on(RoundEventType.AddStat, StatPriority.Exact, event => {
+    round.on(RoundEvents.AddStat, StatPriority.Exact, event => {
       if (event.type === Stat.Health) {
         log(`${event.source.owner.name} gained ${event.amount} of Health`);
 
@@ -30,7 +30,7 @@ export function setupHealthMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStat, StatPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStat, StatPriority.Exact, event => {
       if (event.type === Stat.Health) {
         log(`${event.source.owner.name} lost ${event.amount} of Health`);
 
@@ -43,7 +43,7 @@ export function setupHealthMechanics(game: Game): void {
     });
 
     // Death condition
-    round.on(RoundEventType.SetStat, StatPriority.Post, event => {
+    round.on(RoundEvents.SetStat, StatPriority.Post, event => {
       if (event.type === Stat.Health && event.source.stats[Stat.Health] === 0) {
         log(`${event.source.owner.name} died.`);
         round.end(round.getEnemyUnit(event.source), event.source);
@@ -51,7 +51,7 @@ export function setupHealthMechanics(game: Game): void {
     });
 
     log('Setting up Max Health mechanics.');
-    round.on(RoundEventType.SetStat, StatPriority.Exact, event => {
+    round.on(RoundEvents.SetStat, StatPriority.Exact, event => {
       if (event.type === Stat.MaxHealth) {
         log(
           `${event.source.owner.name}'s MaxHealth changed to ${event.amount}`,
@@ -60,7 +60,7 @@ export function setupHealthMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.AddStat, StatPriority.Exact, event => {
+    round.on(RoundEvents.AddStat, StatPriority.Exact, event => {
       if (event.type === Stat.MaxHealth) {
         log(`${event.source.owner.name} gained ${event.amount} of Max Health`);
         // Get the current health percentage
@@ -81,7 +81,7 @@ export function setupHealthMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEventType.RemoveStat, StatPriority.Exact, event => {
+    round.on(RoundEvents.RemoveStat, StatPriority.Exact, event => {
       if (event.type === Stat.MaxHealth) {
         log(`${event.source.owner.name} lost ${event.amount} of Max Health`);
         // Get the current health percentage

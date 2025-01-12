@@ -3,11 +3,10 @@ import type { StartRoundGameEvent } from '../../game';
 import type { SetStackEvent } from '../../round';
 import {
   Aspect,
-  CardEventType,
   EventPriority,
-  GameEventType,
+  GameEvents,
   Rarity,
-  RoundEventType,
+  RoundEvents,
   Stack,
   StackPriority,
 } from '../../types';
@@ -37,24 +36,28 @@ function createAddStackBonusCard(
     rarity: Rarity.Common,
     aspect,
     load(context: CardContext): void {
-      context.card.on(
-        CardEventType.Trigger,
+      // Trigger card
+      context.game.on(
+        GameEvents.TriggerCard,
         EventPriority.Exact,
-        ({ data }) => {
-          (data as SetStackEvent).amount +=
-            DEFAULT_MULTIPLIER * context.card.getMultiplier();
+        ({ card, data }) => {
+          if (card === context.card) {
+            (data as SetStackEvent).amount +=
+              DEFAULT_MULTIPLIER * context.card.getMultiplier();
+          }
         },
       );
+      // Trigger condition
       context.game.on(
-        GameEventType.StartRound,
+        GameEvents.StartRound,
         EventPriority.Exact,
         ({ round }: StartRoundGameEvent) => {
-          round.on(RoundEventType.AddStack, StackPriority.Additive, event => {
+          round.on(RoundEvents.AddStack, StackPriority.Additive, event => {
             const target = SELF_STACK[stack]
               ? event.source.owner
               : round.getEnemyUnit(event.source).owner;
             if (event.type === stack && target === context.card.owner) {
-              context.card.trigger(event);
+              context.game.triggerCard(context.card, event);
             }
           });
         },
