@@ -7,6 +7,7 @@ import {
   Rarity,
   RoundEvents,
   Stat,
+  StatPriority,
 } from '../../types';
 
 const DEFAULT_MULTIPLIER = 100;
@@ -40,7 +41,7 @@ function createAddStatOnStartCard(
         GameEvents.StartRound,
         EventPriority.Exact,
         ({ round }) => {
-          round.on(RoundEvents.SetupUnit, EventPriority.Post, () => {
+          round.on(RoundEvents.SetupUnit, StatPriority.Additive, () => {
             context.game.triggerCard(context.card, {
               round,
               target: round.getOwnedUnit(context.card.owner),
