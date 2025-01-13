@@ -2,7 +2,7 @@
  * Editions of a card
  */
 export const enum Edition {
-  Common = 1,
+  Common = 0,
 }
 
 /**
@@ -23,71 +23,68 @@ export const enum Rarity {
   // initially by the card pool. Purchasing a starter
   // card of an aspect unlocks Common cards of the same
   // aspect
-  Starter = 1,
+  Starter = 0,
   // 5 copies of Common cards are added to the card pool after being
   // unlocked by the starter card of the same aspect.
   // Unlocks Uncommon cards.
-  Common = 2,
+  Common = 1,
   // 3 copies of Uncommon cards are added to the card pool after
   // purchasing a common card.
   // Unlocks rare cards.
-  Uncommon = 3,
+  Uncommon = 2,
   // A single copy of rare card is added to the card pool
   // after purchasing an uncommon card.
   // Unlocks secret card.
-  Rare = 4,
-  // Only a selected set of secret cards is added to the card pool
-  // (not all of the secret cards of the same aspect).
-  Secret = 5,
+  Rare = 3,
+  // The highest rarity
+  Secret = 4,
 }
 
 /**
  * Stat application priority
  */
 export const enum StatPriority {
-  Initial = 1,
-  Additive = 2,
-  Multiplicative = 3,
-  Exact = 4,
-  Post = 5,
+  Pre = 0,
+  Exact = 1,
+  Post = 2,
 }
 
 /**
  * Stack application priority
  */
 export const enum StackPriority {
-  Initial = 1,
-  Additive = 2,
-  Multiplicative = 3,
-  Exact = 4,
-  Post = 5,
+  Initial = 0,
+  Additive = 1,
+  Multiplicative = 2,
+  Exact = 3,
+  Post = 4,
 }
 
 /**
  * Damage event priority
  */
 export const enum DamagePriority {
-  Initial = 1,
-  AmplificationAdd = 2,
-  AmplificationMult = 3,
-  Critical = 4,
-  Dodge = 5,
-  Armor = 6,
-  Corrosion = 7,
-  ReductionAdditive = 8,
-  ReductionMult = 9,
-  Pre = 10,
-  Exact = 11,
-  Post = 12,
+  Initial = 0,
+  AmplificationAdd = 1,
+  AmplificationMult = 2,
+  Critical = 3,
+  Dodge = 4,
+  Armor = 5,
+  Corrosion = 6,
+  ReductionAdditive = 7,
+  ReductionMult = 8,
+  Pre = 9,
+  Exact = 10,
+  Post = 11,
 }
 
 /**
  * Normal event priority
  */
 export const enum EventPriority {
-  Pre = 1,
-  Exact = 2,
-  Post = 3,
+  Pre = 0,
+  Exact = 1,
+  Post = 2,
 }
 
 export const enum GameEvents {
@@ -112,34 +109,34 @@ export const enum GameEvents {
  * Round Event types
  */
 export const enum RoundEvents {
-  Setup = 3,
-  Start = 4,
-  End = 5,
-  Damage = 7,
-  AddStack = 8,
-  RemoveStack = 9,
-  AddStat = 10,
-  RemoveStat = 11,
-  SetStack = 12,
-  SetStat = 13,
-  Tick = 14,
-  ConsumeStack = 15,
-  Heal = 16,
+  Setup = 0,
+  Start = 1,
+  End = 2,
+  Damage = 3,
+  AddStack = 4,
+  RemoveStack = 5,
+  AddStat = 6,
+  RemoveStat = 7,
+  SetStack = 8,
+  SetStat = 9,
+  Tick = 10,
+  ConsumeStack = 11,
+  Heal = 12,
 }
 
 /**
  * Damage types
  */
 export const enum DamageType {
-  Magic = 1,
-  Attack = 2,
+  Magic = 0,
+  Attack = 1,
 
   // Does not trigger normal damage events either
-  Poison = 3,
+  Poison = 2,
   // Can trigger some damage events
-  Pure = 4,
+  Pure = 3,
   // Does not trigger damage events
-  HealthLoss = 5,
+  HealthLoss = 4,
 }
 
 /**
@@ -157,44 +154,49 @@ export const enum HealingFlags {
 }
 
 export const enum Stat {
+  Health = 0,
   MaxHealth = 1,
-  Health = 2,
+}
+
+export const enum PlayerStat {
+  Life = 0,
+  Gold = 1,
 }
 
 export const enum Stack {
-  Attack = 1,
-  Magic = 2,
+  Attack = 0,
+  Magic = 1,
   // Deals poison damage
-  Poison = 3,
+  Poison = 2,
   // Blocks attack/magic damage
-  Armor = 4,
+  Armor = 3,
   // Counters Armor
-  Corrosion = 5,
+  Corrosion = 4,
   // Speeds up cycles of cards/abilities
-  Speed = 6,
+  Speed = 5,
   // Counters Slow
-  Slow = 7,
+  Slow = 6,
   // Dodges attacks
-  Dodge = 8,
+  Dodge = 7,
   // amplifies attacks
-  Critical = 9,
+  Critical = 8,
   // Healing
-  Healing = 10,
+  Healing = 9,
 }
 
 export const enum Aspect {
-  Universal = 1,
-  Health = 2,
-  Attack = 3,
-  Magic = 4,
-  Poison = 5,
-  Armor = 6,
-  Corrosion = 7,
-  Speed = 8,
-  Slow = 9,
-  Dodge = 10,
-  Critical = 11,
-  Healing = 12,
+  Universal = 0,
+  Health = 1,
+  Attack = 2,
+  Magic = 3,
+  Poison = 4,
+  Armor = 5,
+  Corrosion = 6,
+  Speed = 7,
+  Slow = 8,
+  Dodge = 9,
+  Critical = 10,
+  Healing = 11,
 }
 
 export interface PrintSpawnChance {

@@ -1,18 +1,24 @@
 import { AleaRNG } from './alea';
 import type { Card, CardInstance } from './card';
-import { DEFAULT_MAX_HEALTH } from './constants';
+import { DEFAULT_GOLD, DEFAULT_MAX_HEALTH } from './constants';
 import type { Unit } from './round';
-import { Print, type PrintSpawnChance, Stat } from './types';
+import { PlayerStat, Print, type PrintSpawnChance } from './types';
 
 export interface PlayerStats {
-  [Stat.MaxHealth]: number;
-  [Stat.Health]: number;
+  [PlayerStat.Gold]: number;
+  [PlayerStat.Life]: number;
+}
+
+interface PlayerRNG {
+  self: AleaRNG;
+  unit: AleaRNG;
+  card: AleaRNG;
 }
 
 export class Player {
   stats: PlayerStats = {
-    [Stat.MaxHealth]: DEFAULT_MAX_HEALTH,
-    [Stat.Health]: DEFAULT_MAX_HEALTH,
+    [PlayerStat.Life]: DEFAULT_MAX_HEALTH,
+    [PlayerStat.Gold]: DEFAULT_GOLD,
   };
 
   printSpawnChance: PrintSpawnChance = {
@@ -22,17 +28,18 @@ export class Player {
     [Print.Signed]: 0.1,
   };
 
-  public rng: AleaRNG;
+  public rng: PlayerRNG;
 
   constructor(seed: number) {
-    this.rng = new AleaRNG(seed.toString());
+    const self = new AleaRNG(seed.toString());
+    this.rng = {
+      self,
+      unit: new AleaRNG(self.int32().toString()),
+      card: new AleaRNG(self.int32().toString()),
+    };
   }
 
   public name: string | undefined;
-
-  cloneStats(): PlayerStats {
-    return Object.assign({}, this.stats);
-  }
 
   currentUnit: Unit | undefined;
 

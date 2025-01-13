@@ -73,6 +73,6 @@ export class Boss extends Player {
 
   constructor(public seed: number) {
     super(seed);
-    this.bossData = getRandomBossData(this.rng.random());
+    this.bossData = getRandomBossData(this.rng.self.random());
   }
 }

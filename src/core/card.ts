@@ -75,7 +75,7 @@ export class CardInstance {
     public owner: Player,
     public source: Card,
   ) {
-    this.print = getRandomPrint(owner.rng, owner.printSpawnChance);
+    this.print = getRandomPrint(owner.rng.card, owner.printSpawnChance);
     this.edition = Edition.Common;
   }
 

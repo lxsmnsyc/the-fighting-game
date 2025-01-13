@@ -1,13 +1,14 @@
 import { AleaRNG } from './alea';
+import { DEFAULT_MAX_HEALTH } from './constants';
 import { EventEngine } from './event-engine';
 import type { Game } from './game';
-import type { Player, PlayerStats } from './player';
+import type { Player } from './player';
 import {
   type DamageType,
   EventPriority,
   RoundEvents,
   Stack,
-  type Stat,
+  Stat,
 } from './types';
 
 export interface BaseRoundEvent {
@@ -151,6 +152,11 @@ export type RoundEvent = {
   [RoundEvents.Heal]: HealEvent;
 };
 
+export interface UnitStats {
+  [Stat.Health]: number;
+  [Stat.MaxHealth]: number;
+}
+
 export interface UnitStacks {
   [Stack.Attack]: number;
   [Stack.Magic]: number;
@@ -165,14 +171,16 @@ export interface UnitStacks {
 }
 
 export class Unit {
-  public stats: PlayerStats;
-
   public rng: AleaRNG;
 
   constructor(public owner: Player) {
-    this.stats = owner.cloneStats();
-    this.rng = new AleaRNG(owner.rng.int32().toString());
+    this.rng = new AleaRNG(owner.rng.unit.int32().toString());
   }
+
+  stats: UnitStats = {
+    [Stat.Health]: DEFAULT_MAX_HEALTH,
+    [Stat.MaxHealth]: DEFAULT_MAX_HEALTH,
+  };
 
   // Stacks
   stacks: UnitStacks = {
@@ -198,6 +206,13 @@ export class Round extends EventEngine<RoundEvent> {
     public unitB: Unit,
   ) {
     super();
+  }
+
+  getOwnedUnit(player: Player): Unit {
+    if (this.unitA.owner === player) {
+      return this.unitA;
+    }
+    return this.unitB;
   }
 
   setup(): void {

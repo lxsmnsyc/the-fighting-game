@@ -54,10 +54,7 @@ function createAddStackOnStartCard(
         EventPriority.Exact,
         ({ round }) => {
           round.on(RoundEvents.Start, EventPriority.Post, () => {
-            const unit =
-              context.card.owner === round.unitA.owner
-                ? round.unitA
-                : round.unitB;
+            const unit = round.getOwnedUnit(context.card.owner);
             const target = SELF_STACK[stack] ? unit : round.getEnemyUnit(unit);
             context.game.triggerCard(context.card, {
               round,
