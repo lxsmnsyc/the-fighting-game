@@ -44,9 +44,11 @@ export const enum Rarity {
  * Stat application priority
  */
 export const enum StatPriority {
-  Pre = 0,
-  Exact = 1,
-  Post = 2,
+  Initial = 0,
+  Additive = 1,
+  Multiplicative = 2,
+  Exact = 3,
+  Post = 4,
 }
 
 /**
@@ -110,18 +112,19 @@ export const enum GameEvents {
  */
 export const enum RoundEvents {
   Setup = 0,
-  Start = 1,
-  End = 2,
-  Damage = 3,
-  AddStack = 4,
-  RemoveStack = 5,
-  AddStat = 6,
-  RemoveStat = 7,
-  SetStack = 8,
-  SetStat = 9,
-  Tick = 10,
-  ConsumeStack = 11,
-  Heal = 12,
+  SetupUnit = 1,
+  Start = 2,
+  End = 3,
+  Damage = 4,
+  AddStack = 5,
+  RemoveStack = 6,
+  AddStat = 7,
+  RemoveStat = 8,
+  SetStack = 9,
+  SetStat = 10,
+  Tick = 11,
+  ConsumeStack = 12,
+  Heal = 13,
 }
 
 /**

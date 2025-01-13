@@ -5,7 +5,9 @@ import { EventPriority, GameEvents, RoundEvents } from './types';
 export function setupGame(game: Game): void {
   game.on(GameEvents.Setup, EventPriority.Exact, () => {
     setupGameMechanics(game);
+  });
 
+  game.on(GameEvents.Setup, EventPriority.Post, () => {
     game.start();
   });
 
@@ -13,7 +15,7 @@ export function setupGame(game: Game): void {
     game.nextRound();
   });
 
-  game.on(GameEvents.StartRound, EventPriority.Exact, ({ round }) => {
+  game.on(GameEvents.StartRound, EventPriority.Post, ({ round }) => {
     round.setup();
 
     round.on(RoundEvents.End, EventPriority.Exact, event => {

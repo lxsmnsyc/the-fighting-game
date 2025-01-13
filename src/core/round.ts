@@ -150,6 +150,7 @@ export type RoundEvent = {
   [RoundEvents.ConsumeStack]: ConsumeStackEvent;
 
   [RoundEvents.Heal]: HealEvent;
+  [RoundEvents.SetupUnit]: UnitEvent;
 };
 
 export interface UnitStats {
@@ -217,6 +218,10 @@ export class Round extends EventEngine<RoundEvent> {
 
   setup(): void {
     this.emit(RoundEvents.Setup, { id: 'SetupEvent' });
+  }
+
+  setupUnit(unit: Unit): void {
+    this.emit(RoundEvents.SetupUnit, { id: 'SetupUnitEvent', source: unit });
   }
 
   start(): void {
@@ -328,6 +333,11 @@ export class Round extends EventEngine<RoundEvent> {
 
 export function setupRound(round: Round): void {
   round.on(RoundEvents.Setup, EventPriority.Exact, () => {
+    round.setupUnit(round.unitA);
+    round.setupUnit(round.unitB);
+  });
+
+  round.on(RoundEvents.Setup, EventPriority.Post, () => {
     round.start();
   });
 
