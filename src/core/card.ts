@@ -43,6 +43,8 @@ export interface Card {
 
   name: string;
 
+  image: string;
+
   rarity: Rarity;
 
   aspect: Aspect[];
