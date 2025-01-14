@@ -1,4 +1,4 @@
-import type { AleaRNG } from './alea';
+import { AleaRNG } from './alea';
 import type { Game } from './game';
 import type { Player } from './player';
 import {
@@ -73,11 +73,14 @@ export class CardInstance {
 
   public enabled = true;
 
+  public rng: AleaRNG;
+
   constructor(
     public owner: Player,
     public source: Card,
   ) {
-    this.print = getRandomPrint(owner.rng.card, owner.printSpawnChance);
+    this.rng = new AleaRNG(owner.rng.card.int32().toString());
+    this.print = getRandomPrint(this.rng, owner.printSpawnChance);
     this.edition = Edition.Common;
   }
 

@@ -27,14 +27,14 @@ const SELF_STACK: Record<Stack, boolean> = {
 function createAddStackOnStartCard(
   name: string,
   stack: Stack,
-  aspect: Aspect[],
+  aspect: Aspect,
   image = '',
 ): Card {
   return createCard({
     name,
     image,
     rarity: Rarity.Common,
-    aspect,
+    aspect: [aspect],
     load(context: CardContext): void {
       // Trigger card
       context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
@@ -71,15 +71,15 @@ function createAddStackOnStartCard(
 
 export const ADD_STACK_ON_START_CARDS = [
   // Offensive cards
-  createAddStackOnStartCard('', Stack.Attack, [Aspect.Attack]),
-  createAddStackOnStartCard('', Stack.Magic, [Aspect.Magic]),
-  createAddStackOnStartCard('', Stack.Poison, [Aspect.Poison]),
+  createAddStackOnStartCard('', Stack.Attack, Aspect.Attack),
+  createAddStackOnStartCard('', Stack.Magic, Aspect.Magic),
+  createAddStackOnStartCard('', Stack.Poison, Aspect.Poison),
   // Supportive cards
-  createAddStackOnStartCard('', Stack.Armor, [Aspect.Armor]),
-  createAddStackOnStartCard('', Stack.Corrosion, [Aspect.Corrosion]),
-  createAddStackOnStartCard('', Stack.Speed, [Aspect.Speed]),
-  createAddStackOnStartCard('', Stack.Slow, [Aspect.Slow]),
-  createAddStackOnStartCard('', Stack.Dodge, [Aspect.Dodge]),
-  createAddStackOnStartCard('', Stack.Critical, [Aspect.Critical]),
-  createAddStackOnStartCard('', Stack.Healing, [Aspect.Healing]),
+  createAddStackOnStartCard('', Stack.Armor, Aspect.Armor),
+  createAddStackOnStartCard('', Stack.Corrosion, Aspect.Corrosion),
+  createAddStackOnStartCard('', Stack.Speed, Aspect.Speed),
+  createAddStackOnStartCard('', Stack.Slow, Aspect.Slow),
+  createAddStackOnStartCard('', Stack.Dodge, Aspect.Dodge),
+  createAddStackOnStartCard('', Stack.Critical, Aspect.Critical),
+  createAddStackOnStartCard('', Stack.Healing, Aspect.Healing),
 ];
