@@ -30,9 +30,11 @@ function createAddStackBonusCard(
   name: string,
   stack: Stack,
   aspect: Aspect[],
+  image = '',
 ): Card {
   return createCard({
     name,
+    image,
     rarity: Rarity.Common,
     aspect,
     load(context: CardContext): void {

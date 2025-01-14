@@ -16,10 +16,12 @@ function createAddStatOnStartCard(
   name: string,
   stat: Stat,
   aspect: Aspect[],
+  image = ''
 ): Card {
   return createCard({
     name,
     rarity: Rarity.Common,
+    image,
     aspect,
     load(context: CardContext): void {
       // Trigger card

@@ -26,6 +26,7 @@ function getPeriod(speed: number): number {
 
 export default createCard({
   name: 'Aspect of Armor',
+  image: '',
   rarity: Rarity.Starter,
   aspect: [Aspect.Armor],
   load(context) {
