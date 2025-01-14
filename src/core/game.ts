@@ -39,7 +39,6 @@ export class Game extends EventEngine<GameEvent> {
 
   public rng: {
     world: AleaRNG;
-    shop: AleaRNG;
     boss: AleaRNG;
   };
 
@@ -49,7 +48,6 @@ export class Game extends EventEngine<GameEvent> {
     const world = new AleaRNG(seed);
     this.rng = {
       world,
-      shop: new AleaRNG(world.int32().toString()),
       boss: new AleaRNG(world.int32().toString()),
     };
     this.player = new Player(world.int32());
