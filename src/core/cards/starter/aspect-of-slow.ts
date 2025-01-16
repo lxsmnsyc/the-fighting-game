@@ -1,6 +1,5 @@
 import { createCard } from '../../card';
 import type { StartRoundGameEvent } from '../../game';
-import { lerp } from '../../lerp';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
@@ -12,17 +11,7 @@ import {
 } from '../../types';
 
 const DEFAULT_AMOUNT = 5;
-const MIN_PERIOD = 0.25;
-const MAX_PERIOD = 2.5;
-const MAX_SPEED = 750;
-
-function getPeriod(speed: number): number {
-  return lerp(
-    MIN_PERIOD * 1000,
-    MAX_PERIOD * 1000,
-    Math.min(speed / MAX_SPEED, 1),
-  );
-}
+const DEFAULT_PERIOD = 1.0 * 1000;
 
 export default createCard({
   name: 'Aspect of Slow',
@@ -34,7 +23,12 @@ export default createCard({
     context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
       if (event.card === context.card) {
         const { round, target } = event.data as { round: Round; target: Unit };
-        round.addStack(Stack.Slow, target, DEFAULT_AMOUNT);
+        round.addStack(
+          Stack.Slow,
+          target,
+          DEFAULT_AMOUNT * context.card.getMultiplier(),
+          false,
+        );
       }
     });
     // Trigger condition
@@ -42,27 +36,27 @@ export default createCard({
       GameEvents.StartRound,
       EventPriority.Post,
       ({ round }: StartRoundGameEvent) => {
-        const source =
-          round.unitA.owner === context.card.owner ? round.unitA : round.unitB;
+        round.on(RoundEvents.SetupUnit, EventPriority.Exact, ({ source }) => {
+          if (source.owner !== context.card.owner) {
+            return;
+          }
+          let elapsed = 0;
+          let ready = true;
 
-        let elapsed = 0;
-        let period = getPeriod(source.stacks[Stack.Speed]);
-        let ready = true;
-
-        round.on(RoundEvents.Tick, EventPriority.Exact, event => {
-          if (!ready) {
-            elapsed += event.delta;
-            if (elapsed >= period) {
-              elapsed -= period;
-              period = getPeriod(source.stacks[Stack.Speed]);
-              ready = true;
+          round.on(RoundEvents.Tick, EventPriority.Exact, event => {
+            if (!ready) {
+              elapsed += event.delta;
+              if (elapsed >= DEFAULT_PERIOD) {
+                elapsed -= DEFAULT_PERIOD;
+                ready = true;
+              }
             }
-          }
-          if (ready && !context.card.enabled) {
-            ready = false;
-            const target = round.getEnemyUnit(source);
-            context.game.triggerCard(context.card, { round, target });
-          }
+            if (ready && context.card.enabled) {
+              ready = false;
+              const target = round.getEnemyUnit(source);
+              context.game.triggerCard(context.card, { round, target });
+            }
+          });
         });
       },
     );

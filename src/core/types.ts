@@ -125,6 +125,7 @@ export const enum RoundEvents {
   Tick = 11,
   ConsumeStack = 12,
   Heal = 13,
+  TriggerStack = 14,
 }
 
 /**
@@ -154,6 +155,11 @@ export const enum DamageFlags {
 
 export const enum HealingFlags {
   Missed = 0b0001,
+}
+
+export const enum TriggerStackFlags {
+  Failed = 0b0001,
+  Consume = 0b0010,
 }
 
 export const enum Stat {

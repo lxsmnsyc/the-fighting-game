@@ -42,15 +42,22 @@ function createAddStackBonusCard(
         GameEvents.StartRound,
         EventPriority.Exact,
         ({ round }: StartRoundGameEvent) => {
-          round.on(RoundEvents.AddStack, StackPriority.Additive, event => {
-            if (context.card.enabled && event.type === stack) {
+          round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+            if (source.owner !== context.card.owner) {
+              return;
+            }
+            round.on(RoundEvents.AddStack, StackPriority.Additive, event => {
               const target = SELF_STACK[stack]
-                ? event.source.owner
-                : round.getEnemyUnit(event.source).owner;
-              if (target === context.card.owner) {
+                ? source
+                : round.getEnemyUnit(source);
+              if (
+                context.card.enabled &&
+                event.type === stack &&
+                target === event.source
+              ) {
                 context.game.triggerCard(context.card, event);
               }
-            }
+            });
           });
         },
       );

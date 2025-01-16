@@ -8,13 +8,51 @@ import {
   Stack,
   StackPriority,
   Stat,
+  TriggerStackFlags,
 } from '../types';
 
+const DEFAULT_PERIOD = 1.0 * 1000;
 const CONSUMABLE_STACKS = 0.4;
 
 export function setupHealingMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Healing mechanics.');
+
+    round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+      let elapsed = 0;
+      let ready = true;
+
+      round.on(RoundEvents.Tick, EventPriority.Exact, event => {
+        if (!ready) {
+          elapsed += event.delta;
+          if (elapsed >= DEFAULT_PERIOD) {
+            elapsed -= DEFAULT_PERIOD;
+            ready = true;
+          }
+        }
+        if (ready && source) {
+          ready = false;
+          round.triggerStack(Stack.Healing, source, TriggerStackFlags.Consume);
+        }
+      });
+    });
+
+    round.on(RoundEvents.TriggerStack, EventPriority.Exact, event => {
+      if (event.type !== Stack.Healing) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Failed) {
+        return;
+      }
+
+      const stacks = event.source.getTotalStacks(Stack.Healing);
+      if (stacks > 0) {
+        round.heal(event.source, stacks, 0);
+      }
+      if (event.flag & TriggerStackFlags.Consume) {
+        round.consumeStack(Stack.Attack, event.source);
+      }
+    });
 
     round.on(RoundEvents.Heal, EventPriority.Exact, event => {
       if (!(event.flag & HealingFlags.Missed)) {
@@ -25,14 +63,12 @@ export function setupHealingMechanics(game: Game): void {
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Healing) {
-        const current = event.source.stacks[Stack.Healing];
-        if (current > 0) {
-          round.heal(event.source, current, 0);
-        }
+        const current = event.source.getStacks(Stack.Healing, false);
         round.removeStack(
           Stack.Healing,
           event.source,
           current === 1 ? current : current * CONSUMABLE_STACKS,
+          false,
         );
       }
     });
@@ -43,7 +79,7 @@ export function setupHealingMechanics(game: Game): void {
         log(
           `${event.source.owner.name}'s Healing stacks changed to ${clamped}`,
         );
-        event.source.stacks[Stack.Healing] = clamped;
+        event.source.setStacks(Stack.Healing, event.amount, event.permanent);
       }
     });
 
@@ -55,7 +91,8 @@ export function setupHealingMechanics(game: Game): void {
         round.setStack(
           Stack.Healing,
           event.source,
-          event.source.stacks[Stack.Healing] + event.amount,
+          event.source.getStacks(Stack.Healing, event.permanent) + event.amount,
+          event.permanent,
         );
       }
     });
@@ -68,7 +105,8 @@ export function setupHealingMechanics(game: Game): void {
         round.setStack(
           Stack.Healing,
           event.source,
-          event.source.stacks[Stack.Healing] - event.amount,
+          event.source.getStacks(Stack.Healing, event.permanent) - event.amount,
+          event.permanent,
         );
       }
     });

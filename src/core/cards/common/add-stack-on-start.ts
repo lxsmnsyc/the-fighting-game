@@ -1,4 +1,5 @@
 import { type Card, type CardContext, createCard } from '../../card';
+import { SELF_STACK } from '../../constants';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
@@ -9,20 +10,7 @@ import {
   Stack,
 } from '../../types';
 
-const DEFAULT_MULTIPLIER = 5;
-
-const SELF_STACK: Record<Stack, boolean> = {
-  [Stack.Attack]: true,
-  [Stack.Magic]: true,
-  [Stack.Armor]: true,
-  [Stack.Corrosion]: false,
-  [Stack.Critical]: true,
-  [Stack.Dodge]: true,
-  [Stack.Poison]: false,
-  [Stack.Healing]: true,
-  [Stack.Slow]: false,
-  [Stack.Speed]: true,
-};
+const DEFAULT_MULTIPLIER = 20;
 
 function createAddStackOnStartCard(
   name: string,
@@ -47,21 +35,22 @@ function createAddStackOnStartCard(
             stack,
             target,
             DEFAULT_MULTIPLIER * context.card.getMultiplier(),
+            true,
           );
         }
       });
       // Trigger condition
       context.game.on(
         GameEvents.StartRound,
-        EventPriority.Exact,
+        EventPriority.Post,
         ({ round }) => {
-          round.on(RoundEvents.Start, EventPriority.Post, () => {
-            const unit = round.getOwnedUnit(context.card.owner);
-            const target = SELF_STACK[stack] ? unit : round.getEnemyUnit(unit);
-            context.game.triggerCard(context.card, {
-              round,
-              target,
-            });
+          round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+            if (source.owner === context.card.owner && context.card.enabled) {
+              const target = SELF_STACK[stack]
+                ? source
+                : round.getEnemyUnit(source);
+              context.game.triggerCard(context.card, { round, target });
+            }
           });
         },
       );

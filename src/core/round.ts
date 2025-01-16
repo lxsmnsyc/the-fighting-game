@@ -47,43 +47,36 @@ function createDamageEvent(
   return { id: 'DamageEvent', type, source, target, amount, flag };
 }
 
-export interface HealEvent extends UnitValueEvent {
-  flag: number;
-}
-
-function createHealEvent(
-  source: Unit,
-  amount: number,
-  flag: number,
-): HealEvent {
-  return { id: 'HealEvent', source, amount, flag };
-}
-
 export interface SetStackEvent extends UnitValueEvent {
   type: Stack;
+  permanent: boolean;
 }
+
 function createSetStackEvent(
   type: Stack,
   source: Unit,
   amount: number,
+  permanent: boolean,
 ): SetStackEvent {
-  return { id: 'SetStackEvent', type, source, amount };
+  return { id: 'SetStackEvent', type, source, amount, permanent };
 }
 
 function createAddStackEvent(
   type: Stack,
   source: Unit,
   amount: number,
+  permanent: boolean,
 ): SetStackEvent {
-  return { id: 'AddStackEvent', type, source, amount };
+  return { id: 'AddStackEvent', type, source, amount, permanent };
 }
 
 function createRemoveStackEvent(
   type: Stack,
   source: Unit,
   amount: number,
+  permanent: boolean,
 ): SetStackEvent {
-  return { id: 'RemoveStackEvent', type, source, amount };
+  return { id: 'RemoveStackEvent', type, source, amount, permanent };
 }
 
 export interface SetStatEvent extends UnitValueEvent {
@@ -123,6 +116,23 @@ export interface ConsumeStackEvent extends UnitEvent {
   type: Stack;
 }
 
+export interface HealEvent extends UnitValueEvent {
+  flag: number;
+}
+
+function createHealEvent(
+  source: Unit,
+  amount: number,
+  flag: number,
+): HealEvent {
+  return { id: 'HealEvent', source, amount, flag };
+}
+
+export interface TriggerStackEvent extends ConsumeStackEvent {
+  type: Stack;
+  flag: number;
+}
+
 export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
@@ -149,6 +159,7 @@ export type RoundEvent = {
 
   [RoundEvents.ConsumeStack]: ConsumeStackEvent;
 
+  [RoundEvents.TriggerStack]: TriggerStackEvent;
   [RoundEvents.Heal]: HealEvent;
   [RoundEvents.SetupUnit]: UnitEvent;
 };
@@ -171,20 +182,8 @@ export interface UnitStacks {
   [Stack.Healing]: number;
 }
 
-export class Unit {
-  public rng: AleaRNG;
-
-  constructor(public owner: Player) {
-    this.rng = new AleaRNG(owner.rng.unit.int32().toString());
-  }
-
-  stats: UnitStats = {
-    [Stat.Health]: DEFAULT_MAX_HEALTH,
-    [Stat.MaxHealth]: DEFAULT_MAX_HEALTH,
-  };
-
-  // Stacks
-  stacks: UnitStacks = {
+function createUnitStacks(): UnitStacks {
+  return {
     // Offensive
     [Stack.Attack]: 0,
     [Stack.Magic]: 0,
@@ -198,6 +197,44 @@ export class Unit {
     [Stack.Critical]: 0,
     [Stack.Healing]: 0,
   };
+}
+
+export class Unit {
+  public rng: AleaRNG;
+
+  constructor(public owner: Player) {
+    this.rng = new AleaRNG(owner.rng.unit.int32().toString());
+  }
+
+  stats: UnitStats = {
+    [Stat.Health]: DEFAULT_MAX_HEALTH,
+    [Stat.MaxHealth]: DEFAULT_MAX_HEALTH,
+  };
+
+  // Stacks
+  stacks = {
+    consumable: createUnitStacks(),
+    permanent: createUnitStacks(),
+  };
+
+  getTotalStacks(stack: Stack): number {
+    return this.stacks.permanent[stack] + this.stacks.consumable[stack];
+  }
+
+  getStacks(stack: Stack, permanent: boolean) {
+    return permanent
+      ? this.stacks.permanent[stack]
+      : this.stacks.consumable[stack];
+  }
+
+  setStacks(stack: Stack, amount: number, permanent: boolean) {
+    const target = Math.max(0, amount);
+    if (permanent) {
+      this.stacks.permanent[stack] = target;
+    } else {
+      this.stacks.consumable[stack] = target;
+    }
+  }
 }
 
 export class Round extends EventEngine<RoundEvent> {
@@ -242,6 +279,15 @@ export class Round extends EventEngine<RoundEvent> {
     this.emit(RoundEvents.Heal, createHealEvent(source, amount, flag));
   }
 
+  triggerStack(stack: Stack, source: Unit, flag: number): void {
+    this.emit(RoundEvents.TriggerStack, {
+      id: 'TriggerStackEvent',
+      type: stack,
+      source,
+      flag,
+    });
+  }
+
   dealDamage(
     type: DamageType,
     source: Unit,
@@ -267,29 +313,47 @@ export class Round extends EventEngine<RoundEvent> {
     });
   }
 
-  setStack(type: Stack, source: Unit, amount: number): void {
+  setStack(
+    type: Stack,
+    source: Unit,
+    amount: number,
+    permanent: boolean,
+  ): void {
     this.emit(
       RoundEvents.SetStack,
-      createSetStackEvent(type, source, amount | 0),
+      createSetStackEvent(type, source, amount | 0, permanent),
     );
   }
 
-  addStack(type: Stack, source: Unit, amount: number): void {
+  addStack(
+    type: Stack,
+    source: Unit,
+    amount: number,
+    permanent: boolean,
+  ): void {
     amount |= 0;
     if (amount === 0) {
       return;
     }
-    this.emit(RoundEvents.AddStack, createAddStackEvent(type, source, amount));
+    this.emit(
+      RoundEvents.AddStack,
+      createAddStackEvent(type, source, amount, permanent),
+    );
   }
 
-  removeStack(type: Stack, source: Unit, amount: number): void {
+  removeStack(
+    type: Stack,
+    source: Unit,
+    amount: number,
+    permanent: boolean,
+  ): void {
     amount |= 0;
     if (amount === 0) {
       return;
     }
     this.emit(
       RoundEvents.RemoveStack,
-      createRemoveStackEvent(type, source, amount),
+      createRemoveStackEvent(type, source, amount, permanent),
     );
   }
 

@@ -33,9 +33,9 @@ export function setupDodgeMechanics(game: Game): void {
       if (event.flag & DamageFlags.Missed) {
         return;
       }
-      // Check if player can evade it
-      const stacks = event.target.stacks[Stack.Dodge];
-      if (event.type === DamageType.Attack && stacks !== 0) {
+      if (event.type === DamageType.Attack) {
+        // Check if player can evade it
+        const stacks = event.target.getTotalStacks(Stack.Dodge);
         // If there's an evasion stack
         if (stacks === 0) {
           return;
@@ -55,11 +55,12 @@ export function setupDodgeMechanics(game: Game): void {
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Dodge) {
-        const current = event.source.stacks[Stack.Dodge];
+        const current = event.source.getStacks(Stack.Dodge, false);
         round.removeStack(
           Stack.Dodge,
           event.source,
           Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
+          false,
         );
       }
     });
@@ -67,7 +68,7 @@ export function setupDodgeMechanics(game: Game): void {
     round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Dodge) {
         log(`${event.source.owner.name}'s Dodge changed to ${event.amount}`);
-        event.source.stacks[Stack.Dodge] = event.amount;
+        event.source.setStacks(Stack.Dodge, event.amount, event.permanent);
       }
     });
 
@@ -79,7 +80,8 @@ export function setupDodgeMechanics(game: Game): void {
         round.setStack(
           Stack.Dodge,
           event.source,
-          event.source.stacks[Stack.Dodge] + event.amount,
+          event.source.getStacks(Stack.Dodge, event.permanent) + event.amount,
+          event.permanent,
         );
       }
     });
@@ -90,7 +92,8 @@ export function setupDodgeMechanics(game: Game): void {
         round.setStack(
           Stack.Dodge,
           event.source,
-          event.source.stacks[Stack.Dodge] - event.amount,
+          event.source.getStacks(Stack.Dodge, event.permanent) - event.amount,
+          event.permanent,
         );
       }
     });

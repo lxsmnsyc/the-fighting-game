@@ -11,7 +11,7 @@ import {
   StackPriority,
 } from '../types';
 
-const CONSUMABLE_STACKS = 0.25;
+const CONSUMABLE_STACKS = 0.4;
 
 export function setupCorrosionMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
@@ -28,9 +28,9 @@ export function setupCorrosionMechanics(game: Game): void {
       if (event.type === DamageType.Pure) {
         return;
       }
-      const currentCorrosion = event.target.stacks[Stack.Corrosion];
+      const currentCorrosion = event.target.getTotalStacks(Stack.Corrosion);
       if (currentCorrosion > 0) {
-        event.amount = Math.max(0, event.amount - currentCorrosion);
+        event.amount = Math.max(0, event.amount + currentCorrosion);
         event.flag |= DamageFlags.Corrosion;
         round.consumeStack(Stack.Corrosion, event.target);
       }
@@ -38,54 +38,58 @@ export function setupCorrosionMechanics(game: Game): void {
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Corrosion) {
-        const current = event.source.stacks[Stack.Corrosion];
+        const current = event.source.getStacks(Stack.Corrosion, false);
         round.removeStack(
           Stack.Corrosion,
           event.source,
           current === 1 ? current : current * CONSUMABLE_STACKS,
+          false,
         );
       }
     });
 
     round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Corrosion) {
-        const clamped = Math.max(0, event.amount);
         log(
-          `${event.source.owner.name}'s Corrosion stacks changed to ${clamped}`,
+          `${event.source.owner.name}'s Corrosion stacks changed to ${event.amount}`,
         );
-        event.source.stacks[Stack.Corrosion] = clamped;
+        event.source.setStacks(Stack.Corrosion, event.amount, event.permanent);
       }
     });
 
     round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Corrosion) {
+      if (event.type !== Stack.Corrosion) {
+        return;
+      }
+      if (event.permanent) {
+        round.setStack(
+          Stack.Corrosion,
+          event.source,
+          event.source.getStacks(Stack.Corrosion, true) + event.amount,
+          true,
+        );
+        return;
+      }
+
+      let amount = event.amount;
+
+      if (event.source.getStacks(Stack.Armor, false) > 0) {
         /**
          * Counter Armor by removing stacks from it
          */
-        if (event.source.stacks[Stack.Armor] > 0) {
-          const diff = event.source.stacks[Stack.Armor] - event.amount;
-          round.removeStack(Stack.Armor, event.source, event.amount);
+        round.removeStack(Stack.Armor, event.source, amount, false);
 
-          if (diff < 0) {
-            log(
-              `${event.source.owner.name} gained ${-diff} stacks of Corrosion`,
-            );
-            round.setStack(
-              Stack.Corrosion,
-              event.source,
-              event.source.stacks[Stack.Corrosion] - diff,
-            );
-          }
-        } else {
-          log(
-            `${event.source.owner.name} gained ${event.amount} stacks of Corrosion`,
-          );
-          round.setStack(
-            Stack.Corrosion,
-            event.source,
-            event.source.stacks[Stack.Corrosion] + event.amount,
-          );
-        }
+        amount = -(event.source.getStacks(Stack.Armor, false) - event.amount);
+      }
+
+      if (amount > 0) {
+        log(`${event.source.owner.name} gained ${amount} stacks of Corrosion`);
+        round.setStack(
+          Stack.Corrosion,
+          event.source,
+          event.source.getStacks(Stack.Corrosion, false) + amount,
+          false,
+        );
       }
     });
 
@@ -97,7 +101,9 @@ export function setupCorrosionMechanics(game: Game): void {
         round.setStack(
           Stack.Corrosion,
           event.source,
-          event.source.stacks[Stack.Corrosion] - event.amount,
+          event.source.getStacks(Stack.Corrosion, event.permanent) -
+            event.amount,
+          event.permanent,
         );
       }
     });

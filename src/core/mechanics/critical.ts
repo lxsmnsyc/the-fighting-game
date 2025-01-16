@@ -34,8 +34,8 @@ export function setupCriticalMechanics(game: Game): void {
         return;
       }
       // Check if player can crit
-      const stacks = event.source.stacks[Stack.Critical];
-      if (event.type === DamageType.Attack && stacks !== 0) {
+      if (event.type === DamageType.Attack) {
+        const stacks = event.source.getTotalStacks(Stack.Critical);
         // If there's no critical stack
         if (stacks === 0) {
           return;
@@ -57,11 +57,12 @@ export function setupCriticalMechanics(game: Game): void {
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Critical) {
-        const current = event.source.stacks[Stack.Critical];
+        const current = event.source.getStacks(Stack.Critical, false);
         round.removeStack(
           Stack.Critical,
           event.source,
           Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
+          false,
         );
       }
     });
@@ -71,7 +72,7 @@ export function setupCriticalMechanics(game: Game): void {
         log(
           `${event.source.owner.name}'s Critical stacks changed to ${event.amount}`,
         );
-        event.source.stacks[Stack.Critical] = event.amount;
+        event.source.setStacks(Stack.Critical, event.amount, event.permanent);
       }
     });
 
@@ -83,7 +84,9 @@ export function setupCriticalMechanics(game: Game): void {
         round.setStack(
           Stack.Critical,
           event.source,
-          event.source.stacks[Stack.Critical] + event.amount,
+          event.source.getStacks(Stack.Critical, event.permanent) +
+            event.amount,
+          event.permanent,
         );
       }
     });
@@ -96,7 +99,9 @@ export function setupCriticalMechanics(game: Game): void {
         round.setStack(
           Stack.Critical,
           event.source,
-          event.source.stacks[Stack.Critical] - event.amount,
+          event.source.getStacks(Stack.Critical, event.permanent) -
+            event.amount,
+          event.permanent,
         );
       }
     });

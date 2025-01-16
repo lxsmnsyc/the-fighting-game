@@ -18,6 +18,7 @@ function createAddStackOnHealCard(
   name: string,
   stack: Stack,
   aspect: Aspect,
+  permanent = false,
   image = '',
 ): Card {
   return createCard({
@@ -32,7 +33,12 @@ function createAddStackOnHealCard(
             round: Round;
             target: Unit;
           };
-          round.addStack(stack, target, DEFAULT_AMOUNT);
+          round.addStack(
+            stack,
+            target,
+            DEFAULT_AMOUNT * context.card.getMultiplier(),
+            permanent,
+          );
         }
       });
 
@@ -40,21 +46,26 @@ function createAddStackOnHealCard(
         GameEvents.StartRound,
         EventPriority.Exact,
         ({ round }) => {
-          round.on(RoundEvents.Heal, EventPriority.Post, event => {
-            if (
-              context.card.enabled &&
-              event.source.owner === context.card.owner &&
-              !(event.flag & HealingFlags.Missed) &&
-              context.card.rng.random() <= DEFAULT_CHANCE
-            ) {
-              const target = SELF_STACK[stack]
-                ? event.source.owner
-                : round.getEnemyUnit(event.source).owner;
-              context.game.triggerCard(context.card, {
-                target,
-                round,
-              });
+          round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+            if (source.owner !== context.card.owner) {
+              return;
             }
+            round.on(RoundEvents.Heal, EventPriority.Post, event => {
+              if (
+                context.card.enabled &&
+                event.source === source &&
+                !(event.flag & HealingFlags.Missed) &&
+                context.card.rng.random() <= DEFAULT_CHANCE
+              ) {
+                const target = SELF_STACK[stack]
+                  ? source
+                  : round.getEnemyUnit(source);
+                context.game.triggerCard(context.card, {
+                  target,
+                  round,
+                });
+              }
+            });
           });
         },
       );

@@ -16,7 +16,7 @@ function createAddStatOnStartCard(
   name: string,
   stat: Stat,
   aspect: Aspect[],
-  image = ''
+  image = '',
 ): Card {
   return createCard({
     name,
@@ -43,12 +43,19 @@ function createAddStatOnStartCard(
         GameEvents.StartRound,
         EventPriority.Exact,
         ({ round }) => {
-          round.on(RoundEvents.SetupUnit, StatPriority.Additive, () => {
-            context.game.triggerCard(context.card, {
-              round,
-              target: round.getOwnedUnit(context.card.owner),
-            });
-          });
+          round.on(
+            RoundEvents.SetupUnit,
+            StatPriority.Additive,
+            ({ source }) => {
+              if (source.owner !== context.card.owner) {
+                return;
+              }
+              context.game.triggerCard(context.card, {
+                round,
+                target: source,
+              });
+            },
+          );
         },
       );
     },

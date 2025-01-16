@@ -11,7 +11,7 @@ import {
   StackPriority,
 } from '../types';
 
-const CONSUMABLE_STACKS = 0.25;
+const CONSUMABLE_STACKS = 0.4;
 
 export function setupArmorMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
@@ -28,7 +28,7 @@ export function setupArmorMechanics(game: Game): void {
       if (event.type === DamageType.Pure) {
         return;
       }
-      const currentArmor = event.target.stacks[Stack.Armor];
+      const currentArmor = event.target.getTotalStacks(Stack.Armor);
       if (currentArmor > 0) {
         event.amount = Math.max(0, event.amount - currentArmor);
         event.flag |= DamageFlags.Armor;
@@ -38,50 +38,57 @@ export function setupArmorMechanics(game: Game): void {
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Armor) {
-        const current = event.source.stacks[Stack.Armor];
+        const current = event.source.getStacks(Stack.Armor, false);
         round.removeStack(
           Stack.Armor,
           event.source,
           current === 1 ? current : current * CONSUMABLE_STACKS,
+          false,
         );
       }
     });
 
     round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
       if (event.type === Stack.Armor) {
-        const clamped = Math.max(0, event.amount);
-        log(`${event.source.owner.name}'s Armor stacks changed to ${clamped}`);
-        event.source.stacks[Stack.Armor] = clamped;
+        log(
+          `${event.source.owner.name}'s Armor stacks changed to ${event.amount}`,
+        );
+        event.source.setStacks(Stack.Armor, event.amount, event.permanent);
       }
     });
 
     round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Armor) {
+      if (event.type !== Stack.Armor) {
+        return;
+      }
+      if (event.permanent) {
+        round.setStack(
+          Stack.Armor,
+          event.source,
+          event.source.getStacks(Stack.Armor, true) + event.amount,
+          true,
+        );
+        return;
+      }
+
+      let amount = event.amount;
+      if (event.source.getStacks(Stack.Corrosion, false) > 0) {
         /**
          * Counter Corrosion by removing stacks from it
          */
-        if (event.source.stacks[Stack.Corrosion] > 0) {
-          const diff = event.source.stacks[Stack.Corrosion] - event.amount;
-          round.removeStack(Stack.Corrosion, event.source, event.amount);
+        round.removeStack(Stack.Corrosion, event.source, amount, false);
 
-          if (diff < 0) {
-            log(`${event.source.owner.name} gained ${-diff} stacks of Armor`);
-            round.setStack(
-              Stack.Armor,
-              event.source,
-              event.source.stacks[Stack.Armor] - diff,
-            );
-          }
-        } else {
-          log(
-            `${event.source.owner.name} gained ${event.amount} stacks of Armor`,
-          );
-          round.setStack(
-            Stack.Armor,
-            event.source,
-            event.source.stacks[Stack.Armor] + event.amount,
-          );
-        }
+        amount = -(event.source.getStacks(Stack.Corrosion, false) - amount);
+      }
+
+      if (amount > 0) {
+        log(`${event.source.owner.name} gained ${amount} stacks of Armor`);
+        round.setStack(
+          Stack.Armor,
+          event.source,
+          event.source.getStacks(Stack.Armor, false) + amount,
+          false,
+        );
       }
     });
 
@@ -91,7 +98,8 @@ export function setupArmorMechanics(game: Game): void {
         round.setStack(
           Stack.Armor,
           event.source,
-          event.source.stacks[Stack.Armor] - event.amount,
+          event.source.getStacks(Stack.Armor, event.permanent) - event.amount,
+          event.permanent,
         );
       }
     });
