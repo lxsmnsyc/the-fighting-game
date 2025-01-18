@@ -6,7 +6,62 @@
     <title>Seroval Playground</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <style>
+      .card-container {
+        width: 256px;
+      }
+      .card {
+        aspect-ratio: 4 / 5;
+        display: flex;
+        background-color: navy;
+
+        border-radius: 1rem;
+        padding: 1rem;
+
+        flex-direction: column;
+        gap: 1rem;
+
+        justify-content: center;
+      }
+
+      .card-type {
+        background-color: aqua;
+      }
+
+      .card-art {
+        flex-grow: 1;
+        aspect-ratio: 1 / 1;
+        background-color: aqua;
+
+        border-radius: 0.5rem;
+      }
+
+      .card-name {
+        background-color: aqua;
+        padding: 0.25rem 0rem;
+      }
+    </style>
+    <div id="root">
+      <div class="card-container">
+        <div class="card">
+          <div class="card-type">
+            <span>
+              NAME
+
+            </span>
+          </div>
+          <div class="card-art">
+  
+          </div>
+          <div class="card-name">
+            <span>
+              NAME
+
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <script type="module" src="/src/main.tsx"></script> -->
   </body>
 </html>

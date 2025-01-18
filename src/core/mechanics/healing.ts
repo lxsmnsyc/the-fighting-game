@@ -10,6 +10,7 @@ import {
   Stat,
   TriggerStackFlags,
 } from '../types';
+import { createTimer } from './tick';
 
 const DEFAULT_PERIOD = 1.0 * 1000;
 const CONSUMABLE_STACKS = 0.4;
@@ -19,21 +20,9 @@ export function setupHealingMechanics(game: Game): void {
     log('Setting up Healing mechanics.');
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
-      let elapsed = 0;
-      let ready = true;
-
-      round.on(RoundEvents.Tick, EventPriority.Exact, event => {
-        if (!ready) {
-          elapsed += event.delta;
-          if (elapsed >= DEFAULT_PERIOD) {
-            elapsed -= DEFAULT_PERIOD;
-            ready = true;
-          }
-        }
-        if (ready && source) {
-          ready = false;
-          round.triggerStack(Stack.Healing, source, TriggerStackFlags.Consume);
-        }
+      createTimer(round, DEFAULT_PERIOD, () => {
+        round.triggerStack(Stack.Healing, source, TriggerStackFlags.Consume);
+        return true;
       });
     });
 

@@ -1,8 +1,6 @@
 import type { Game } from '../game';
-import { lerp } from '../lerp';
-import type { Player } from '../player';
 import type { Round } from '../round';
-import { EventPriority, GameEvents, RoundEvents, Stack } from '../types';
+import { EventPriority, GameEvents, RoundEvents } from '../types';
 
 const FPS = 60;
 const FPS_DURATION = 1000 / FPS;
@@ -36,44 +34,24 @@ export function setupTickMechanics(game: Game): void {
   });
 }
 
-const MAX_SPEED = 750;
-
-function getPeriod(
-  speed: number,
-  minPeriod: number,
-  maxPeriod: number,
-): number {
-  return lerp(
-    minPeriod * 1000,
-    maxPeriod * 1000,
-    Math.min(speed / MAX_SPEED, 1),
-  );
-}
-
-export interface UsePeriodOptions {
-  round: Round;
-  player: Player;
-  period: { min: number; max: number };
-  run(): void;
-}
-
-export function useScalingPeriod(options: UsePeriodOptions): void {
+export function createTimer(
+  round: Round,
+  period: number,
+  callback: () => boolean,
+): void {
   let elapsed = 0;
-  let period = getPeriod(
-    options.player.stats[Stack.Speed],
-    options.period.min,
-    options.period.max,
-  );
-  options.round.on(RoundEvents.Tick, EventPriority.Exact, event => {
-    elapsed += event.delta;
-    if (elapsed >= period) {
-      elapsed -= period;
-      period = getPeriod(
-        options.player.stats[Stack.Speed],
-        options.period.min,
-        options.period.max,
-      );
-      options.run();
+  let ready = true;
+
+  round.on(RoundEvents.Tick, EventPriority.Exact, event => {
+    if (!ready) {
+      elapsed += event.delta;
+      if (elapsed >= period) {
+        elapsed -= period;
+        ready = true;
+      }
+    }
+    if (ready) {
+      ready = !callback();
     }
   });
 }

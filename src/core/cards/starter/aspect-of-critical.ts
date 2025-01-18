@@ -1,5 +1,6 @@
 import { createCard } from '../../card';
 import type { StartRoundGameEvent } from '../../game';
+import { createTimer } from '../../mechanics/tick';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
@@ -40,21 +41,13 @@ export default createCard({
           if (source.owner !== context.card.owner) {
             return;
           }
-          let elapsed = 0;
-          let ready = true;
 
-          round.on(RoundEvents.Tick, EventPriority.Exact, event => {
-            if (!ready) {
-              elapsed += event.delta;
-              if (elapsed >= DEFAULT_PERIOD) {
-                elapsed -= DEFAULT_PERIOD;
-                ready = true;
-              }
-            }
-            if (ready && context.card.enabled) {
-              ready = false;
+          createTimer(round, DEFAULT_PERIOD, () => {
+            if (context.card.enabled) {
               context.game.triggerCard(context.card, { round, source });
+              return true;
             }
+            return false;
           });
         });
       },
