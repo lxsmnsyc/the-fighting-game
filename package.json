@@ -13,15 +13,15 @@
 		"start": "vite preview"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.8.3",
-		"autoprefixer": "^10.4.19",
-		"postcss": "^8.4.39",
-		"tailwindcss": "^3.4.6",
-		"typescript": "^5.5.3",
-		"vite": "^5.3.4",
-		"vite-plugin-solid": "^2.10.2"
+		"@biomejs/biome": "^1.9.4",
+		"autoprefixer": "^10.4.21",
+		"postcss": "^8.5.3",
+		"tailwindcss": "^4.0.14",
+		"typescript": "^5.8.2",
+		"vite": "^6.2.1",
+		"vite-plugin-solid": "^2.11.6"
 	},
 	"dependencies": {
-		"solid-js": "^1.8.18"
+		"solid-js": "^1.9.5"
 	}
 }
