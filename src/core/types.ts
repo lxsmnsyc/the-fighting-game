@@ -9,10 +9,11 @@ export const enum Edition {
  * Print types, stackable
  */
 export const enum Print {
-  Error = 0b0001,
-  Negative = 0b0010,
-  Monotone = 0b0100,
-  Signed = 0b1000,
+  Error = 0b00001,
+  Negative = 0b00010,
+  Monotone = 0b00100,
+  FullArt = 0b01000,
+  ThreeD = 0b10000
 }
 
 /**
@@ -126,38 +127,61 @@ export const enum RoundEvents {
   ConsumeStack = 12,
   Heal = 13,
   TriggerStack = 14,
+  Attack = 15,
 }
 
 /**
  * Damage types
  */
 export const enum DamageType {
-  Magic = 0,
-  Attack = 1,
+  Magical = 0,
+  Physical = 1,
+
+  Attack = 2,
 
   // Does not trigger normal damage events either
-  Poison = 2,
+  Poison = 3,
   // Can trigger some damage events
-  Pure = 3,
+  Pure = 4,
   // Does not trigger damage events
-  HealthLoss = 4,
+  HealthLoss = 5,
 }
 
 /**
  * Damage flags
  */
 export const enum DamageFlags {
+  /**
+   * Damage missed
+   */
   Missed = 0b0001,
+  /**
+   * Damage reduced by Armor
+   */
   Armor = 0b0010,
+  /**
+   * Damage amplified by Corrosion
+   */
   Corrosion = 0b0100,
+  /**
+   * Critical damage applied
+   */
   Critical = 0b1000,
 }
 
 export const enum HealingFlags {
+  /**
+   * Healing missed
+   */
   Missed = 0b0001,
 }
 
 export const enum TriggerStackFlags {
+  Failed = 0b0001,
+  Consume = 0b0010,
+}
+
+export const enum AttackFlags {
   Failed = 0b0001,
   Consume = 0b0010,
 }
@@ -212,5 +236,6 @@ export interface PrintSpawnChance {
   [Print.Error]: number;
   [Print.Monotone]: number;
   [Print.Negative]: number;
-  [Print.Signed]: number;
+  [Print.FullArt]: number;
+  [Print.ThreeD]: number;
 }

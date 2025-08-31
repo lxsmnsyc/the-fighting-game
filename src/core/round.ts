@@ -133,6 +133,17 @@ export interface TriggerStackEvent extends ConsumeStackEvent {
   flag: number;
 }
 
+export interface AttackEvent extends UnitEvent {
+  flag: number;
+}
+
+function createAttackEvent(
+  source: Unit,
+  flag: number,
+): AttackEvent {
+  return { id: 'AttackEvent', source, flag };
+}
+
 export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
@@ -162,6 +173,7 @@ export type RoundEvent = {
   [RoundEvents.TriggerStack]: TriggerStackEvent;
   [RoundEvents.Heal]: HealEvent;
   [RoundEvents.SetupUnit]: UnitEvent;
+  [RoundEvents.Attack]: AttackEvent;
 };
 
 export interface UnitStats {
@@ -277,6 +289,10 @@ export class Round extends EventEngine<RoundEvent> {
       return;
     }
     this.emit(RoundEvents.Heal, createHealEvent(source, amount, flag));
+  }
+
+  attack(source: Unit, flag: number): void {
+    this.emit(RoundEvents.Attack, createAttackEvent(source, flag));
   }
 
   triggerStack(stack: Stack, source: Unit, flag: number): void {

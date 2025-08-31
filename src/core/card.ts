@@ -32,8 +32,12 @@ export function getRandomPrint(
     print |= Print.Negative;
   }
 
-  if (multiplier[Print.Signed] > rng.random()) {
-    print |= Print.Signed;
+  if (multiplier[Print.FullArt] > rng.random()) {
+    print |= Print.FullArt;
+  }
+
+  if (multiplier[Print.ThreeD] > rng.random()) {
+    print |= Print.ThreeD;
   }
   return print;
 }
@@ -96,7 +100,10 @@ export class CardInstance {
     if (this.print & Print.Negative) {
       mult++;
     }
-    if (this.print & Print.Signed) {
+    if (this.print & Print.FullArt) {
+      mult++;
+    }
+    if (this.print & Print.ThreeD) {
       mult++;
     }
 

@@ -60,7 +60,7 @@ export function setupMagicMechanics(game: Game): void {
       const stacks = event.source.getTotalStacks(Stack.Magic);
       if (stacks > 0) {
         round.dealDamage(
-          DamageType.Magic,
+          DamageType.Magical,
           event.source,
           round.getEnemyUnit(event.source),
           stacks,

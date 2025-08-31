@@ -2,6 +2,7 @@ import type { Game } from '../game';
 import { lerp } from '../lerp';
 import { log } from '../log';
 import {
+  AttackFlags,
   DamageType,
   EventPriority,
   GameEvents,
@@ -45,9 +46,20 @@ export function setupAttackMechanics(game: Game): void {
         }
         if (ready && source) {
           ready = false;
-          round.triggerStack(Stack.Attack, source, TriggerStackFlags.Consume);
+          round.attack(source, 0);
         }
       });
+    });
+
+    round.on(RoundEvents.Attack, EventPriority.Exact, event => {
+      if (event.flag & AttackFlags.Failed) {
+        return;
+      }
+      round.triggerStack(
+        Stack.Attack,
+        event.source,
+        event.flag & AttackFlags.Consume ? TriggerStackFlags.Consume : 0,
+      );
     });
 
     round.on(RoundEvents.TriggerStack, EventPriority.Exact, event => {
