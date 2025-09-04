@@ -55,3 +55,28 @@ export function createTimer(
     }
   });
 }
+
+
+export function createDynamicTimer(
+  round: Round,
+  period: () => number,
+  callback: () => boolean,
+): void {
+  let elapsed = 0;
+  let lastPeriod = period();
+  let ready = true;
+
+  round.on(RoundEvents.Tick, EventPriority.Exact, event => {
+    if (!ready) {
+      elapsed += event.delta;
+      if (elapsed >= lastPeriod) {
+        elapsed -= lastPeriod;
+        ready = true;
+      }
+    }
+    if (ready) {
+      ready = !callback();
+      lastPeriod = period();
+    }
+  });
+}

@@ -11,6 +11,7 @@ import {
   StackPriority,
   TriggerStackFlags,
 } from '../types';
+import { createDynamicTimer } from './tick';
 
 const MIN_PERIOD = 0.25;
 const MAX_PERIOD = 2.5;
@@ -31,23 +32,9 @@ export function setupAttackMechanics(game: Game): void {
     log('Setting up Attack mechanics.');
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
-      let elapsed = 0;
-      let period = getPeriod(source.getTotalStacks(Stack.Speed));
-      let ready = true;
-
-      round.on(RoundEvents.Tick, EventPriority.Exact, event => {
-        if (!ready) {
-          elapsed += event.delta;
-          if (elapsed >= period) {
-            elapsed -= period;
-            period = getPeriod(source.getTotalStacks(Stack.Speed));
-            ready = true;
-          }
-        }
-        if (ready && source) {
-          ready = false;
-          round.attack(source, 0);
-        }
+      createDynamicTimer(round, () => getPeriod(source.getTotalStacks(Stack.Speed)), () => {
+        round.attack(source, 0);
+        return true;
       });
     });
 
