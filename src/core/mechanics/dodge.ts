@@ -10,19 +10,20 @@ import {
   RoundEvents,
   Stack,
   StackPriority,
+  TriggerStackFlags,
 } from '../types';
 
-const MIN_EVASION_CHANCE = 0;
-const MAX_EVASION_CHANCE = 100;
-const MAX_EVASION_STACKS = 750;
+const MIN_DODGE_CHANCE = 0;
+const MAX_DODGE_CHANCE = 100;
+const MAX_DODGE_STACKS = 750;
 
 const CONSUMABLE_STACKS = 0.4;
 
 function getDodgeChance(stack: number): number {
   return lerp(
-    MIN_EVASION_CHANCE,
-    MAX_EVASION_CHANCE,
-    Math.min(stack / MAX_EVASION_STACKS, 1),
+    MIN_DODGE_CHANCE,
+    MAX_DODGE_CHANCE,
+    Math.min(stack / MAX_DODGE_STACKS, 1),
   );
 }
 
@@ -36,11 +37,11 @@ export function setupDodgeMechanics(game: Game): void {
       if (event.type === DamageType.Attack) {
         // Check if player can evade it
         const stacks = event.target.getTotalStacks(Stack.Dodge);
-        // If there's an evasion stack
+        // If there's an dodge stack
         if (stacks === 0) {
           return;
         }
-        // Calculat evasion chance
+        // Calculat dodge chance
         const currentDodge = getDodgeChance(stacks);
         // Push your luck
         const random = event.target.rng.random() * 100;
@@ -49,7 +50,23 @@ export function setupDodgeMechanics(game: Game): void {
         }
         log(`${event.target.owner.name} dodged ${event.amount} of damage.`);
         event.flag |= DamageFlags.Missed;
-        round.consumeStack(Stack.Dodge, event.target);
+        round.triggerStack(
+          Stack.Dodge,
+          event.target,
+          TriggerStackFlags.Consume,
+        );
+      }
+    });
+
+    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
+      if (event.type !== Stack.Dodge) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Failed) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Consume) {
+        round.consumeStack(Stack.Dodge, event.source);
       }
     });
 

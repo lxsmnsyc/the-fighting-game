@@ -9,6 +9,7 @@ import {
   RoundEvents,
   Stack,
   StackPriority,
+  TriggerStackFlags,
 } from '../types';
 
 const CONSUMABLE_STACKS = 0.4;
@@ -32,7 +33,23 @@ export function setupCorrosionMechanics(game: Game): void {
       if (currentCorrosion > 0) {
         event.amount = Math.max(0, event.amount + currentCorrosion);
         event.flag |= DamageFlags.Corrosion;
-        round.consumeStack(Stack.Corrosion, event.target);
+        round.triggerStack(
+          Stack.Corrosion,
+          event.target,
+          TriggerStackFlags.Consume,
+        );
+      }
+    });
+    
+    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
+      if (event.type !== Stack.Corrosion) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Failed) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Consume) {
+        round.consumeStack(Stack.Corrosion, event.source);
       }
     });
 

@@ -9,6 +9,7 @@ import {
   RoundEvents,
   Stack,
   StackPriority,
+  TriggerStackFlags,
 } from '../types';
 
 const CONSUMABLE_STACKS = 0.4;
@@ -22,17 +23,30 @@ export function setupArmorMechanics(game: Game): void {
       if (event.flag & (DamageFlags.Missed | DamageFlags.Armor)) {
         return;
       }
-      if (event.type === DamageType.Poison) {
-        return;
-      }
-      if (event.type === DamageType.Pure) {
+      if (event.type === DamageType.Poison || event.type === DamageType.Pure) {
         return;
       }
       const currentArmor = event.target.getTotalStacks(Stack.Armor);
       if (currentArmor > 0) {
         event.amount = Math.max(0, event.amount - currentArmor);
         event.flag |= DamageFlags.Armor;
-        round.consumeStack(Stack.Armor, event.target);
+        round.triggerStack(
+          Stack.Armor,
+          event.target,
+          TriggerStackFlags.Consume,
+        );
+      }
+    });
+
+    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
+      if (event.type !== Stack.Armor) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Failed) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Consume) {
+        round.consumeStack(Stack.Armor, event.source);
       }
     });
 

@@ -10,6 +10,7 @@ import {
   RoundEvents,
   Stack,
   StackPriority,
+  TriggerStackFlags,
 } from '../types';
 
 const MIN_CRITICAL_CHANCE = 0;
@@ -51,7 +52,23 @@ export function setupCriticalMechanics(game: Game): void {
         log(`${event.source.owner.name} triggered a critical.`);
         event.flag |= DamageFlags.Critical;
 
-        round.consumeStack(Stack.Critical, event.target);
+        round.triggerStack(
+          Stack.Critical,
+          event.source,
+          TriggerStackFlags.Consume,
+        );
+      }
+    });
+
+    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
+      if (event.type !== Stack.Critical) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Failed) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Consume) {
+        round.consumeStack(Stack.Critical, event.source);
       }
     });
 

@@ -6,6 +6,7 @@ import {
   RoundEvents,
   Stack,
   StackPriority,
+  TriggerStackFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -18,10 +19,21 @@ export function setupSpeedMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        // TODO triggerStack?
-        round.consumeStack(Stack.Speed, source);
+        round.triggerStack(Stack.Speed, source, TriggerStackFlags.Consume);
         return true;
       });
+    });
+
+    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
+      if (event.type !== Stack.Speed) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Failed) {
+        return;
+      }
+      if (event.flag & TriggerStackFlags.Consume) {
+        round.consumeStack(Stack.Speed, event.source);
+      }
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
