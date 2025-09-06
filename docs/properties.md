@@ -40,8 +40,10 @@
   - Defines the tick rate of periodic cards.
   - Defines the tick rate of `Attack` at a 0.25 to 2.5 second rate.
   - Maximum tick improvement achieved at 750 stacks.
+  - Consumes 40% of the current `Speed` stack per second.
 - Slow
   - Counteracts `Slow` (when receiving `Speed`, `Slow` stack decreases).
+  - Consumes 40% of the current `Slow` stack per second.
 - Dodge
   - Causes `Attack` damage to miss by chance.
   - When damage is dodged, consumes 40% of the current `Dodge` stacks.
