@@ -21,7 +21,7 @@ export function setupHealingMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.triggerStack(Stack.Healing, source, TriggerStackFlags.Consume);
+        round.triggerStack(Stack.Healing, source, 0);
         return true;
       });
     });
@@ -33,14 +33,14 @@ export function setupHealingMechanics(game: Game): void {
       if (event.flag & TriggerStackFlags.Failed) {
         return;
       }
-
       const stacks = event.source.getTotalStacks(Stack.Healing);
       if (stacks > 0) {
         round.heal(event.source, stacks, 0);
       }
-      if (event.flag & TriggerStackFlags.Consume) {
-        round.consumeStack(Stack.Attack, event.source);
+      if (event.flag & TriggerStackFlags.NoConsume) {
+        return;
       }
+      round.consumeStack(Stack.Healing, event.source);
     });
 
     round.on(RoundEvents.Heal, EventPriority.Exact, event => {

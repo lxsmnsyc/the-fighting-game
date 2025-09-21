@@ -19,7 +19,7 @@ export function setupSpeedMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.triggerStack(Stack.Speed, source, TriggerStackFlags.Consume);
+        round.triggerStack(Stack.Speed, source, 0);
         return true;
       });
     });
@@ -31,9 +31,10 @@ export function setupSpeedMechanics(game: Game): void {
       if (event.flag & TriggerStackFlags.Failed) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Consume) {
-        round.consumeStack(Stack.Speed, event.source);
+      if (event.flag & TriggerStackFlags.NoConsume) {
+        return;
       }
+      round.consumeStack(Stack.Speed, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

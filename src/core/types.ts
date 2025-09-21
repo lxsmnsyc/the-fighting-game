@@ -12,8 +12,6 @@ export const enum Print {
   Error = 0b00001,
   Negative = 0b00010,
   Monotone = 0b00100,
-  FullArt = 0b01000,
-  ThreeD = 0b10000
 }
 
 /**
@@ -178,12 +176,12 @@ export const enum HealingFlags {
 
 export const enum TriggerStackFlags {
   Failed = 0b0001,
-  Consume = 0b0010,
+  NoConsume = 0b0010,
 }
 
 export const enum AttackFlags {
   Failed = 0b0001,
-  Consume = 0b0010,
+  NoConsume = 0b0010,
 }
 
 export const enum Stat {
@@ -236,6 +234,4 @@ export interface PrintSpawnChance {
   [Print.Error]: number;
   [Print.Monotone]: number;
   [Print.Negative]: number;
-  [Print.FullArt]: number;
-  [Print.ThreeD]: number;
 }

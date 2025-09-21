@@ -33,9 +33,10 @@ export function setupMagicMechanics(game: Game): void {
           0,
         );
       }
-      if (event.flag & TriggerStackFlags.Consume) {
-        round.consumeStack(Stack.Magic, event.source);
+      if (event.flag & TriggerStackFlags.NoConsume) {
+        return;
       }
+      round.consumeStack(Stack.Magic, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

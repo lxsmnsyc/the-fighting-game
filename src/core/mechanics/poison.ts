@@ -20,7 +20,7 @@ export function setupPoisonMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.triggerStack(Stack.Poison, source, TriggerStackFlags.Consume);
+        round.triggerStack(Stack.Poison, source, 0);
         return true;
       });
     });
@@ -42,9 +42,10 @@ export function setupPoisonMechanics(game: Game): void {
           0,
         );
       }
-      if (event.flag & TriggerStackFlags.Consume) {
-        round.consumeStack(Stack.Poison, event.source);
+      if (event.flag & TriggerStackFlags.NoConsume) {
+        return;
       }
+      round.consumeStack(Stack.Poison, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

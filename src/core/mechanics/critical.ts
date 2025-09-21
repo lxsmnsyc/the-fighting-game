@@ -55,7 +55,7 @@ export function setupCriticalMechanics(game: Game): void {
         round.triggerStack(
           Stack.Critical,
           event.source,
-          TriggerStackFlags.Consume,
+          0,
         );
       }
     });
@@ -67,9 +67,10 @@ export function setupCriticalMechanics(game: Game): void {
       if (event.flag & TriggerStackFlags.Failed) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Consume) {
-        round.consumeStack(Stack.Critical, event.source);
+      if (event.flag & TriggerStackFlags.NoConsume) {
+        return;
       }
+      round.consumeStack(Stack.Critical, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

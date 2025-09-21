@@ -53,7 +53,7 @@ export function setupDodgeMechanics(game: Game): void {
         round.triggerStack(
           Stack.Dodge,
           event.target,
-          TriggerStackFlags.Consume,
+          0,
         );
       }
     });
@@ -65,9 +65,10 @@ export function setupDodgeMechanics(game: Game): void {
       if (event.flag & TriggerStackFlags.Failed) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Consume) {
-        round.consumeStack(Stack.Dodge, event.source);
+      if (event.flag & TriggerStackFlags.NoConsume) {
+        return;
       }
+      round.consumeStack(Stack.Dodge, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

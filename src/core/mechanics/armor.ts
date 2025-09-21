@@ -33,7 +33,7 @@ export function setupArmorMechanics(game: Game): void {
         round.triggerStack(
           Stack.Armor,
           event.target,
-          TriggerStackFlags.Consume,
+          0,
         );
       }
     });
@@ -45,9 +45,10 @@ export function setupArmorMechanics(game: Game): void {
       if (event.flag & TriggerStackFlags.Failed) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Consume) {
-        round.consumeStack(Stack.Armor, event.source);
+      if (event.flag & TriggerStackFlags.NoConsume) {
+        return;
       }
+      round.consumeStack(Stack.Armor, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

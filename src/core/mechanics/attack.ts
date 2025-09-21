@@ -45,7 +45,7 @@ export function setupAttackMechanics(game: Game): void {
       round.triggerStack(
         Stack.Attack,
         event.source,
-        event.flag & AttackFlags.Consume ? TriggerStackFlags.Consume : 0,
+        event.flag & AttackFlags.NoConsume ? TriggerStackFlags.NoConsume : 0,
       );
     });
 
@@ -66,9 +66,10 @@ export function setupAttackMechanics(game: Game): void {
           0,
         );
       }
-      if (event.flag & TriggerStackFlags.Consume) {
-        round.consumeStack(Stack.Attack, event.source);
+      if (event.flag & TriggerStackFlags.NoConsume) {
+        return;
       }
+      round.consumeStack(Stack.Attack, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
