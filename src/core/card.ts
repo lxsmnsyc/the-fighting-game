@@ -32,13 +32,6 @@ export function getRandomPrint(
     print |= Print.Negative;
   }
 
-  if (multiplier[Print.FullArt] > rng.random()) {
-    print |= Print.FullArt;
-  }
-
-  if (multiplier[Print.ThreeD] > rng.random()) {
-    print |= Print.ThreeD;
-  }
   return print;
 }
 
@@ -70,6 +63,9 @@ export interface TriggerCardEvent extends BaseCardEvent {
   data: unknown;
 }
 
+const MIN_ERROR_VALUE = 0.75;
+const MAX_ERROR_VALUE = 1.25;
+
 export class CardInstance {
   public edition: Edition;
 
@@ -88,25 +84,19 @@ export class CardInstance {
     this.edition = Edition.Common;
   }
 
-  getMultiplier(): number {
-    let mult = 1;
+  getCardValue(value: number): number {
+    let result = value;
 
     if (this.print & Print.Error) {
-      mult++;
+      const minValue = value * MIN_ERROR_VALUE;
+      const maxValue = value * MAX_ERROR_VALUE;
+      
+      result = minValue + (Math.random() * (maxValue - minValue)) | 0;
     }
     if (this.print & Print.Monotone) {
-      mult++;
-    }
-    if (this.print & Print.Negative) {
-      mult++;
-    }
-    if (this.print & Print.FullArt) {
-      mult++;
-    }
-    if (this.print & Print.ThreeD) {
-      mult++;
+      result *= 2;
     }
 
-    return mult;
+    return result;
   }
 }

@@ -36,7 +36,7 @@ function createAddStackOnHealCard(
           round.addStack(
             stack,
             target,
-            DEFAULT_AMOUNT * context.card.getMultiplier(),
+            context.card.getCardValue(DEFAULT_AMOUNT),
             permanent,
           );
         }

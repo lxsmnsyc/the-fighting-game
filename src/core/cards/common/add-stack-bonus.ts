@@ -32,8 +32,7 @@ function createAddStackBonusCard(
         EventPriority.Exact,
         ({ card, data }) => {
           if (card === context.card) {
-            (data as SetStackEvent).amount +=
-              DEFAULT_MULTIPLIER * context.card.getMultiplier();
+            (data as SetStackEvent).amount += context.card.getCardValue(DEFAULT_MULTIPLIER);
           }
         },
       );

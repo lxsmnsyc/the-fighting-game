@@ -34,7 +34,7 @@ function createAddStackOnStartCard(
           round.addStack(
             stack,
             target,
-            DEFAULT_MULTIPLIER * context.card.getMultiplier(),
+            context.card.getCardValue(DEFAULT_MULTIPLIER),
             true,
           );
         }
