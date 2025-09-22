@@ -1,6 +1,7 @@
 import type { Game } from '../game';
-import type { Round } from '../round';
-import { EventPriority, GameEvents, RoundEvents } from '../types';
+import { lerp } from '../lerp';
+import type { Round, Unit } from '../round';
+import { EventPriority, GameEvents, RoundEvents, Stack } from '../types';
 
 const FPS = 60;
 const FPS_DURATION = 1000 / FPS;
@@ -34,10 +35,16 @@ export function setupTickMechanics(game: Game): void {
   });
 }
 
+/**
+ * Return `true` if timer should be reset. Return `false` if
+ * it should re-run immediately on next tick.
+ */
+type TimerCallback = () => boolean;
+
 export function createTimer(
   round: Round,
   period: number,
-  callback: () => boolean,
+  callback: TimerCallback,
 ): void {
   let elapsed = 0;
   let ready = true;
@@ -60,7 +67,7 @@ export function createTimer(
 export function createDynamicTimer(
   round: Round,
   period: () => number,
-  callback: () => boolean,
+  callback: TimerCallback,
 ): void {
   let elapsed = 0;
   let lastPeriod = period();
@@ -79,4 +86,24 @@ export function createDynamicTimer(
       lastPeriod = period();
     }
   });
+}
+
+const MAX_SPEED = 1000;
+
+export function createCooldown(
+  round: Round,
+  unit: Unit,
+  min: number,
+  max: number,
+  callback: TimerCallback,
+): void {
+  createDynamicTimer(
+    round,
+    () => lerp(
+      min * 1000,
+      max * 1000,
+      Math.min(unit.getTotalStacks(Stack.Speed) / MAX_SPEED, 1), 
+    ),
+    callback,
+  );
 }
