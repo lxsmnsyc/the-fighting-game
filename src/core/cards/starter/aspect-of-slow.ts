@@ -27,7 +27,7 @@ export default createCard({
         round.addStack(
           Stack.Slow,
           target,
-          DEFAULT_AMOUNT * context.card.getMultiplier(),
+          context.card.getValue(DEFAULT_AMOUNT),
           false,
         );
       }

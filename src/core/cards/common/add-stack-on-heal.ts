@@ -11,16 +11,25 @@ import {
   Stack,
 } from '../../types';
 
-const DEFAULT_AMOUNT = 10;
 const DEFAULT_CHANCE = 0.2;
 
-function createAddStackOnHealCard(
-  name: string,
-  stack: Stack,
-  aspect: Aspect,
+interface AddStackOnHealCardOptions {
+  name: string;
+  stack: Stack;
+  aspect: Aspect;
+  amount: number;
+  permanent?: boolean;
+  image?: string;
+}
+
+function createAddStackOnHealCard({
+  name,
+  stack,
+  aspect,
+  amount,
   permanent = false,
   image = '',
-): Card {
+}: AddStackOnHealCardOptions): Card {
   return createCard({
     name,
     aspect: [Aspect.Healing, aspect],
@@ -36,7 +45,7 @@ function createAddStackOnHealCard(
           round.addStack(
             stack,
             target,
-            context.card.getCardValue(DEFAULT_AMOUNT),
+            context.card.getValue(amount),
             permanent,
           );
         }
@@ -74,13 +83,58 @@ function createAddStackOnHealCard(
 }
 
 export const ADD_STACK_ON_HEAL_CARDS = [
-  createAddStackOnHealCard('', Stack.Armor, Aspect.Armor),
-  createAddStackOnHealCard('', Stack.Attack, Aspect.Attack),
-  createAddStackOnHealCard('', Stack.Corrosion, Aspect.Corrosion),
-  createAddStackOnHealCard('', Stack.Critical, Aspect.Critical),
-  createAddStackOnHealCard('', Stack.Dodge, Aspect.Dodge),
-  createAddStackOnHealCard('', Stack.Magic, Aspect.Magic),
-  createAddStackOnHealCard('', Stack.Poison, Aspect.Poison),
-  createAddStackOnHealCard('', Stack.Slow, Aspect.Slow),
-  createAddStackOnHealCard('', Stack.Speed, Aspect.Speed),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Armor,
+    aspect: Aspect.Armor,
+    amount: 50,
+  }),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Attack,
+    aspect: Aspect.Attack,
+    amount: 50,
+  }),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Corrosion,
+    aspect: Aspect.Corrosion,
+    amount: 50,
+  }),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Critical,
+    aspect: Aspect.Critical,
+    amount: 50,
+  }),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Dodge,
+    aspect: Aspect.Dodge,
+    amount: 50,
+  }),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Magic,
+    aspect: Aspect.Magic,
+    amount: 50,
+  }),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Poison,
+    aspect: Aspect.Poison,
+    amount: 50,
+  }),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Slow,
+    aspect: Aspect.Slow,
+    amount: 50,
+  }),
+  createAddStackOnHealCard({
+    name: '',
+    stack: Stack.Speed,
+    aspect: Aspect.Speed,
+    amount: 50,
+  }),
 ];

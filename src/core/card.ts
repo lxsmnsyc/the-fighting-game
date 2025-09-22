@@ -84,14 +84,14 @@ export class CardInstance {
     this.edition = Edition.Common;
   }
 
-  getCardValue(value: number): number {
+  getValue(value: number): number {
     let result = value;
 
     if (this.print & Print.Error) {
       const minValue = value * MIN_ERROR_VALUE;
       const maxValue = value * MAX_ERROR_VALUE;
-      
-      result = minValue + (Math.random() * (maxValue - minValue)) | 0;
+
+      result = (minValue + Math.random() * (maxValue - minValue)) | 0;
     }
     if (this.print & Print.Monotone) {
       result *= 2;

@@ -34,7 +34,7 @@ function createAddStatOnStartCard(
           round.addStat(
             stat,
             target,
-            context.card.getCardValue(DEFAULT_MULTIPLIER),
+            context.card.getValue(DEFAULT_MULTIPLIER),
           );
         }
       });

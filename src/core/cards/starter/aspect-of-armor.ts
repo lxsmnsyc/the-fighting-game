@@ -25,7 +25,7 @@ export default createCard({
         round.addStack(
           Stack.Armor,
           source,
-          DEFAULT_AMOUNT * context.card.getMultiplier(),
+          context.card.getValue(DEFAULT_AMOUNT),
           true,
         );
       }
