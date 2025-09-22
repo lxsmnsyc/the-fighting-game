@@ -1,5 +1,4 @@
 import type { Game } from '../game';
-import { lerp } from '../lerp';
 import { log } from '../log';
 import {
   AttackFlags,
@@ -11,19 +10,10 @@ import {
   StackPriority,
   TriggerStackFlags,
 } from '../types';
-import { createDynamicTimer } from './tick';
+import { createCooldown } from './tick';
 
 const MIN_PERIOD = 0.25;
 const MAX_PERIOD = 2.5;
-const MAX_SPEED = 750;
-
-function getPeriod(speed: number): number {
-  return lerp(
-    MIN_PERIOD * 1000,
-    MAX_PERIOD * 1000,
-    Math.min(speed / MAX_SPEED, 1),
-  );
-}
 
 const CONSUMABLE_STACKS = 0.4;
 
@@ -32,7 +22,7 @@ export function setupAttackMechanics(game: Game): void {
     log('Setting up Attack mechanics.');
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
-      createDynamicTimer(round, () => getPeriod(source.getTotalStacks(Stack.Speed)), () => {
+      createCooldown(round, source, MIN_PERIOD, MAX_PERIOD, () => {
         round.attack(source, 0);
         return true;
       });
