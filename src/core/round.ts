@@ -128,20 +128,43 @@ function createHealEvent(
   return { id: 'HealEvent', source, amount, flag };
 }
 
+export interface NaturalHealEvent extends UnitEvent {
+  flag: number;
+}
+
+function createNaturalHealEvent(
+  source: Unit,
+  flag: number,
+): NaturalHealEvent {
+  return { id: 'NaturalHealEvent', source, flag };
+}
+
 export interface TriggerStackEvent extends ConsumeStackEvent {
   type: Stack;
   flag: number;
 }
 
-export interface AttackEvent extends UnitEvent {
+export interface AttackEvent extends UnitValueEvent {
   flag: number;
 }
 
 function createAttackEvent(
   source: Unit,
+  amount: number,
   flag: number,
 ): AttackEvent {
-  return { id: 'AttackEvent', source, flag };
+  return { id: 'AttackEvent', source, amount, flag };
+}
+
+export interface NaturalAttackEvent extends UnitEvent {
+  flag: number;
+}
+
+function createNaturalAttackEvent(
+  source: Unit,
+  flag: number,
+): NaturalAttackEvent {
+  return { id: 'NaturalAttackEvent', source, flag };
 }
 
 export type RoundEvent = {
@@ -174,6 +197,8 @@ export type RoundEvent = {
   [RoundEvents.Heal]: HealEvent;
   [RoundEvents.SetupUnit]: UnitEvent;
   [RoundEvents.Attack]: AttackEvent;
+  [RoundEvents.NaturalAttack]: NaturalAttackEvent;
+  [RoundEvents.NaturalHeal]: NaturalHealEvent;
 };
 
 export interface UnitStats {
@@ -283,6 +308,10 @@ export class Round extends EventEngine<RoundEvent> {
     this.emit(RoundEvents.Tick, { id: 'TickEvent', delta });
   }
 
+  naturalHeal(source: Unit, flag: number): void {
+    this.emit(RoundEvents.NaturalHeal, createNaturalHealEvent(source, flag));
+  }
+
   heal(source: Unit, amount: number, flag: number): void {
     amount |= 0;
     if (amount === 0) {
@@ -291,8 +320,12 @@ export class Round extends EventEngine<RoundEvent> {
     this.emit(RoundEvents.Heal, createHealEvent(source, amount, flag));
   }
 
-  attack(source: Unit, flag: number): void {
-    this.emit(RoundEvents.Attack, createAttackEvent(source, flag));
+  naturalAttack(source: Unit, flag: number): void {
+    this.emit(RoundEvents.NaturalAttack, createNaturalAttackEvent(source, flag));
+  }
+
+  attack(source: Unit, amount: number, flag: number): void {
+    this.emit(RoundEvents.Attack, createAttackEvent(source, amount, flag));
   }
 
   triggerStack(stack: Stack, source: Unit, flag: number): void {

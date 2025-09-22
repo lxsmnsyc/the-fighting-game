@@ -8,7 +8,6 @@ import {
   RoundEvents,
   Stack,
   StackPriority,
-  TriggerStackFlags,
 } from '../types';
 import { createCooldown } from './tick';
 
@@ -23,43 +22,36 @@ export function setupAttackMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createCooldown(round, source, MIN_PERIOD, MAX_PERIOD, () => {
-        round.attack(source, 0);
+        round.naturalAttack(source, 0);
         return true;
       });
+    });
+
+    round.on(RoundEvents.NaturalAttack, EventPriority.Exact, event => {
+      if (event.flag & AttackFlags.Failed) {
+        return;
+      }
+      const stacks = event.source.getTotalStacks(Stack.Attack);
+      if (stacks > 0) {
+        round.attack(event.source, stacks, event.flag);
+      }
+      if (event.flag & AttackFlags.NoConsume) {
+        return;
+      }
+      round.consumeStack(Stack.Attack, event.source);
     });
 
     round.on(RoundEvents.Attack, EventPriority.Exact, event => {
       if (event.flag & AttackFlags.Failed) {
         return;
       }
-      round.triggerStack(
-        Stack.Attack,
+      round.dealDamage(
+        DamageType.Attack,
         event.source,
-        event.flag & AttackFlags.NoConsume ? TriggerStackFlags.NoConsume : 0,
+        round.getEnemyUnit(event.source),
+        event.amount,
+        0,
       );
-    });
-
-    round.on(RoundEvents.TriggerStack, EventPriority.Exact, event => {
-      if (event.type !== Stack.Attack) {
-        return;
-      }
-      if (event.flag & TriggerStackFlags.Failed) {
-        return;
-      }
-      const stacks = event.source.getTotalStacks(Stack.Attack);
-      if (stacks > 0) {
-        round.dealDamage(
-          DamageType.Attack,
-          event.source,
-          round.getEnemyUnit(event.source),
-          stacks,
-          0,
-        );
-      }
-      if (event.flag & TriggerStackFlags.NoConsume) {
-        return;
-      }
-      round.consumeStack(Stack.Attack, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
