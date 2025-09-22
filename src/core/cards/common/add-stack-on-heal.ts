@@ -63,7 +63,7 @@ function createAddStackOnHealCard({
               if (
                 context.card.enabled &&
                 event.source === source &&
-                !(event.flag & HealingFlags.Missed) &&
+                !(event.flag & HealingFlags.Failed) &&
                 context.card.rng.random() <= DEFAULT_CHANCE
               ) {
                 const target = SELF_STACK[stack]
