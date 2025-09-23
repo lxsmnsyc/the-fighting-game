@@ -37,74 +37,13 @@ export interface DamageEvent extends UnitValueEvent {
   flag: number;
 }
 
-function createDamageEvent(
-  type: DamageType,
-  source: Unit,
-  target: Unit,
-  amount: number,
-  flag: number,
-): DamageEvent {
-  return { id: 'DamageEvent', type, source, target, amount, flag };
-}
-
 export interface SetStackEvent extends UnitValueEvent {
   type: Stack;
   permanent: boolean;
 }
 
-function createSetStackEvent(
-  type: Stack,
-  source: Unit,
-  amount: number,
-  permanent: boolean,
-): SetStackEvent {
-  return { id: 'SetStackEvent', type, source, amount, permanent };
-}
-
-function createAddStackEvent(
-  type: Stack,
-  source: Unit,
-  amount: number,
-  permanent: boolean,
-): SetStackEvent {
-  return { id: 'AddStackEvent', type, source, amount, permanent };
-}
-
-function createRemoveStackEvent(
-  type: Stack,
-  source: Unit,
-  amount: number,
-  permanent: boolean,
-): SetStackEvent {
-  return { id: 'RemoveStackEvent', type, source, amount, permanent };
-}
-
 export interface SetStatEvent extends UnitValueEvent {
   type: Stat;
-}
-
-function createSetStatEvent(
-  type: Stat,
-  source: Unit,
-  amount: number,
-): SetStatEvent {
-  return { id: 'SetStatEvent', type, source, amount };
-}
-
-function createStatEvent(
-  type: Stat,
-  source: Unit,
-  amount: number,
-): SetStatEvent {
-  return { id: 'AddStatEvent', type, source, amount };
-}
-
-function createRemoveStatEvent(
-  type: Stat,
-  source: Unit,
-  amount: number,
-): SetStatEvent {
-  return { id: 'RemoveStatEvent', type, source, amount };
 }
 
 export interface EndRoundEvent extends BaseRoundEvent {
@@ -120,23 +59,8 @@ export interface HealEvent extends UnitValueEvent {
   flag: number;
 }
 
-function createHealEvent(
-  source: Unit,
-  amount: number,
-  flag: number,
-): HealEvent {
-  return { id: 'HealEvent', source, amount, flag };
-}
-
-export interface NaturalHealEvent extends UnitEvent {
+export interface TickHealEvent extends UnitEvent {
   flag: number;
-}
-
-function createNaturalHealEvent(
-  source: Unit,
-  flag: number,
-): NaturalHealEvent {
-  return { id: 'NaturalHealEvent', source, flag };
 }
 
 export interface TriggerStackEvent extends ConsumeStackEvent {
@@ -148,23 +72,8 @@ export interface AttackEvent extends UnitValueEvent {
   flag: number;
 }
 
-function createAttackEvent(
-  source: Unit,
-  amount: number,
-  flag: number,
-): AttackEvent {
-  return { id: 'AttackEvent', source, amount, flag };
-}
-
-export interface NaturalAttackEvent extends UnitEvent {
+export interface TickAttackEvent extends UnitEvent {
   flag: number;
-}
-
-function createNaturalAttackEvent(
-  source: Unit,
-  flag: number,
-): NaturalAttackEvent {
-  return { id: 'NaturalAttackEvent', source, flag };
 }
 
 export interface DamageSubEvent extends BaseRoundEvent {
@@ -196,7 +105,6 @@ export interface TickPoisonEvent extends UnitEvent {
   flag: number;
 }
 
-
 export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
@@ -227,8 +135,8 @@ export type RoundEvent = {
   [RoundEvents.Heal]: HealEvent;
   [RoundEvents.SetupUnit]: UnitEvent;
   [RoundEvents.Attack]: AttackEvent;
-  [RoundEvents.NaturalAttack]: NaturalAttackEvent;
-  [RoundEvents.NaturalHeal]: NaturalHealEvent;
+  [RoundEvents.TickAttack]: TickAttackEvent;
+  [RoundEvents.TickHeal]: TickHealEvent;
   [RoundEvents.Dodge]: DamageSubEvent;
   [RoundEvents.Critical]: CriticalEvent;
   [RoundEvents.Armor]: ArmorEvent;
@@ -346,7 +254,7 @@ export class Round extends EventEngine<RoundEvent> {
   }
 
   naturalHeal(source: Unit, flag: number): void {
-    this.emit(RoundEvents.NaturalHeal, createNaturalHealEvent(source, flag));
+    this.emit(RoundEvents.TickHeal, { id: 'TickHealEvent', source, flag });
   }
 
   heal(source: Unit, amount: number, flag: number): void {
@@ -354,15 +262,15 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(RoundEvents.Heal, createHealEvent(source, amount, flag));
+    this.emit(RoundEvents.Heal, { id: 'HealEvent', source, amount, flag });
   }
 
   naturalAttack(source: Unit, flag: number): void {
-    this.emit(RoundEvents.NaturalAttack, createNaturalAttackEvent(source, flag));
+    this.emit(RoundEvents.TickAttack, { id: 'TickAttackEvent', source, flag });
   }
 
   attack(source: Unit, amount: number, flag: number): void {
-    this.emit(RoundEvents.Attack, createAttackEvent(source, amount, flag));
+    this.emit(RoundEvents.Attack, { id: 'AttackEvent', source, amount, flag });
   }
 
   dodge(parent: DamageEvent, flag: number): void {
@@ -446,7 +354,7 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(
       RoundEvents.Damage,
-      createDamageEvent(type, source, target, amount, flag),
+      { id: 'DamageEvent', type, source, target, amount, flag },
     );
   }
 
@@ -466,7 +374,7 @@ export class Round extends EventEngine<RoundEvent> {
   ): void {
     this.emit(
       RoundEvents.SetStack,
-      createSetStackEvent(type, source, amount | 0, permanent),
+      { id: 'SetStackEvent', type, source, amount: amount | 0, permanent },
     );
   }
 
@@ -482,7 +390,7 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(
       RoundEvents.AddStack,
-      createAddStackEvent(type, source, amount, permanent),
+      { id: 'AddStackEvent', type, source, amount, permanent },
     );
   }
 
@@ -498,14 +406,14 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(
       RoundEvents.RemoveStack,
-      createRemoveStackEvent(type, source, amount, permanent),
+      { id: 'RemoveStackEvent', type, source, amount, permanent },
     );
   }
 
   setStat(type: Stat, source: Unit, amount: number): void {
     this.emit(
       RoundEvents.SetStat,
-      createSetStatEvent(type, source, amount | 0),
+      { id: 'SetStatEvent', type, source, amount: amount | 0 },
     );
   }
 
@@ -514,7 +422,7 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(RoundEvents.AddStat, createStatEvent(type, source, amount));
+    this.emit(RoundEvents.AddStat, { id: 'AddStatEvent', type, source, amount });
   }
 
   removeStat(type: Stat, source: Unit, amount: number): void {
@@ -524,7 +432,7 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(
       RoundEvents.RemoveStat,
-      createRemoveStatEvent(type, source, amount),
+      { id: 'RemoveStatEvent', type, source, amount },
     );
   }
 

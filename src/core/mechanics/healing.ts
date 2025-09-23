@@ -26,7 +26,7 @@ export function setupHealingMechanics(game: Game): void {
       });
     });
 
-    round.on(RoundEvents.NaturalHeal, EventPriority.Exact, event => {
+    round.on(RoundEvents.TickHeal, EventPriority.Exact, event => {
       if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }

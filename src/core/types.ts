@@ -127,8 +127,8 @@ export const enum RoundEvents {
   TriggerStack = 14,
   Attack = 15,
 
-  NaturalHeal = 16,
-  NaturalAttack = 17,
+  TickHeal = 16,
+  TickAttack = 17,
 
   Dodge = 18,
   Critical = 19,

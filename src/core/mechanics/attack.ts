@@ -28,7 +28,7 @@ export function setupAttackMechanics(game: Game): void {
       });
     });
 
-    round.on(RoundEvents.NaturalAttack, EventPriority.Exact, event => {
+    round.on(RoundEvents.TickAttack, EventPriority.Exact, event => {
       if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
