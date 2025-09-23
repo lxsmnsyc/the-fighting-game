@@ -3,11 +3,12 @@ import { log } from '../log';
 import {
   EventPriority,
   GameEvents,
-  HealingFlags,
   RoundEvents,
   Stack,
   StackPriority,
   Stat,
+  TriggerFlags,
+  TriggerStackFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -26,25 +27,25 @@ export function setupHealingMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.NaturalHeal, EventPriority.Exact, event => {
-      if (event.flag & HealingFlags.Failed) {
+      if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
-      const stacks = event.source.getTotalStacks(Stack.Healing);
-      if (stacks > 0) {
-        round.heal(event.source, stacks, event.flag);
+      if (!(event.flag & TriggerStackFlags.Failed)) {
+        const stacks = event.source.getTotalStacks(Stack.Healing);
+        if (stacks > 0) {
+          round.heal(event.source, stacks, event.flag);
+        }
       }
-      if (event.flag & HealingFlags.NoConsume) {
-        return;
+      if (!(event.flag & TriggerStackFlags.NoConsume)) {
+        round.consumeStack(Stack.Healing, event.source);
       }
-      round.consumeStack(Stack.Healing, event.source);
     });
 
     round.on(RoundEvents.Heal, EventPriority.Exact, event => {
-      if (event.flag & HealingFlags.Failed) {
-        return;
+      if (!(event.flag & TriggerFlags.Disabled)) {
+        log(`${event.source.owner.name} healed ${event.amount} of Health`);
+        round.addStat(Stat.Health, event.source, event.amount);
       }
-      log(`${event.source.owner.name} healed ${event.amount} of Health`);
-      round.addStat(Stat.Health, event.source, event.amount);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

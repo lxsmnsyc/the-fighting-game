@@ -1,13 +1,14 @@
 import type { Game } from '../game';
 import { log } from '../log';
 import {
-  AttackFlags,
   DamageType,
   EventPriority,
   GameEvents,
   RoundEvents,
   Stack,
   StackPriority,
+  TriggerFlags,
+  TriggerStackFlags,
 } from '../types';
 import { createCooldown } from './tick';
 
@@ -28,30 +29,30 @@ export function setupAttackMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.NaturalAttack, EventPriority.Exact, event => {
-      if (event.flag & AttackFlags.Failed) {
+      if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
-      const stacks = event.source.getTotalStacks(Stack.Attack);
-      if (stacks > 0) {
-        round.attack(event.source, stacks, event.flag);
+      if (!(event.flag & TriggerStackFlags.Failed)) {
+        const stacks = event.source.getTotalStacks(Stack.Attack);
+        if (stacks > 0) {
+          round.attack(event.source, stacks, event.flag);
+        }
       }
-      if (event.flag & AttackFlags.NoConsume) {
-        return;
+      if (!(event.flag & TriggerStackFlags.NoConsume)) {
+        round.consumeStack(Stack.Attack, event.source);
       }
-      round.consumeStack(Stack.Attack, event.source);
     });
 
     round.on(RoundEvents.Attack, EventPriority.Exact, event => {
-      if (event.flag & AttackFlags.Failed) {
-        return;
+      if (!(event.flag & TriggerFlags.Disabled)) {
+        round.dealDamage(
+          DamageType.Attack,
+          event.source,
+          round.getEnemyUnit(event.source),
+          event.amount,
+          0,
+        );
       }
-      round.dealDamage(
-        DamageType.Attack,
-        event.source,
-        round.getEnemyUnit(event.source),
-        event.amount,
-        0,
-      );
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

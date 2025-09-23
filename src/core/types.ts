@@ -172,20 +172,11 @@ export const enum DamageFlags {
    */
   Critical = 0b1000,
 }
-
-export const enum HealingFlags {
+export const enum TriggerFlags {
   Disabled = 0b0001,
-  Failed = 0b0010,
-  NoConsume = 0b0100,
 }
 
 export const enum TriggerStackFlags {
-  Disabled = 0b0001,
-  Failed = 0b0010,
-  NoConsume = 0b0100,
-}
-
-export const enum AttackFlags {
   Disabled = 0b0001,
   Failed = 0b0010,
   NoConsume = 0b0100,

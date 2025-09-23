@@ -63,10 +63,9 @@ export function setupCriticalMechanics(game: Game): void {
         log(`${event.parent.source.owner.name} triggered a critical.`);
         event.flag |= DamageFlags.Critical;
       }
-      if (event.flag & TriggerStackFlags.NoConsume) {
-        return;
+      if (!(event.flag & TriggerStackFlags.NoConsume)) {
+        round.consumeStack(Stack.Critical, event.parent.source);
       }
-      round.consumeStack(Stack.Critical, event.parent.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
