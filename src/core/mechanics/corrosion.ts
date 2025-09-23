@@ -44,19 +44,6 @@ export function setupCorrosionMechanics(game: Game): void {
         round.consumeStack(Stack.Corrosion, event.parent.source);
       }
     });
-    
-    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Corrosion) {
-        return;
-      }
-      if (event.flag & TriggerStackFlags.Failed) {
-        return;
-      }
-      if (event.flag & TriggerStackFlags.NoConsume) {
-        return;
-      }
-      round.consumeStack(Stack.Corrosion, event.source);
-    });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
       if (event.type === Stack.Corrosion) {
