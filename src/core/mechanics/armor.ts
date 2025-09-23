@@ -28,27 +28,21 @@ export function setupArmorMechanics(game: Game): void {
       }
       const currentArmor = event.target.getTotalStacks(Stack.Armor);
       if (currentArmor > 0) {
-        event.amount = Math.max(0, event.amount - currentArmor);
-        event.flag |= DamageFlags.Armor;
-        round.triggerStack(
-          Stack.Armor,
-          event.target,
-          0,
-        );
+        round.triggerArmor(event, currentArmor, 0);
       }
     });
 
-    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Armor) {
+    round.on(RoundEvents.Armor, EventPriority.Exact, event => {
+      if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Failed) {
-        return;
+      if (!(event.flag & TriggerStackFlags.Failed)) {
+        event.parent.amount = Math.max(0, event.parent.amount - event.value);
+        event.parent.flag |= DamageFlags.Armor;
       }
-      if (event.flag & TriggerStackFlags.NoConsume) {
-        return;
+      if (!(event.flag & TriggerStackFlags.NoConsume)) {
+        round.consumeStack(Stack.Armor, event.parent.source);
       }
-      round.consumeStack(Stack.Armor, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

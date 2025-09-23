@@ -23,21 +23,25 @@ export function setupCorrosionMechanics(game: Game): void {
       if (event.flag & (DamageFlags.Missed | DamageFlags.Corrosion)) {
         return;
       }
-      if (event.type === DamageType.Poison) {
-        return;
-      }
-      if (event.type === DamageType.Pure) {
+      if (event.type === DamageType.Poison || event.type === DamageType.Pure) {
         return;
       }
       const currentCorrosion = event.target.getTotalStacks(Stack.Corrosion);
       if (currentCorrosion > 0) {
-        event.amount = Math.max(0, event.amount + currentCorrosion);
-        event.flag |= DamageFlags.Corrosion;
-        round.triggerStack(
-          Stack.Corrosion,
-          event.target,
-          0,
-        );
+        round.triggerCorrosion(event, currentCorrosion, 0);
+      }
+    });
+
+    round.on(RoundEvents.Corrosion, EventPriority.Exact, event => {
+      if (event.flag & TriggerStackFlags.Disabled) {
+        return;
+      }
+      if (!(event.flag & TriggerStackFlags.Failed)) {
+        event.parent.amount = Math.max(0, event.parent.amount + event.value);
+        event.parent.flag |= DamageFlags.Corrosion;
+      }
+      if (!(event.flag & TriggerStackFlags.NoConsume)) {
+        round.consumeStack(Stack.Corrosion, event.parent.source);
       }
     });
     

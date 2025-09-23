@@ -132,6 +132,8 @@ export const enum RoundEvents {
 
   Dodge = 18,
   Critical = 19,
+  Armor = 20,
+  Corrosion = 21,
 }
 
 /**

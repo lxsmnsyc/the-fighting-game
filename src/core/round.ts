@@ -176,6 +176,14 @@ export interface CriticalEvent extends DamageSubEvent {
   multiplier: number;
 }
 
+export interface CorrosionEvent extends DamageSubEvent {
+  value: number;
+}
+
+export interface ArmorEvent extends DamageSubEvent {
+  value: number;
+}
+
 export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
@@ -210,6 +218,8 @@ export type RoundEvent = {
   [RoundEvents.NaturalHeal]: NaturalHealEvent;
   [RoundEvents.Dodge]: DamageSubEvent;
   [RoundEvents.Critical]: CriticalEvent;
+  [RoundEvents.Armor]: ArmorEvent;
+  [RoundEvents.Corrosion]: CorrosionEvent;
 };
 
 export interface UnitStats {
@@ -353,6 +363,24 @@ export class Round extends EventEngine<RoundEvent> {
       parent,
       flag,
       multiplier,
+    });
+  }
+
+  triggerArmor(parent: DamageEvent, value: number, flag: number): void {
+    this.emit(RoundEvents.Armor, {
+      id: 'ArmorEvent',
+      parent,
+      flag,
+      value,
+    });
+  }
+
+  triggerCorrosion(parent: DamageEvent, value: number, flag: number): void {
+    this.emit(RoundEvents.Corrosion, {
+      id: 'CorrosionEvent',
+      parent,
+      flag,
+      value,
     });
   }
 
