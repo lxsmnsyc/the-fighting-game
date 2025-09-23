@@ -25,27 +25,27 @@ export function setupPoisonMechanics(game: Game): void {
       });
     });
 
-    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Poison) {
+    round.on(RoundEvents.TickSpeed, StackPriority.Exact, event => {
+      if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Failed) {
-        return;
+      if (!(event.flag & TriggerStackFlags.Failed)) {
+        const stacks = event.source.getTotalStacks(Stack.Poison);
+        if (stacks > 0) {
+          round.dealDamage(
+            DamageType.Poison,
+            round.getEnemyUnit(event.source),
+            event.source,
+            stacks,
+            0,
+          );
+        } else {
+          return;
+        }
       }
-      const stacks = event.source.getTotalStacks(Stack.Poison);
-      if (stacks > 0) {
-        round.dealDamage(
-          DamageType.Poison,
-          round.getEnemyUnit(event.source),
-          event.source,
-          stacks,
-          0,
-        );
+      if (!(event.flag & TriggerStackFlags.NoConsume)) {
+        round.consumeStack(Stack.Poison, event.source);
       }
-      if (event.flag & TriggerStackFlags.NoConsume) {
-        return;
-      }
-      round.consumeStack(Stack.Poison, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

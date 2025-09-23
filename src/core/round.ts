@@ -184,6 +184,19 @@ export interface ArmorEvent extends DamageSubEvent {
   value: number;
 }
 
+export interface TickSpeedEvent extends UnitEvent {
+  flag: number;
+}
+
+export interface TickSlowEvent extends UnitEvent {
+  flag: number;
+}
+
+export interface TickPoisonEvent extends UnitEvent {
+  flag: number;
+}
+
+
 export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
@@ -220,6 +233,9 @@ export type RoundEvent = {
   [RoundEvents.Critical]: CriticalEvent;
   [RoundEvents.Armor]: ArmorEvent;
   [RoundEvents.Corrosion]: CorrosionEvent;
+  [RoundEvents.TickSpeed]: TickSpeedEvent;
+  [RoundEvents.TickSlow]: TickSlowEvent;
+  [RoundEvents.TickPoison]: TickPoisonEvent;
 };
 
 export interface UnitStats {
@@ -381,6 +397,30 @@ export class Round extends EventEngine<RoundEvent> {
       parent,
       flag,
       value,
+    });
+  }
+
+  tickSpeed(source: Unit, flag: number): void {
+    this.emit(RoundEvents.TickSpeed, {
+      id: 'TickSpeedEvent',
+      source,
+      flag,
+    });
+  }
+
+  tickSlow(source: Unit, flag: number): void {
+    this.emit(RoundEvents.TickSlow, {
+      id: 'TickSlowEvent',
+      source,
+      flag,
+    });
+  }
+
+  tickPoison(source: Unit, flag: number): void {
+    this.emit(RoundEvents.TickPoison, {
+      id: 'TickPoisonEvent',
+      source,
+      flag,
     });
   }
 

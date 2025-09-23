@@ -134,6 +134,10 @@ export const enum RoundEvents {
   Critical = 19,
   Armor = 20,
   Corrosion = 21,
+
+  TickSpeed = 22,
+  TickSlow = 23,
+  TickPoison = 24,
 }
 
 /**

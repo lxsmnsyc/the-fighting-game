@@ -19,22 +19,18 @@ export function setupSlowMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.triggerStack(Stack.Slow, source, 0);
+        round.tickSlow(source, 0);
         return true;
       });
     });
 
-    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Slow) {
+    round.on(RoundEvents.TickSlow, StackPriority.Exact, event => {
+      if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Failed) {
-        return;
+      if (!(event.flag & TriggerStackFlags.NoConsume)) {
+        round.consumeStack(Stack.Slow, event.source);
       }
-      if (event.flag & TriggerStackFlags.NoConsume) {
-        return;
-      }
-      round.consumeStack(Stack.Slow, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

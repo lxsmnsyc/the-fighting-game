@@ -25,7 +25,6 @@ export class Player {
     [Print.Error]: 0.1,
     [Print.Monotone]: 0.1,
     [Print.Negative]: 0.1,
-    [Print.Signed]: 0.1,
   };
 
   public rng: PlayerRNG;
