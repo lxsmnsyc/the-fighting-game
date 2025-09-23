@@ -63,11 +63,6 @@ export interface TickHealEvent extends UnitEvent {
   flag: number;
 }
 
-export interface TriggerStackEvent extends ConsumeStackEvent {
-  type: Stack;
-  flag: number;
-}
-
 export interface AttackEvent extends UnitValueEvent {
   flag: number;
 }
@@ -105,6 +100,10 @@ export interface TickPoisonEvent extends UnitEvent {
   flag: number;
 }
 
+export interface TickMagicEvent extends UnitEvent {
+  flag: number;
+}
+
 export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
@@ -131,7 +130,6 @@ export type RoundEvent = {
 
   [RoundEvents.ConsumeStack]: ConsumeStackEvent;
 
-  [RoundEvents.TriggerStack]: TriggerStackEvent;
   [RoundEvents.Heal]: HealEvent;
   [RoundEvents.SetupUnit]: UnitEvent;
   [RoundEvents.Attack]: AttackEvent;
@@ -144,6 +142,7 @@ export type RoundEvent = {
   [RoundEvents.TickSpeed]: TickSpeedEvent;
   [RoundEvents.TickSlow]: TickSlowEvent;
   [RoundEvents.TickPoison]: TickPoisonEvent;
+  [RoundEvents.TickMagic]: TickMagicEvent;
 };
 
 export interface UnitStats {
@@ -332,10 +331,9 @@ export class Round extends EventEngine<RoundEvent> {
     });
   }
 
-  triggerStack(stack: Stack, source: Unit, flag: number): void {
-    this.emit(RoundEvents.TriggerStack, {
-      id: 'TriggerStackEvent',
-      type: stack,
+  tickMagic(source: Unit, flag: number): void {
+    this.emit(RoundEvents.TickMagic, {
+      id: 'TickMagicEvent',
       source,
       flag,
     });

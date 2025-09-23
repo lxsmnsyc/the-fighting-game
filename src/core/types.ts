@@ -123,8 +123,8 @@ export const enum RoundEvents {
   SetStat = 10,
   Tick = 11,
   ConsumeStack = 12,
+
   Heal = 13,
-  TriggerStack = 14,
   Attack = 15,
 
   TickHeal = 16,
@@ -138,6 +138,7 @@ export const enum RoundEvents {
   TickSpeed = 22,
   TickSlow = 23,
   TickPoison = 24,
+  TickMagic = 25,
 }
 
 /**
@@ -178,6 +179,7 @@ export const enum DamageFlags {
    */
   Critical = 0b1000,
 }
+
 export const enum TriggerFlags {
   Disabled = 0b0001,
 }
@@ -207,7 +209,7 @@ export const enum Stack {
   Armor = 3,
   // Counters Armor
   Corrosion = 4,
-  // Speeds up cycles of cards/abilities
+  // Speeds up cooldown of cards/abilities
   Speed = 5,
   // Counters Slow
   Slow = 6,

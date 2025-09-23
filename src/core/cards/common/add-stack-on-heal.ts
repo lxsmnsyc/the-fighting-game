@@ -5,7 +5,7 @@ import {
   Aspect,
   EventPriority,
   GameEvents,
-  HealingFlags,
+  TriggerFlags,
   Rarity,
   RoundEvents,
   Stack,
@@ -63,7 +63,7 @@ function createAddStackOnHealCard({
               if (
                 context.card.enabled &&
                 event.source === source &&
-                !(event.flag & HealingFlags.Failed) &&
+                !(event.flag & TriggerFlags.Disabled) &&
                 context.card.rng.random() <= DEFAULT_CHANCE
               ) {
                 const target = SELF_STACK[stack]

@@ -16,27 +16,25 @@ export function setupMagicMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Magic mechanics.');
 
-    round.on(RoundEvents.TriggerStack, EventPriority.Exact, event => {
-      if (event.type !== Stack.Magic) {
+    round.on(RoundEvents.TickMagic, EventPriority.Exact, event => {
+      if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Failed) {
-        return;
+      if (!(event.flag & TriggerStackFlags.Failed)) {
+        const stacks = event.source.getTotalStacks(Stack.Magic);
+        if (stacks > 0) {
+          round.dealDamage(
+            DamageType.Magical,
+            event.source,
+            round.getEnemyUnit(event.source),
+            stacks,
+            0,
+          );
+        }
       }
-      const stacks = event.source.getTotalStacks(Stack.Magic);
-      if (stacks > 0) {
-        round.dealDamage(
-          DamageType.Magical,
-          event.source,
-          round.getEnemyUnit(event.source),
-          stacks,
-          0,
-        );
+      if (!(event.flag & TriggerStackFlags.NoConsume)) {
+        round.consumeStack(Stack.Magic, event.source);
       }
-      if (event.flag & TriggerStackFlags.NoConsume) {
-        return;
-      }
-      round.consumeStack(Stack.Magic, event.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
