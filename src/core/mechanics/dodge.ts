@@ -15,7 +15,7 @@ import {
 
 const MIN_DODGE_CHANCE = 0;
 const MAX_DODGE_CHANCE = 100;
-const MAX_DODGE_STACKS = 750;
+const MAX_DODGE_STACKS = 1000;
 
 const CONSUMABLE_STACKS = 0.4;
 
@@ -48,27 +48,22 @@ export function setupDodgeMechanics(game: Game): void {
         if (random > currentDodge) {
           return;
         }
-        log(`${event.target.owner.name} dodged ${event.amount} of damage.`);
-        event.flag |= DamageFlags.Missed;
-        round.triggerStack(
-          Stack.Dodge,
-          event.target,
-          0,
-        );
+        round.dodge(event, 0);
       }
     });
 
-    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Dodge) {
+    round.on(RoundEvents.Dodge, EventPriority.Exact, event => {
+      if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Failed) {
-        return;
+      if (!(event.flag & TriggerStackFlags.Failed)) {
+        log(`${event.parent.target.owner.name} dodged ${event.parent.amount} of damage.`);
+        event.parent.flag |= DamageFlags.Missed;
       }
       if (event.flag & TriggerStackFlags.NoConsume) {
         return;
       }
-      round.consumeStack(Stack.Dodge, event.source);
+      round.consumeStack(Stack.Dodge, event.parent.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {

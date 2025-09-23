@@ -167,6 +167,15 @@ function createNaturalAttackEvent(
   return { id: 'NaturalAttackEvent', source, flag };
 }
 
+export interface DamageSubEvent extends BaseRoundEvent {
+  parent: DamageEvent;
+  flag: number;
+}
+
+export interface CriticalEvent extends DamageSubEvent {
+  multiplier: number;
+}
+
 export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
@@ -199,6 +208,8 @@ export type RoundEvent = {
   [RoundEvents.Attack]: AttackEvent;
   [RoundEvents.NaturalAttack]: NaturalAttackEvent;
   [RoundEvents.NaturalHeal]: NaturalHealEvent;
+  [RoundEvents.Dodge]: DamageSubEvent;
+  [RoundEvents.Critical]: CriticalEvent;
 };
 
 export interface UnitStats {
@@ -326,6 +337,23 @@ export class Round extends EventEngine<RoundEvent> {
 
   attack(source: Unit, amount: number, flag: number): void {
     this.emit(RoundEvents.Attack, createAttackEvent(source, amount, flag));
+  }
+
+  dodge(parent: DamageEvent, flag: number): void {
+    this.emit(RoundEvents.Dodge, {
+      id: 'DodgeEvent',
+      parent,
+      flag,
+    });
+  }
+
+  critical(parent: DamageEvent, multiplier: number, flag: number): void {
+    this.emit(RoundEvents.Critical, {
+      id: 'CriticalEvent',
+      parent,
+      flag,
+      multiplier,
+    });
   }
 
   triggerStack(stack: Stack, source: Unit, flag: number): void {

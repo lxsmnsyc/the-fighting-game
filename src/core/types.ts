@@ -129,6 +129,9 @@ export const enum RoundEvents {
 
   NaturalHeal = 16,
   NaturalAttack = 17,
+
+  Dodge = 18,
+  Critical = 19,
 }
 
 /**
@@ -171,18 +174,21 @@ export const enum DamageFlags {
 }
 
 export const enum HealingFlags {
-  Failed = 0b0001,
-  NoConsume = 0b0010,
+  Disabled = 0b0001,
+  Failed = 0b0010,
+  NoConsume = 0b0100,
 }
 
 export const enum TriggerStackFlags {
-  Failed = 0b0001,
-  NoConsume = 0b0010,
+  Disabled = 0b0001,
+  Failed = 0b0010,
+  NoConsume = 0b0100,
 }
 
 export const enum AttackFlags {
-  Failed = 0b0001,
-  NoConsume = 0b0010,
+  Disabled = 0b0001,
+  Failed = 0b0010,
+  NoConsume = 0b0100,
 }
 
 export const enum Stat {

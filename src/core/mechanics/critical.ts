@@ -13,9 +13,10 @@ import {
   TriggerStackFlags,
 } from '../types';
 
+const DEFAULT_CRITICAL_MULTIPLIER = 2;
 const MIN_CRITICAL_CHANCE = 0;
 const MAX_CRITICAL_CHANCE = 100;
-const MAX_CRITICAL_STACKS = 750;
+const MAX_CRITICAL_STACKS = 1000;
 const CONSUMABLE_STACKS = 0.4;
 
 function getCriticalChance(stack: number): number {
@@ -48,29 +49,24 @@ export function setupCriticalMechanics(game: Game): void {
         if (random > currentCriticalChance) {
           return;
         }
-        event.amount *= 2; // TODO Adjust??
-        log(`${event.source.owner.name} triggered a critical.`);
-        event.flag |= DamageFlags.Critical;
-
-        round.triggerStack(
-          Stack.Critical,
-          event.source,
-          0,
-        );
+        
+        round.critical(event, DEFAULT_CRITICAL_MULTIPLIER, 0);
       }
     });
 
-    round.on(RoundEvents.TriggerStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Critical) {
+    round.on(RoundEvents.Critical, EventPriority.Exact, event => {
+      if (event.flag & TriggerStackFlags.Disabled) {
         return;
       }
-      if (event.flag & TriggerStackFlags.Failed) {
-        return;
+      if (!(event.flag & TriggerStackFlags.Failed)) {
+        event.parent.amount *= event.multiplier;
+        log(`${event.parent.source.owner.name} triggered a critical.`);
+        event.flag |= DamageFlags.Critical;
       }
       if (event.flag & TriggerStackFlags.NoConsume) {
         return;
       }
-      round.consumeStack(Stack.Critical, event.source);
+      round.consumeStack(Stack.Critical, event.parent.source);
     });
 
     round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
