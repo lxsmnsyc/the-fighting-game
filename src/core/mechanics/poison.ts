@@ -20,12 +20,12 @@ export function setupPoisonMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.triggerEnergy(Energy.Poison, source, 0);
+        round.tickPoison(source, 0);
         return true;
       });
     });
 
-    round.on(RoundEvents.TickSpeed, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.TickPoison, EnergyPriority.Exact, event => {
       if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }

@@ -88,6 +88,7 @@ export function createDynamicTimer(
 }
 
 const MAX_SPEED = 1000;
+const MAX_SLOW = 1000;
 
 export function createCooldown(
   round: Round,
@@ -98,12 +99,16 @@ export function createCooldown(
 ): void {
   createDynamicTimer(
     round,
-    () =>
-      lerp(
+    () => {
+      const currentSpeed = unit.getTotalEnergy(Energy.Speed);
+      const currentSlow = unit.getTotalEnergy(Energy.Slow);
+      const total = Math.max(-MAX_SLOW, Math.min(currentSpeed - currentSlow, MAX_SPEED));
+      return lerp(
         min * 1000,
         max * 1000,
-        Math.min(unit.getTotalEnergy(Energy.Speed) / MAX_SPEED, 1),
-      ),
+        (MAX_SLOW + total) / (MAX_SPEED + MAX_SLOW),
+      );
+    },
     callback,
   );
 }

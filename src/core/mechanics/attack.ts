@@ -13,7 +13,7 @@ import {
 import { createCooldown } from './tick';
 
 const MIN_PERIOD = 0.25;
-const MAX_PERIOD = 2.5;
+const MAX_PERIOD = 5.0;
 
 const CONSUMABLE_STACKS = 0.4;
 
