@@ -41,7 +41,6 @@ export default createCard({
           if (source.owner !== context.card.owner) {
             return;
           }
-
           createTimer(round, DEFAULT_PERIOD, () => {
             if (context.card.enabled) {
               context.game.triggerCard(context.card, { round, source });

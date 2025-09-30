@@ -10,7 +10,7 @@ import {
   RoundEvents,
 } from '../../types';
 
-const DEFAULT_AMOUNT = 10;
+const DEFAULT_AMOUNT = 25;
 
 export default createCard({
   name: 'Aspect of Corrosion',

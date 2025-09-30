@@ -1,5 +1,6 @@
 import { createCard } from '../../card';
 import type { StartRoundGameEvent } from '../../game';
+import { createTimer } from '../../mechanics/tick';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
@@ -10,7 +11,8 @@ import {
   RoundEvents,
 } from '../../types';
 
-const DEFAULT_AMOUNT = 10;
+const DEFAULT_AMOUNT = 5;
+const DEFAULT_PERIOD = 1.0 * 1000;
 
 export default createCard({
   name: 'Aspect of Magic',
@@ -26,7 +28,7 @@ export default createCard({
           Energy.Magic,
           source,
           context.card.getValue(DEFAULT_AMOUNT),
-          true,
+          false,
         );
       }
     });
@@ -35,10 +37,17 @@ export default createCard({
       GameEvents.StartRound,
       EventPriority.Post,
       ({ round }: StartRoundGameEvent) => {
-        round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
-          if (source.owner === context.card.owner && context.card.enabled) {
-            context.game.triggerCard(context.card, { round, source });
+        round.on(RoundEvents.SetupUnit, EventPriority.Exact, ({ source }) => {
+          if (source.owner !== context.card.owner) {
+            return;
           }
+          createTimer(round, DEFAULT_PERIOD, () => {
+            if (context.card.enabled) {
+              context.game.triggerCard(context.card, { round, source });
+              return true;
+            }
+            return false;
+          });
         });
       },
     );
