@@ -104,8 +104,8 @@ export function createCooldown(
       const currentSlow = unit.getTotalEnergy(Energy.Slow);
       const total = Math.max(-MAX_SLOW, Math.min(currentSpeed - currentSlow, MAX_SPEED));
       return lerp(
-        min * 1000,
         max * 1000,
+        min * 1000,
         (MAX_SLOW + total) / (MAX_SPEED + MAX_SLOW),
       );
     },
