@@ -3,30 +3,30 @@ import { SELF_STACK } from '../../constants';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
+  Energy,
   EventPriority,
   GameEvents,
   Rarity,
   RoundEvents,
-  Stack,
 } from '../../types';
 
-interface AddStackOnStartCardOptions {
+interface AddEnergyOnStartCardOptions {
   name: string;
-  stack: Stack;
+  energy: Energy;
   aspect: Aspect;
   amount: number;
   permanent?: boolean;
   image?: string;
 }
 
-function createAddStackOnStartCard({
+function createAddEnergyOnStartCard({
   name,
-  stack,
+  energy,
   aspect,
   amount,
   permanent = false,
   image = '',
-}: AddStackOnStartCardOptions): Card {
+}: AddEnergyOnStartCardOptions): Card {
   return createCard({
     name,
     image,
@@ -40,8 +40,8 @@ function createAddStackOnStartCard({
             round: Round;
             target: Unit;
           };
-          round.addStack(
-            stack,
+          round.addEnergy(
+            energy,
             target,
             context.card.getValue(amount),
             permanent,
@@ -55,7 +55,7 @@ function createAddStackOnStartCard({
         ({ round }) => {
           round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
             if (source.owner === context.card.owner && context.card.enabled) {
-              const target = SELF_STACK[stack]
+              const target = SELF_STACK[energy]
                 ? source
                 : round.getEnemyUnit(source);
               context.game.triggerCard(context.card, { round, target });
@@ -69,64 +69,64 @@ function createAddStackOnStartCard({
 
 export const ADD_STACK_ON_START_CARDS = [
   // Offensive cards
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Attack,
+    energy: Energy.Attack,
     aspect: Aspect.Attack,
     amount: 20,
   }),
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Magic,
+    energy: Energy.Magic,
     aspect: Aspect.Magic,
     amount: 20,
   }),
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Poison,
+    energy: Energy.Poison,
     aspect: Aspect.Poison,
     amount: 20,
   }),
   // Supportive cards
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Armor,
+    energy: Energy.Armor,
     aspect: Aspect.Armor,
     amount: 20,
   }),
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Corrosion,
+    energy: Energy.Corrosion,
     aspect: Aspect.Corrosion,
     amount: 20,
   }),
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Speed,
+    energy: Energy.Speed,
     aspect: Aspect.Speed,
     amount: 20,
   }),
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Slow,
+    energy: Energy.Slow,
     aspect: Aspect.Slow,
     amount: 20,
   }),
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Dodge,
+    energy: Energy.Dodge,
     aspect: Aspect.Dodge,
     amount: 20,
   }),
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Critical,
+    energy: Energy.Critical,
     aspect: Aspect.Critical,
     amount: 20,
   }),
-  createAddStackOnStartCard({
+  createAddEnergyOnStartCard({
     name: '',
-    stack: Stack.Healing,
+    energy: Energy.Healing,
     aspect: Aspect.Healing,
     amount: 20,
   }),

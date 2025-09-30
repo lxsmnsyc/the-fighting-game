@@ -3,33 +3,33 @@ import { SELF_STACK } from '../../constants';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
+  Energy,
   EventPriority,
   GameEvents,
-  TriggerFlags,
   Rarity,
   RoundEvents,
-  Stack,
+  TriggerFlags,
 } from '../../types';
 
 const DEFAULT_CHANCE = 0.2;
 
-interface AddStackOnHealCardOptions {
+interface AddEnergyOnHealCardOptions {
   name: string;
-  stack: Stack;
+  energy: Energy;
   aspect: Aspect;
   amount: number;
   permanent?: boolean;
   image?: string;
 }
 
-function createAddStackOnHealCard({
+function createAddEnergyOnHealCard({
   name,
-  stack,
+  energy,
   aspect,
   amount,
   permanent = false,
   image = '',
-}: AddStackOnHealCardOptions): Card {
+}: AddEnergyOnHealCardOptions): Card {
   return createCard({
     name,
     aspect: [Aspect.Healing, aspect],
@@ -42,8 +42,8 @@ function createAddStackOnHealCard({
             round: Round;
             target: Unit;
           };
-          round.addStack(
-            stack,
+          round.addEnergy(
+            energy,
             target,
             context.card.getValue(amount),
             permanent,
@@ -66,7 +66,7 @@ function createAddStackOnHealCard({
                 !(event.flag & TriggerFlags.Disabled) &&
                 context.card.rng.random() <= DEFAULT_CHANCE
               ) {
-                const target = SELF_STACK[stack]
+                const target = SELF_STACK[energy]
                   ? source
                   : round.getEnemyUnit(source);
                 context.game.triggerCard(context.card, {
@@ -83,57 +83,57 @@ function createAddStackOnHealCard({
 }
 
 export const ADD_STACK_ON_HEAL_CARDS = [
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Armor,
+    energy: Energy.Armor,
     aspect: Aspect.Armor,
     amount: 50,
   }),
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Attack,
+    energy: Energy.Attack,
     aspect: Aspect.Attack,
     amount: 50,
   }),
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Corrosion,
+    energy: Energy.Corrosion,
     aspect: Aspect.Corrosion,
     amount: 50,
   }),
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Critical,
+    energy: Energy.Critical,
     aspect: Aspect.Critical,
     amount: 50,
   }),
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Dodge,
+    energy: Energy.Dodge,
     aspect: Aspect.Dodge,
     amount: 50,
   }),
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Magic,
+    energy: Energy.Magic,
     aspect: Aspect.Magic,
     amount: 50,
   }),
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Poison,
+    energy: Energy.Poison,
     aspect: Aspect.Poison,
     amount: 50,
   }),
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Slow,
+    energy: Energy.Slow,
     aspect: Aspect.Slow,
     amount: 50,
   }),
-  createAddStackOnHealCard({
+  createAddEnergyOnHealCard({
     name: '',
-    stack: Stack.Speed,
+    energy: Energy.Speed,
     aspect: Aspect.Speed,
     amount: 50,
   }),

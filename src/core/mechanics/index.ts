@@ -21,12 +21,12 @@ export function setupGameMechanics(game: Game): void {
   // Setup stats
   setupHealthMechanics(game);
 
-  // Setup offensive stacks
+  // Setup offensive energy
   setupAttackMechanics(game);
   setupMagicMechanics(game);
   setupPoisonMechanics(game);
 
-  // Setup supportive stacks
+  // Setup supportive energy
   setupArmorMechanics(game);
   setupCorrosionMechanics(game);
   setupDodgeMechanics(game);

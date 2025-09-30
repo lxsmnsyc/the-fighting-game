@@ -1,4 +1,4 @@
-import { Stack } from './types';
+import { Energy } from './types';
 
 export const DEFAULT_MAX_HEALTH = 1000;
 
@@ -8,15 +8,15 @@ export const DEFAULT_CRIT_MULTIPLIER = 200;
 
 export const DEFAULT_LIFE = 3;
 
-export const SELF_STACK: Record<Stack, boolean> = {
-  [Stack.Attack]: true,
-  [Stack.Magic]: true,
-  [Stack.Armor]: true,
-  [Stack.Corrosion]: false,
-  [Stack.Critical]: true,
-  [Stack.Dodge]: true,
-  [Stack.Poison]: false,
-  [Stack.Healing]: true,
-  [Stack.Slow]: false,
-  [Stack.Speed]: true,
+export const SELF_STACK: Record<Energy, boolean> = {
+  [Energy.Attack]: true,
+  [Energy.Magic]: true,
+  [Energy.Armor]: true,
+  [Energy.Corrosion]: false,
+  [Energy.Critical]: true,
+  [Energy.Dodge]: true,
+  [Energy.Poison]: false,
+  [Energy.Healing]: true,
+  [Energy.Slow]: false,
+  [Energy.Speed]: true,
 };

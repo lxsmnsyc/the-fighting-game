@@ -4,11 +4,11 @@ import { createTimer } from '../../mechanics/tick';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
+  Energy,
   EventPriority,
   GameEvents,
   Rarity,
   RoundEvents,
-  Stack,
 } from '../../types';
 
 const DEFAULT_AMOUNT = 5;
@@ -24,8 +24,8 @@ export default createCard({
     context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
       if (event.card === context.card) {
         const { round, source } = event.data as { round: Round; source: Unit };
-        round.addStack(
-          Stack.Critical,
+        round.addEnergy(
+          Energy.Critical,
           source,
           context.card.getValue(DEFAULT_AMOUNT),
           false,

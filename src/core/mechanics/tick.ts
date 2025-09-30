@@ -1,7 +1,7 @@
 import type { Game } from '../game';
 import { lerp } from '../lerp';
 import type { Round, Unit } from '../round';
-import { EventPriority, GameEvents, RoundEvents, Stack } from '../types';
+import { Energy, EventPriority, GameEvents, RoundEvents } from '../types';
 
 const FPS = 60;
 const FPS_DURATION = 1000 / FPS;
@@ -63,7 +63,6 @@ export function createTimer(
   });
 }
 
-
 export function createDynamicTimer(
   round: Round,
   period: () => number,
@@ -99,11 +98,12 @@ export function createCooldown(
 ): void {
   createDynamicTimer(
     round,
-    () => lerp(
-      min * 1000,
-      max * 1000,
-      Math.min(unit.getTotalStacks(Stack.Speed) / MAX_SPEED, 1), 
-    ),
+    () =>
+      lerp(
+        min * 1000,
+        max * 1000,
+        Math.min(unit.getTotalEnergy(Energy.Speed) / MAX_SPEED, 1),
+      ),
     callback,
   );
 }

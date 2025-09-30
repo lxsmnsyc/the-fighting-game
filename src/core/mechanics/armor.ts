@@ -4,12 +4,12 @@ import {
   DamageFlags,
   DamagePriority,
   DamageType,
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
-  TriggerStackFlags,
+  TriggerEnergyFlags,
 } from '../types';
 
 const CONSUMABLE_STACKS = 0.4;
@@ -26,30 +26,30 @@ export function setupArmorMechanics(game: Game): void {
       if (event.type === DamageType.Poison || event.type === DamageType.Pure) {
         return;
       }
-      const currentArmor = event.target.getTotalStacks(Stack.Armor);
+      const currentArmor = event.target.getTotalEnergy(Energy.Armor);
       if (currentArmor > 0) {
         round.triggerArmor(event, currentArmor, 0);
       }
     });
 
     round.on(RoundEvents.Armor, EventPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.Failed)) {
+      if (!(event.flag & TriggerEnergyFlags.Failed)) {
         event.parent.amount = Math.max(0, event.parent.amount - event.value);
         event.parent.flag |= DamageFlags.Armor;
       }
-      if (!(event.flag & TriggerStackFlags.NoConsume)) {
-        round.consumeStack(Stack.Armor, event.parent.source);
+      if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
+        round.consumeEnergy(Energy.Armor, event.parent.source);
       }
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Armor) {
-        const current = event.source.getStacks(Stack.Armor, false);
-        round.removeStack(
-          Stack.Armor,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Armor) {
+        const current = event.source.getEnergy(Energy.Armor, false);
+        round.removeEnergy(
+          Energy.Armor,
           event.source,
           current === 1 ? current : current * CONSUMABLE_STACKS,
           false,
@@ -57,57 +57,57 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Armor) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Armor) {
         log(
-          `${event.source.owner.name}'s Armor stacks changed to ${event.amount}`,
+          `${event.source.owner.name}'s Armor energy changed to ${event.amount}`,
         );
-        event.source.setStacks(Stack.Armor, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Armor, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Armor) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type !== Energy.Armor) {
         return;
       }
       if (event.permanent) {
-        round.setStack(
-          Stack.Armor,
+        round.setEnergy(
+          Energy.Armor,
           event.source,
-          event.source.getStacks(Stack.Armor, true) + event.amount,
+          event.source.getEnergy(Energy.Armor, true) + event.amount,
           true,
         );
         return;
       }
 
       let amount = event.amount;
-      if (event.source.getStacks(Stack.Corrosion, false) > 0) {
+      if (event.source.getEnergy(Energy.Corrosion, false) > 0) {
         /**
-         * Counter Corrosion by removing stacks from it
+         * Counter Corrosion by removing energy from it
          */
-        round.removeStack(Stack.Corrosion, event.source, amount, false);
+        round.removeEnergy(Energy.Corrosion, event.source, amount, false);
 
-        amount = -(event.source.getStacks(Stack.Corrosion, false) - amount);
+        amount = -(event.source.getEnergy(Energy.Corrosion, false) - amount);
       }
 
       if (amount > 0) {
-        log(`${event.source.owner.name} gained ${amount} stacks of Armor`);
-        round.setStack(
-          Stack.Armor,
+        log(`${event.source.owner.name} gained ${amount} energy of Armor`);
+        round.setEnergy(
+          Energy.Armor,
           event.source,
-          event.source.getStacks(Stack.Armor, false) + amount,
+          event.source.getEnergy(Energy.Armor, false) + amount,
           false,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Armor) {
-        log(`${event.source.owner.name} lost ${event.amount} stacks of Armor`);
-        round.setStack(
-          Stack.Armor,
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Armor) {
+        log(`${event.source.owner.name} lost ${event.amount} energy of Armor`);
+        round.setEnergy(
+          Energy.Armor,
           event.source,
-          event.source.getStacks(Stack.Armor, event.permanent) - event.amount,
+          event.source.getEnergy(Energy.Armor, event.permanent) - event.amount,
           event.permanent,
         );
       }

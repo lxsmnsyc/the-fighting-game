@@ -5,9 +5,9 @@ import type { Game } from './game';
 import type { Player } from './player';
 import {
   type DamageType,
+  Energy,
   EventPriority,
   RoundEvents,
-  Stack,
   Stat,
 } from './types';
 
@@ -37,8 +37,8 @@ export interface DamageEvent extends UnitValueEvent {
   flag: number;
 }
 
-export interface SetStackEvent extends UnitValueEvent {
-  type: Stack;
+export interface SetEnergyEvent extends UnitValueEvent {
+  type: Energy;
   permanent: boolean;
 }
 
@@ -51,8 +51,8 @@ export interface EndRoundEvent extends BaseRoundEvent {
   loser: Unit;
 }
 
-export interface ConsumeStackEvent extends UnitEvent {
-  type: Stack;
+export interface ConsumeEnergyEvent extends UnitEvent {
+  type: Energy;
 }
 
 export interface HealEvent extends UnitValueEvent {
@@ -121,14 +121,14 @@ export type RoundEvent = {
   [RoundEvents.AddStat]: SetStatEvent;
   [RoundEvents.RemoveStat]: SetStatEvent;
 
-  [RoundEvents.AddStack]: SetStackEvent;
-  [RoundEvents.RemoveStack]: SetStackEvent;
-  [RoundEvents.SetStack]: SetStackEvent;
+  [RoundEvents.AddEnergy]: SetEnergyEvent;
+  [RoundEvents.RemoveEnergy]: SetEnergyEvent;
+  [RoundEvents.SetEnergy]: SetEnergyEvent;
 
   [RoundEvents.End]: EndRoundEvent;
   [RoundEvents.Tick]: TickEvent;
 
-  [RoundEvents.ConsumeStack]: ConsumeStackEvent;
+  [RoundEvents.ConsumeEnergy]: ConsumeEnergyEvent;
 
   [RoundEvents.Heal]: HealEvent;
   [RoundEvents.SetupUnit]: UnitEvent;
@@ -150,33 +150,33 @@ export interface UnitStats {
   [Stat.MaxHealth]: number;
 }
 
-export interface UnitStacks {
-  [Stack.Attack]: number;
-  [Stack.Magic]: number;
-  [Stack.Poison]: number;
-  [Stack.Armor]: number;
-  [Stack.Corrosion]: number;
-  [Stack.Speed]: number;
-  [Stack.Slow]: number;
-  [Stack.Dodge]: number;
-  [Stack.Critical]: number;
-  [Stack.Healing]: number;
+export interface UnitEnergy {
+  [Energy.Attack]: number;
+  [Energy.Magic]: number;
+  [Energy.Poison]: number;
+  [Energy.Armor]: number;
+  [Energy.Corrosion]: number;
+  [Energy.Speed]: number;
+  [Energy.Slow]: number;
+  [Energy.Dodge]: number;
+  [Energy.Critical]: number;
+  [Energy.Healing]: number;
 }
 
-function createUnitStacks(): UnitStacks {
+function createUnitEnergy(): UnitEnergy {
   return {
     // Offensive
-    [Stack.Attack]: 0,
-    [Stack.Magic]: 0,
-    [Stack.Poison]: 0,
+    [Energy.Attack]: 0,
+    [Energy.Magic]: 0,
+    [Energy.Poison]: 0,
     // Supporting
-    [Stack.Armor]: 0,
-    [Stack.Corrosion]: 0,
-    [Stack.Speed]: 0,
-    [Stack.Slow]: 0,
-    [Stack.Dodge]: 0,
-    [Stack.Critical]: 0,
-    [Stack.Healing]: 0,
+    [Energy.Armor]: 0,
+    [Energy.Corrosion]: 0,
+    [Energy.Speed]: 0,
+    [Energy.Slow]: 0,
+    [Energy.Dodge]: 0,
+    [Energy.Critical]: 0,
+    [Energy.Healing]: 0,
   };
 }
 
@@ -192,28 +192,28 @@ export class Unit {
     [Stat.MaxHealth]: DEFAULT_MAX_HEALTH,
   };
 
-  // Stacks
-  stacks = {
-    consumable: createUnitStacks(),
-    permanent: createUnitStacks(),
+  // Energies
+  energies = {
+    consumable: createUnitEnergy(),
+    permanent: createUnitEnergy(),
   };
 
-  getTotalStacks(stack: Stack): number {
-    return this.stacks.permanent[stack] + this.stacks.consumable[stack];
+  getTotalEnergy(energy: Energy): number {
+    return this.energies.permanent[energy] + this.energies.consumable[energy];
   }
 
-  getStacks(stack: Stack, permanent: boolean) {
+  getEnergy(energy: Energy, permanent: boolean): number {
     return permanent
-      ? this.stacks.permanent[stack]
-      : this.stacks.consumable[stack];
+      ? this.energies.permanent[energy]
+      : this.energies.consumable[energy];
   }
 
-  setStacks(stack: Stack, amount: number, permanent: boolean) {
+  setEnergy(energy: Energy, amount: number, permanent: boolean) {
     const target = Math.max(0, amount);
     if (permanent) {
-      this.stacks.permanent[stack] = target;
+      this.energies.permanent[energy] = target;
     } else {
-      this.stacks.consumable[stack] = target;
+      this.energies.consumable[energy] = target;
     }
   }
 }
@@ -350,34 +350,41 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(
-      RoundEvents.Damage,
-      { id: 'DamageEvent', type, source, target, amount, flag },
-    );
+    this.emit(RoundEvents.Damage, {
+      id: 'DamageEvent',
+      type,
+      source,
+      target,
+      amount,
+      flag,
+    });
   }
 
-  consumeStack(type: Stack, source: Unit): void {
-    this.emit(RoundEvents.ConsumeStack, {
-      id: 'ConsumeStack',
+  consumeEnergy(type: Energy, source: Unit): void {
+    this.emit(RoundEvents.ConsumeEnergy, {
+      id: 'ConsumeEnergy',
       type,
       source,
     });
   }
 
-  setStack(
-    type: Stack,
+  setEnergy(
+    type: Energy,
     source: Unit,
     amount: number,
     permanent: boolean,
   ): void {
-    this.emit(
-      RoundEvents.SetStack,
-      { id: 'SetStackEvent', type, source, amount: amount | 0, permanent },
-    );
+    this.emit(RoundEvents.SetEnergy, {
+      id: 'SetEnergyEvent',
+      type,
+      source,
+      amount: amount | 0,
+      permanent,
+    });
   }
 
-  addStack(
-    type: Stack,
+  addEnergy(
+    type: Energy,
     source: Unit,
     amount: number,
     permanent: boolean,
@@ -386,14 +393,17 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(
-      RoundEvents.AddStack,
-      { id: 'AddStackEvent', type, source, amount, permanent },
-    );
+    this.emit(RoundEvents.AddEnergy, {
+      id: 'AddEnergyEvent',
+      type,
+      source,
+      amount,
+      permanent,
+    });
   }
 
-  removeStack(
-    type: Stack,
+  removeEnergy(
+    type: Energy,
     source: Unit,
     amount: number,
     permanent: boolean,
@@ -402,17 +412,22 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(
-      RoundEvents.RemoveStack,
-      { id: 'RemoveStackEvent', type, source, amount, permanent },
-    );
+    this.emit(RoundEvents.RemoveEnergy, {
+      id: 'RemoveEnergyEvent',
+      type,
+      source,
+      amount,
+      permanent,
+    });
   }
 
   setStat(type: Stat, source: Unit, amount: number): void {
-    this.emit(
-      RoundEvents.SetStat,
-      { id: 'SetStatEvent', type, source, amount: amount | 0 },
-    );
+    this.emit(RoundEvents.SetStat, {
+      id: 'SetStatEvent',
+      type,
+      source,
+      amount: amount | 0,
+    });
   }
 
   addStat(type: Stat, source: Unit, amount: number): void {
@@ -420,7 +435,12 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(RoundEvents.AddStat, { id: 'AddStatEvent', type, source, amount });
+    this.emit(RoundEvents.AddStat, {
+      id: 'AddStatEvent',
+      type,
+      source,
+      amount,
+    });
   }
 
   removeStat(type: Stat, source: Unit, amount: number): void {
@@ -428,10 +448,12 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(
-      RoundEvents.RemoveStat,
-      { id: 'RemoveStatEvent', type, source, amount },
-    );
+    this.emit(RoundEvents.RemoveStat, {
+      id: 'RemoveStatEvent',
+      type,
+      source,
+      amount,
+    });
   }
 
   getEnemyUnit(unit: Unit) {

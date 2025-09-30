@@ -11,7 +11,7 @@
 
 ## Prints
 
-Cards can have an effect multiplier called prints. Each prints increases the multiplier by 1 and stacks on one another, giving a maximum multiplier of 5.
+Cards can have an effect multiplier called prints. Each prints increases the multiplier by 1 and energies on one another, giving a maximum multiplier of 5.
 
 - Negative
 - Error

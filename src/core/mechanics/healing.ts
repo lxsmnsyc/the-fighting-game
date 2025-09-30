@@ -1,14 +1,14 @@
 import type { Game } from '../game';
 import { log } from '../log';
 import {
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
   Stat,
+  TriggerEnergyFlags,
   TriggerFlags,
-  TriggerStackFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -27,17 +27,17 @@ export function setupHealingMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.TickHeal, EventPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.Failed)) {
-        const stacks = event.source.getTotalStacks(Stack.Healing);
-        if (stacks > 0) {
-          round.heal(event.source, stacks, event.flag);
+      if (!(event.flag & TriggerEnergyFlags.Failed)) {
+        const energy = event.source.getTotalEnergy(Energy.Healing);
+        if (energy > 0) {
+          round.heal(event.source, energy, event.flag);
         }
       }
-      if (!(event.flag & TriggerStackFlags.NoConsume)) {
-        round.consumeStack(Stack.Healing, event.source);
+      if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
+        round.consumeEnergy(Energy.Healing, event.source);
       }
     });
 
@@ -48,11 +48,11 @@ export function setupHealingMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Healing) {
-        const current = event.source.getStacks(Stack.Healing, false);
-        round.removeStack(
-          Stack.Healing,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Healing) {
+        const current = event.source.getEnergy(Energy.Healing, false);
+        round.removeEnergy(
+          Energy.Healing,
           event.source,
           current === 1 ? current : current * CONSUMABLE_STACKS,
           false,
@@ -60,39 +60,41 @@ export function setupHealingMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Healing) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Healing) {
         const clamped = Math.max(0, event.amount);
         log(
-          `${event.source.owner.name}'s Healing stacks changed to ${clamped}`,
+          `${event.source.owner.name}'s Healing energy changed to ${clamped}`,
         );
-        event.source.setStacks(Stack.Healing, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Healing, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Healing) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Healing) {
         log(
-          `${event.source.owner.name} gained ${event.amount} stacks of Healing`,
+          `${event.source.owner.name} gained ${event.amount} energy of Healing`,
         );
-        round.setStack(
-          Stack.Healing,
+        round.setEnergy(
+          Energy.Healing,
           event.source,
-          event.source.getStacks(Stack.Healing, event.permanent) + event.amount,
+          event.source.getEnergy(Energy.Healing, event.permanent) +
+            event.amount,
           event.permanent,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Healing) {
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Healing) {
         log(
-          `${event.source.owner.name} lost ${event.amount} stacks of Healing`,
+          `${event.source.owner.name} lost ${event.amount} energy of Healing`,
         );
-        round.setStack(
-          Stack.Healing,
+        round.setEnergy(
+          Energy.Healing,
           event.source,
-          event.source.getStacks(Stack.Healing, event.permanent) - event.amount,
+          event.source.getEnergy(Energy.Healing, event.permanent) -
+            event.amount,
           event.permanent,
         );
       }

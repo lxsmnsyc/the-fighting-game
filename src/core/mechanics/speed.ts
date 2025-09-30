@@ -1,12 +1,12 @@
 import type { Game } from '../game';
 import { log } from '../log';
 import {
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
-  TriggerStackFlags,
+  TriggerEnergyFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -24,20 +24,20 @@ export function setupSpeedMechanics(game: Game): void {
       });
     });
 
-    round.on(RoundEvents.TickSpeed, StackPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+    round.on(RoundEvents.TickSpeed, EnergyPriority.Exact, event => {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.NoConsume)) {
-        round.consumeStack(Stack.Speed, event.source);
+      if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
+        round.consumeEnergy(Energy.Speed, event.source);
       }
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Speed) {
-        const consumable = event.source.getStacks(Stack.Speed, false);
-        round.removeStack(
-          Stack.Speed,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Speed) {
+        const consumable = event.source.getEnergy(Energy.Speed, false);
+        round.removeEnergy(
+          Energy.Speed,
           event.source,
           consumable === 1 ? consumable : consumable * CONSUMABLE_STACKS,
           false,
@@ -45,22 +45,22 @@ export function setupSpeedMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Speed) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Speed) {
         log(`${event.source.owner.name}'s Speed changed to ${event.amount}`);
-        event.source.setStacks(Stack.Speed, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Speed, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Speed) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type !== Energy.Speed) {
         return;
       }
       if (event.permanent) {
-        round.setStack(
-          Stack.Speed,
+        round.setEnergy(
+          Energy.Speed,
           event.source,
-          event.source.getStacks(Stack.Speed, true) + event.amount,
+          event.source.getEnergy(Energy.Speed, true) + event.amount,
           true,
         );
         return;
@@ -68,33 +68,33 @@ export function setupSpeedMechanics(game: Game): void {
 
       let amount = event.amount;
 
-      if (event.source.getStacks(Stack.Slow, false) > 0) {
+      if (event.source.getEnergy(Energy.Slow, false) > 0) {
         /**
-         * Counter Slow by removing stacks from it
+         * Counter Slow by removing energy from it
          */
-        round.removeStack(Stack.Slow, event.source, amount, false);
+        round.removeEnergy(Energy.Slow, event.source, amount, false);
 
-        amount = -(event.source.getStacks(Stack.Slow, false) - event.amount);
+        amount = -(event.source.getEnergy(Energy.Slow, false) - event.amount);
       }
 
       if (amount > 0) {
-        log(`${event.source.owner.name} gained ${amount} stacks of Speed`);
-        round.setStack(
-          Stack.Speed,
+        log(`${event.source.owner.name} gained ${amount} energy of Speed`);
+        round.setEnergy(
+          Energy.Speed,
           event.source,
-          event.source.getStacks(Stack.Speed, false) + amount,
+          event.source.getEnergy(Energy.Speed, false) + amount,
           false,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Speed) {
-        log(`${event.source.owner.name} lost ${event.amount} stacks of Speed`);
-        round.setStack(
-          Stack.Speed,
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Speed) {
+        log(`${event.source.owner.name} lost ${event.amount} energy of Speed`);
+        round.setEnergy(
+          Energy.Speed,
           event.source,
-          event.source.getStacks(Stack.Speed, event.permanent) - event.amount,
+          event.source.getEnergy(Energy.Speed, event.permanent) - event.amount,
           event.permanent,
         );
       }

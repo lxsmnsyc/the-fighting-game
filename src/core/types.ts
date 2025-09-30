@@ -51,9 +51,9 @@ export const enum StatPriority {
 }
 
 /**
- * Stack application priority
+ * Energy application priority
  */
-export const enum StackPriority {
+export const enum EnergyPriority {
   Initial = 0,
   Additive = 1,
   Multiplicative = 2,
@@ -115,14 +115,14 @@ export const enum RoundEvents {
   Start = 2,
   End = 3,
   Damage = 4,
-  AddStack = 5,
-  RemoveStack = 6,
+  AddEnergy = 5,
+  RemoveEnergy = 6,
   AddStat = 7,
   RemoveStat = 8,
-  SetStack = 9,
+  SetEnergy = 9,
   SetStat = 10,
   Tick = 11,
-  ConsumeStack = 12,
+  ConsumeEnergy = 12,
 
   Heal = 13,
   Attack = 15,
@@ -184,7 +184,7 @@ export const enum TriggerFlags {
   Disabled = 0b0001,
 }
 
-export const enum TriggerStackFlags {
+export const enum TriggerEnergyFlags {
   Disabled = 0b0001,
   Failed = 0b0010,
   NoConsume = 0b0100,
@@ -200,7 +200,7 @@ export const enum PlayerStat {
   Gold = 1,
 }
 
-export const enum Stack {
+export const enum Energy {
   Attack = 0,
   Magic = 1,
   // Deals poison damage

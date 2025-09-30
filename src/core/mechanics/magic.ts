@@ -2,12 +2,12 @@ import type { Game } from '../game';
 import { log } from '../log';
 import {
   DamageType,
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
-  TriggerStackFlags,
+  TriggerEnergyFlags,
 } from '../types';
 
 const CONSUMABLE_STACKS = 0.4;
@@ -17,31 +17,31 @@ export function setupMagicMechanics(game: Game): void {
     log('Setting up Magic mechanics.');
 
     round.on(RoundEvents.TickMagic, EventPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.Failed)) {
-        const stacks = event.source.getTotalStacks(Stack.Magic);
-        if (stacks > 0) {
+      if (!(event.flag & TriggerEnergyFlags.Failed)) {
+        const energy = event.source.getTotalEnergy(Energy.Magic);
+        if (energy > 0) {
           round.dealDamage(
             DamageType.Magical,
             event.source,
             round.getEnemyUnit(event.source),
-            stacks,
+            energy,
             0,
           );
         }
       }
-      if (!(event.flag & TriggerStackFlags.NoConsume)) {
-        round.consumeStack(Stack.Magic, event.source);
+      if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
+        round.consumeEnergy(Energy.Magic, event.source);
       }
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Magic) {
-        const consumable = event.source.getStacks(Stack.Magic, false);
-        round.removeStack(
-          Stack.Magic,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Magic) {
+        const consumable = event.source.getEnergy(Energy.Magic, false);
+        round.removeEnergy(
+          Energy.Magic,
           event.source,
           consumable === 1 ? consumable : consumable * CONSUMABLE_STACKS,
           false,
@@ -49,36 +49,36 @@ export function setupMagicMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Magic) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Magic) {
         log(
-          `${event.source.owner.name}'s Magic stacks changed to ${event.amount}`,
+          `${event.source.owner.name}'s Magic energy changed to ${event.amount}`,
         );
-        event.source.setStacks(Stack.Magic, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Magic, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Magic) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Magic) {
         log(
-          `${event.source.owner.name} gained ${event.amount} stacks of Magic`,
+          `${event.source.owner.name} gained ${event.amount} energy of Magic`,
         );
-        round.setStack(
-          Stack.Magic,
+        round.setEnergy(
+          Energy.Magic,
           event.source,
-          event.source.getStacks(Stack.Magic, event.permanent) + event.amount,
+          event.source.getEnergy(Energy.Magic, event.permanent) + event.amount,
           event.permanent,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Magic) {
-        log(`${event.source.owner.name} lost ${event.amount} stacks of Magic`);
-        round.setStack(
-          Stack.Magic,
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Magic) {
+        log(`${event.source.owner.name} lost ${event.amount} energy of Magic`);
+        round.setEnergy(
+          Energy.Magic,
           event.source,
-          event.source.getStacks(Stack.Magic, event.permanent) - event.amount,
+          event.source.getEnergy(Energy.Magic, event.permanent) - event.amount,
           event.permanent,
         );
       }

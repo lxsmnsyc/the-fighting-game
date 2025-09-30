@@ -1,34 +1,34 @@
 import { type Card, type CardContext, createCard } from '../../card';
 import { SELF_STACK } from '../../constants';
 import type { StartRoundGameEvent } from '../../game';
-import type { SetStackEvent } from '../../round';
+import type { SetEnergyEvent } from '../../round';
 import {
   Aspect,
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   Rarity,
   RoundEvents,
-  Stack,
-  StackPriority,
 } from '../../types';
 
-interface AddStackBonusCardOptions {
+interface AddEnergyBonusCardOptions {
   name: string;
-  stack: Stack;
+  energy: Energy;
   aspect: Aspect;
   amount: number;
   permanent?: boolean;
   image?: string;
 }
 
-function createAddStackBonusCard({
+function createAddEnergyBonusCard({
   name,
-  stack,
+  energy,
   aspect,
   amount,
   permanent = false,
   image = '',
-}: AddStackBonusCardOptions): Card {
+}: AddEnergyBonusCardOptions): Card {
   return createCard({
     name,
     image,
@@ -41,7 +41,7 @@ function createAddStackBonusCard({
         EventPriority.Exact,
         ({ card, data }) => {
           if (card === context.card) {
-            (data as SetStackEvent).amount += context.card.getValue(amount);
+            (data as SetEnergyEvent).amount += context.card.getValue(amount);
           }
         },
       );
@@ -54,13 +54,13 @@ function createAddStackBonusCard({
             if (source.owner !== context.card.owner) {
               return;
             }
-            round.on(RoundEvents.AddStack, StackPriority.Additive, event => {
-              const target = SELF_STACK[stack]
+            round.on(RoundEvents.AddEnergy, EnergyPriority.Additive, event => {
+              const target = SELF_STACK[energy]
                 ? source
                 : round.getEnemyUnit(source);
               if (
                 context.card.enabled &&
-                event.type === stack &&
+                event.type === energy &&
                 target === event.source &&
                 event.permanent === permanent
               ) {
@@ -76,64 +76,64 @@ function createAddStackBonusCard({
 
 export const ADD_STACK_BONUS_CARDS = [
   // Offensive cards
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Attack,
+    energy: Energy.Attack,
     aspect: Aspect.Attack,
     amount: 20,
   }),
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Magic,
+    energy: Energy.Magic,
     aspect: Aspect.Magic,
     amount: 20,
   }),
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Poison,
+    energy: Energy.Poison,
     aspect: Aspect.Poison,
     amount: 20,
   }),
   // Supportive cards
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Armor,
+    energy: Energy.Armor,
     aspect: Aspect.Armor,
     amount: 20,
   }),
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Corrosion,
+    energy: Energy.Corrosion,
     aspect: Aspect.Corrosion,
     amount: 20,
   }),
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Speed,
+    energy: Energy.Speed,
     aspect: Aspect.Speed,
     amount: 20,
   }),
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Slow,
+    energy: Energy.Slow,
     aspect: Aspect.Slow,
     amount: 20,
   }),
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Dodge,
+    energy: Energy.Dodge,
     aspect: Aspect.Dodge,
     amount: 20,
   }),
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Critical,
+    energy: Energy.Critical,
     aspect: Aspect.Critical,
     amount: 20,
   }),
-  createAddStackBonusCard({
+  createAddEnergyBonusCard({
     name: '',
-    stack: Stack.Healing,
+    energy: Energy.Healing,
     aspect: Aspect.Healing,
     amount: 20,
   }),

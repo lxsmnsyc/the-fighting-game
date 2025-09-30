@@ -2,13 +2,13 @@ import type { Game } from '../game';
 import { log } from '../log';
 import {
   DamageType,
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
+  TriggerEnergyFlags,
   TriggerFlags,
-  TriggerStackFlags,
 } from '../types';
 import { createCooldown } from './tick';
 
@@ -29,17 +29,17 @@ export function setupAttackMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.TickAttack, EventPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.Failed)) {
-        const stacks = event.source.getTotalStacks(Stack.Attack);
-        if (stacks > 0) {
-          round.attack(event.source, stacks, event.flag);
+      if (!(event.flag & TriggerEnergyFlags.Failed)) {
+        const energy = event.source.getTotalEnergy(Energy.Attack);
+        if (energy > 0) {
+          round.attack(event.source, energy, event.flag);
         }
       }
-      if (!(event.flag & TriggerStackFlags.NoConsume)) {
-        round.consumeStack(Stack.Attack, event.source);
+      if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
+        round.consumeEnergy(Energy.Attack, event.source);
       }
     });
 
@@ -55,11 +55,11 @@ export function setupAttackMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Attack) {
-        const consumable = event.source.getStacks(Stack.Attack, false);
-        round.removeStack(
-          Stack.Attack,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Attack) {
+        const consumable = event.source.getEnergy(Energy.Attack, false);
+        round.removeEnergy(
+          Energy.Attack,
           event.source,
           consumable === 1 ? consumable : consumable * CONSUMABLE_STACKS,
           false,
@@ -67,36 +67,36 @@ export function setupAttackMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Attack) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Attack) {
         log(
-          `${event.source.owner.name}'s Attack stacks changed to ${event.amount}`,
+          `${event.source.owner.name}'s Attack energy changed to ${event.amount}`,
         );
-        event.source.setStacks(Stack.Attack, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Attack, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Attack) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Attack) {
         log(
-          `${event.source.owner.name} gained ${event.amount} stacks of Attack`,
+          `${event.source.owner.name} gained ${event.amount} energy of Attack`,
         );
-        round.setStack(
-          Stack.Attack,
+        round.setEnergy(
+          Energy.Attack,
           event.source,
-          event.source.getStacks(Stack.Attack, event.permanent) + event.amount,
+          event.source.getEnergy(Energy.Attack, event.permanent) + event.amount,
           event.permanent,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Attack) {
-        log(`${event.source.owner.name} lost ${event.amount} stacks of Attack`);
-        round.setStack(
-          Stack.Attack,
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Attack) {
+        log(`${event.source.owner.name} lost ${event.amount} energy of Attack`);
+        round.setEnergy(
+          Energy.Attack,
           event.source,
-          event.source.getStacks(Stack.Attack, event.permanent) - event.amount,
+          event.source.getEnergy(Energy.Attack, event.permanent) - event.amount,
           event.permanent,
         );
       }

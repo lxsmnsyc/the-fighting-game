@@ -5,12 +5,12 @@ import {
   DamageFlags,
   DamagePriority,
   DamageType,
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
-  TriggerStackFlags,
+  TriggerEnergyFlags,
 } from '../types';
 
 const DEFAULT_CRITICAL_MULTIPLIER = 2;
@@ -19,11 +19,11 @@ const MAX_CRITICAL_CHANCE = 100;
 const MAX_CRITICAL_STACKS = 1000;
 const CONSUMABLE_STACKS = 0.4;
 
-function getCriticalChance(stack: number): number {
+function getCriticalChance(energy: number): number {
   return lerp(
     MIN_CRITICAL_CHANCE,
     MAX_CRITICAL_CHANCE,
-    Math.min(stack / MAX_CRITICAL_STACKS, 1),
+    Math.min(energy / MAX_CRITICAL_STACKS, 1),
   );
 }
 
@@ -37,42 +37,42 @@ export function setupCriticalMechanics(game: Game): void {
       }
       // Check if player can crit
       if (event.type === DamageType.Attack) {
-        const stacks = event.source.getTotalStacks(Stack.Critical);
-        // If there's no critical stack
-        if (stacks === 0) {
+        const energy = event.source.getTotalEnergy(Energy.Critical);
+        // If there's no critical energy
+        if (energy === 0) {
           return;
         }
         // Calculate critical chance
-        const currentCriticalChance = getCriticalChance(stacks);
+        const currentCriticalChance = getCriticalChance(energy);
         // Push your luck
         const random = event.source.rng.random() * 100;
         if (random > currentCriticalChance) {
           return;
         }
-        
+
         round.critical(event, DEFAULT_CRITICAL_MULTIPLIER, 0);
       }
     });
 
     round.on(RoundEvents.Critical, EventPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.Failed)) {
+      if (!(event.flag & TriggerEnergyFlags.Failed)) {
         event.parent.amount *= event.multiplier;
         log(`${event.parent.source.owner.name} triggered a critical.`);
         event.parent.flag |= DamageFlags.Critical;
       }
-      if (!(event.flag & TriggerStackFlags.NoConsume)) {
-        round.consumeStack(Stack.Critical, event.parent.source);
+      if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
+        round.consumeEnergy(Energy.Critical, event.parent.source);
       }
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Critical) {
-        const current = event.source.getStacks(Stack.Critical, false);
-        round.removeStack(
-          Stack.Critical,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Critical) {
+        const current = event.source.getEnergy(Energy.Critical, false);
+        round.removeEnergy(
+          Energy.Critical,
           event.source,
           Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
           false,
@@ -80,39 +80,39 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Critical) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Critical) {
         log(
-          `${event.source.owner.name}'s Critical stacks changed to ${event.amount}`,
+          `${event.source.owner.name}'s Critical energy changed to ${event.amount}`,
         );
-        event.source.setStacks(Stack.Critical, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Critical, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Critical) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Critical) {
         log(
-          `${event.source.owner.name} gained ${event.amount} stacks of Critical`,
+          `${event.source.owner.name} gained ${event.amount} energy of Critical`,
         );
-        round.setStack(
-          Stack.Critical,
+        round.setEnergy(
+          Energy.Critical,
           event.source,
-          event.source.getStacks(Stack.Critical, event.permanent) +
+          event.source.getEnergy(Energy.Critical, event.permanent) +
             event.amount,
           event.permanent,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Critical) {
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Critical) {
         log(
-          `${event.source.owner.name} lost ${event.amount} stacks of Critical`,
+          `${event.source.owner.name} lost ${event.amount} energy of Critical`,
         );
-        round.setStack(
-          Stack.Critical,
+        round.setEnergy(
+          Energy.Critical,
           event.source,
-          event.source.getStacks(Stack.Critical, event.permanent) -
+          event.source.getEnergy(Energy.Critical, event.permanent) -
             event.amount,
           event.permanent,
         );

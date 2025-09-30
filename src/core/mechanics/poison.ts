@@ -2,12 +2,12 @@ import type { Game } from '../game';
 import { log } from '../log';
 import {
   DamageType,
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
-  TriggerStackFlags,
+  TriggerEnergyFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -20,39 +20,39 @@ export function setupPoisonMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.triggerStack(Stack.Poison, source, 0);
+        round.triggerEnergy(Energy.Poison, source, 0);
         return true;
       });
     });
 
-    round.on(RoundEvents.TickSpeed, StackPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+    round.on(RoundEvents.TickSpeed, EnergyPriority.Exact, event => {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.Failed)) {
-        const stacks = event.source.getTotalStacks(Stack.Poison);
-        if (stacks > 0) {
+      if (!(event.flag & TriggerEnergyFlags.Failed)) {
+        const energy = event.source.getTotalEnergy(Energy.Poison);
+        if (energy > 0) {
           round.dealDamage(
             DamageType.Poison,
             round.getEnemyUnit(event.source),
             event.source,
-            stacks,
+            energy,
             0,
           );
         } else {
           return;
         }
       }
-      if (!(event.flag & TriggerStackFlags.NoConsume)) {
-        round.consumeStack(Stack.Poison, event.source);
+      if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
+        round.consumeEnergy(Energy.Poison, event.source);
       }
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Poison) {
-        const current = event.source.getStacks(Stack.Poison, false);
-        round.removeStack(
-          Stack.Poison,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Poison) {
+        const current = event.source.getEnergy(Energy.Poison, false);
+        round.removeEnergy(
+          Energy.Poison,
           event.source,
           current === 1 ? current : current * CONSUMABLE_STACKS,
           false,
@@ -60,36 +60,36 @@ export function setupPoisonMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Poison) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Poison) {
         log(
-          `${event.source.owner.name}'s Poison stacks changed to ${event.amount}`,
+          `${event.source.owner.name}'s Poison energy changed to ${event.amount}`,
         );
-        event.source.setStacks(Stack.Poison, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Poison, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Poison) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Poison) {
         log(
-          `${event.source.owner.name} gained ${event.amount} stacks of Poison`,
+          `${event.source.owner.name} gained ${event.amount} energy of Poison`,
         );
-        round.setStack(
-          Stack.Poison,
+        round.setEnergy(
+          Energy.Poison,
           event.source,
-          event.source.getStacks(Stack.Poison, event.permanent) + event.amount,
+          event.source.getEnergy(Energy.Poison, event.permanent) + event.amount,
           event.permanent,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Poison) {
-        log(`${event.source.owner.name} lost ${event.amount} stacks of Poison`);
-        round.setStack(
-          Stack.Poison,
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Poison) {
+        log(`${event.source.owner.name} lost ${event.amount} energy of Poison`);
+        round.setEnergy(
+          Energy.Poison,
           event.source,
-          event.source.getStacks(Stack.Poison, event.permanent) - event.amount,
+          event.source.getEnergy(Energy.Poison, event.permanent) - event.amount,
           event.permanent,
         );
       }

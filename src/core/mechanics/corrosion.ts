@@ -4,12 +4,12 @@ import {
   DamageFlags,
   DamagePriority,
   DamageType,
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
-  TriggerStackFlags,
+  TriggerEnergyFlags,
 } from '../types';
 
 const CONSUMABLE_STACKS = 0.4;
@@ -26,30 +26,30 @@ export function setupCorrosionMechanics(game: Game): void {
       if (event.type === DamageType.Poison || event.type === DamageType.Pure) {
         return;
       }
-      const currentCorrosion = event.target.getTotalStacks(Stack.Corrosion);
+      const currentCorrosion = event.target.getTotalEnergy(Energy.Corrosion);
       if (currentCorrosion > 0) {
         round.triggerCorrosion(event, currentCorrosion, 0);
       }
     });
 
     round.on(RoundEvents.Corrosion, EventPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.Failed)) {
+      if (!(event.flag & TriggerEnergyFlags.Failed)) {
         event.parent.amount = Math.max(0, event.parent.amount + event.value);
         event.parent.flag |= DamageFlags.Corrosion;
       }
-      if (!(event.flag & TriggerStackFlags.NoConsume)) {
-        round.consumeStack(Stack.Corrosion, event.parent.source);
+      if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
+        round.consumeEnergy(Energy.Corrosion, event.parent.source);
       }
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Corrosion) {
-        const current = event.source.getStacks(Stack.Corrosion, false);
-        round.removeStack(
-          Stack.Corrosion,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Corrosion) {
+        const current = event.source.getEnergy(Energy.Corrosion, false);
+        round.removeEnergy(
+          Energy.Corrosion,
           event.source,
           current === 1 ? current : current * CONSUMABLE_STACKS,
           false,
@@ -57,24 +57,24 @@ export function setupCorrosionMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Corrosion) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Corrosion) {
         log(
-          `${event.source.owner.name}'s Corrosion stacks changed to ${event.amount}`,
+          `${event.source.owner.name}'s Corrosion energy changed to ${event.amount}`,
         );
-        event.source.setStacks(Stack.Corrosion, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Corrosion, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type !== Stack.Corrosion) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type !== Energy.Corrosion) {
         return;
       }
       if (event.permanent) {
-        round.setStack(
-          Stack.Corrosion,
+        round.setEnergy(
+          Energy.Corrosion,
           event.source,
-          event.source.getStacks(Stack.Corrosion, true) + event.amount,
+          event.source.getEnergy(Energy.Corrosion, true) + event.amount,
           true,
         );
         return;
@@ -82,35 +82,35 @@ export function setupCorrosionMechanics(game: Game): void {
 
       let amount = event.amount;
 
-      if (event.source.getStacks(Stack.Armor, false) > 0) {
+      if (event.source.getEnergy(Energy.Armor, false) > 0) {
         /**
-         * Counter Armor by removing stacks from it
+         * Counter Armor by removing energy from it
          */
-        round.removeStack(Stack.Armor, event.source, amount, false);
+        round.removeEnergy(Energy.Armor, event.source, amount, false);
 
-        amount = -(event.source.getStacks(Stack.Armor, false) - event.amount);
+        amount = -(event.source.getEnergy(Energy.Armor, false) - event.amount);
       }
 
       if (amount > 0) {
-        log(`${event.source.owner.name} gained ${amount} stacks of Corrosion`);
-        round.setStack(
-          Stack.Corrosion,
+        log(`${event.source.owner.name} gained ${amount} energy of Corrosion`);
+        round.setEnergy(
+          Energy.Corrosion,
           event.source,
-          event.source.getStacks(Stack.Corrosion, false) + amount,
+          event.source.getEnergy(Energy.Corrosion, false) + amount,
           false,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Corrosion) {
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Corrosion) {
         log(
-          `${event.source.owner.name} lost ${event.amount} stacks of Corrosion`,
+          `${event.source.owner.name} lost ${event.amount} energy of Corrosion`,
         );
-        round.setStack(
-          Stack.Corrosion,
+        round.setEnergy(
+          Energy.Corrosion,
           event.source,
-          event.source.getStacks(Stack.Corrosion, event.permanent) -
+          event.source.getEnergy(Energy.Corrosion, event.permanent) -
             event.amount,
           event.permanent,
         );

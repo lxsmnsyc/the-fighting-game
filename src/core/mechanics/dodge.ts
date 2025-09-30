@@ -5,12 +5,12 @@ import {
   DamageFlags,
   DamagePriority,
   DamageType,
+  Energy,
+  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
-  Stack,
-  StackPriority,
-  TriggerStackFlags,
+  TriggerEnergyFlags,
 } from '../types';
 
 const MIN_DODGE_CHANCE = 0;
@@ -19,11 +19,11 @@ const MAX_DODGE_STACKS = 1000;
 
 const CONSUMABLE_STACKS = 0.4;
 
-function getDodgeChance(stack: number): number {
+function getDodgeChance(energy: number): number {
   return lerp(
     MIN_DODGE_CHANCE,
     MAX_DODGE_CHANCE,
-    Math.min(stack / MAX_DODGE_STACKS, 1),
+    Math.min(energy / MAX_DODGE_STACKS, 1),
   );
 }
 
@@ -36,13 +36,13 @@ export function setupDodgeMechanics(game: Game): void {
       }
       if (event.type === DamageType.Attack) {
         // Check if player can evade it
-        const stacks = event.target.getTotalStacks(Stack.Dodge);
-        // If there's an dodge stack
-        if (stacks === 0) {
+        const energy = event.target.getTotalEnergy(Energy.Dodge);
+        // If there's an dodge energy
+        if (energy === 0) {
           return;
         }
         // Calculat dodge chance
-        const currentDodge = getDodgeChance(stacks);
+        const currentDodge = getDodgeChance(energy);
         // Push your luck
         const random = event.target.rng.random() * 100;
         if (random > currentDodge) {
@@ -53,24 +53,26 @@ export function setupDodgeMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.Dodge, EventPriority.Exact, event => {
-      if (event.flag & TriggerStackFlags.Disabled) {
+      if (event.flag & TriggerEnergyFlags.Disabled) {
         return;
       }
-      if (!(event.flag & TriggerStackFlags.Failed)) {
-        log(`${event.parent.target.owner.name} dodged ${event.parent.amount} of damage.`);
+      if (!(event.flag & TriggerEnergyFlags.Failed)) {
+        log(
+          `${event.parent.target.owner.name} dodged ${event.parent.amount} of damage.`,
+        );
         event.parent.flag |= DamageFlags.Missed;
       }
-      if (event.flag & TriggerStackFlags.NoConsume) {
+      if (event.flag & TriggerEnergyFlags.NoConsume) {
         return;
       }
-      round.consumeStack(Stack.Dodge, event.parent.source);
+      round.consumeEnergy(Energy.Dodge, event.parent.source);
     });
 
-    round.on(RoundEvents.ConsumeStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Dodge) {
-        const current = event.source.getStacks(Stack.Dodge, false);
-        round.removeStack(
-          Stack.Dodge,
+    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Dodge) {
+        const current = event.source.getEnergy(Energy.Dodge, false);
+        round.removeEnergy(
+          Energy.Dodge,
           event.source,
           Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
           false,
@@ -78,34 +80,34 @@ export function setupDodgeMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Dodge) {
+    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Dodge) {
         log(`${event.source.owner.name}'s Dodge changed to ${event.amount}`);
-        event.source.setStacks(Stack.Dodge, event.amount, event.permanent);
+        event.source.setEnergy(Energy.Dodge, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Dodge) {
+    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Dodge) {
         log(
-          `${event.source.owner.name} gained ${event.amount} stacks of Dodge`,
+          `${event.source.owner.name} gained ${event.amount} energy of Dodge`,
         );
-        round.setStack(
-          Stack.Dodge,
+        round.setEnergy(
+          Energy.Dodge,
           event.source,
-          event.source.getStacks(Stack.Dodge, event.permanent) + event.amount,
+          event.source.getEnergy(Energy.Dodge, event.permanent) + event.amount,
           event.permanent,
         );
       }
     });
 
-    round.on(RoundEvents.RemoveStack, StackPriority.Exact, event => {
-      if (event.type === Stack.Dodge) {
-        log(`${event.source.owner.name} lost ${event.amount} stacks of Dodge`);
-        round.setStack(
-          Stack.Dodge,
+    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+      if (event.type === Energy.Dodge) {
+        log(`${event.source.owner.name} lost ${event.amount} energy of Dodge`);
+        round.setEnergy(
+          Energy.Dodge,
           event.source,
-          event.source.getStacks(Stack.Dodge, event.permanent) - event.amount,
+          event.source.getEnergy(Energy.Dodge, event.permanent) - event.amount,
           event.permanent,
         );
       }

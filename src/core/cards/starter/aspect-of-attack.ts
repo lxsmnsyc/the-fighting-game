@@ -3,11 +3,11 @@ import type { StartRoundGameEvent } from '../../game';
 import type { Round, Unit } from '../../round';
 import {
   Aspect,
+  Energy,
   EventPriority,
   GameEvents,
   Rarity,
   RoundEvents,
-  Stack,
 } from '../../types';
 
 const DEFAULT_AMOUNT = 10;
@@ -22,8 +22,8 @@ export default createCard({
     context.game.on(GameEvents.TriggerCard, EventPriority.Exact, event => {
       if (event.card === context.card) {
         const { round, source } = event.data as { round: Round; source: Unit };
-        round.addStack(
-          Stack.Attack,
+        round.addEnergy(
+          Energy.Attack,
           source,
           context.card.getValue(DEFAULT_AMOUNT),
           true,
