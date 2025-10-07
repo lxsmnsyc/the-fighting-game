@@ -27,9 +27,6 @@ export function setupHealingMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.TickHeal, EventPriority.Exact, event => {
-      if (event.flag & TriggerEnergyFlags.Disabled) {
-        return;
-      }
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         const energy = event.source.getTotalEnergy(Energy.Healing);
         if (energy > 0) {

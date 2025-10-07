@@ -31,7 +31,7 @@ export function setupDodgeMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Dodge mechanics.');
     round.on(RoundEvents.Damage, DamagePriority.Dodge, event => {
-      if (event.flag & DamageFlags.Missed) {
+      if (event.flag & (DamageFlags.Missed | DamageFlags.Pierce)) {
         return;
       }
       if (event.type === DamageType.Attack) {
@@ -53,9 +53,6 @@ export function setupDodgeMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.Dodge, EventPriority.Exact, event => {
-      if (event.flag & TriggerEnergyFlags.Disabled) {
-        return;
-      }
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         log(
           `${event.parent.target.owner.name} dodged ${event.parent.amount} of damage.`,

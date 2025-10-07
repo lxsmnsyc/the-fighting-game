@@ -1,10 +1,14 @@
-import { EventEmitter, type EventEmitterListener } from './event-emitter';
+import {
+  type BaseEvent,
+  EventEmitter,
+  type EventEmitterListener,
+} from './event-emitter';
 
-export interface BaseEvent {
-  id: string;
-}
+type EventMap = {
+  [event: number]: BaseEvent;
+};
 
-export class EventEngine<T extends Record<number, BaseEvent>> {
+export class EventEngine<T extends EventMap> {
   private emitters: Partial<Record<keyof T, EventEmitter<any>>> = {};
 
   on<E extends keyof T>(

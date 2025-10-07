@@ -26,9 +26,6 @@ export function setupPoisonMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.TickPoison, EnergyPriority.Exact, event => {
-      if (event.flag & TriggerEnergyFlags.Disabled) {
-        return;
-      }
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         const energy = event.source.getTotalEnergy(Energy.Poison);
         if (energy > 0) {

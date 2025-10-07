@@ -165,19 +165,23 @@ export const enum DamageFlags {
   /**
    * Damage missed
    */
-  Missed = 0b0001,
+  Missed = 0b00001,
   /**
    * Damage reduced by Armor
    */
-  Armor = 0b0010,
+  Armor = 0b00010,
   /**
    * Damage amplified by Corrosion
    */
-  Corrosion = 0b0100,
+  Corrosion = 0b00100,
   /**
    * Critical damage applied
    */
-  Critical = 0b1000,
+  Critical = 0b01000,
+  /**
+   * Damage bypasses Dodge
+   */
+  Pierce = 0b10000
 }
 
 export const enum TriggerFlags {

@@ -17,9 +17,6 @@ export function setupMagicMechanics(game: Game): void {
     log('Setting up Magic mechanics.');
 
     round.on(RoundEvents.TickMagic, EventPriority.Exact, event => {
-      if (event.flag & TriggerEnergyFlags.Disabled) {
-        return;
-      }
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         const energy = event.source.getTotalEnergy(Energy.Magic);
         if (energy > 0) {

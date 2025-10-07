@@ -25,9 +25,6 @@ export function setupSlowMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.TickSlow, EnergyPriority.Exact, event => {
-      if (event.flag & TriggerEnergyFlags.Disabled) {
-        return;
-      }
       if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
         round.consumeEnergy(Energy.Slow, event.source);
       }

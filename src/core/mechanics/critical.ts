@@ -55,9 +55,6 @@ export function setupCriticalMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.Critical, EventPriority.Exact, event => {
-      if (event.flag & TriggerEnergyFlags.Disabled) {
-        return;
-      }
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         event.parent.amount *= event.multiplier;
         log(`${event.parent.source.owner.name} triggered a critical.`);

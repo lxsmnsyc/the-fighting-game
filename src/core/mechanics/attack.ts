@@ -29,9 +29,6 @@ export function setupAttackMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.TickAttack, EventPriority.Exact, event => {
-      if (event.flag & TriggerEnergyFlags.Disabled) {
-        return;
-      }
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         const energy = event.source.getTotalEnergy(Energy.Attack);
         if (energy > 0) {

@@ -33,9 +33,6 @@ export function setupArmorMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.Armor, EventPriority.Exact, event => {
-      if (event.flag & TriggerEnergyFlags.Disabled) {
-        return;
-      }
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         event.parent.amount = Math.max(0, event.parent.amount - event.value);
         event.parent.flag |= DamageFlags.Armor;

@@ -1,5 +1,6 @@
 import { AleaRNG } from './alea';
 import { DEFAULT_MAX_HEALTH } from './constants';
+import type { BaseEvent } from './event-emitter';
 import { EventEngine } from './event-engine';
 import type { Game } from './game';
 import type { Player } from './player';
@@ -11,15 +12,11 @@ import {
   Stat,
 } from './types';
 
-export interface BaseRoundEvent {
-  id: string;
-}
-
-export interface TickEvent extends BaseRoundEvent {
+export interface TickEvent extends BaseEvent {
   delta: number;
 }
 
-export interface UnitEvent extends BaseRoundEvent {
+export interface UnitEvent extends BaseEvent {
   source: Unit;
 }
 
@@ -46,7 +43,7 @@ export interface SetStatEvent extends UnitValueEvent {
   type: Stat;
 }
 
-export interface EndRoundEvent extends BaseRoundEvent {
+export interface EndRoundEvent extends BaseEvent {
   winner: Unit;
   loser: Unit;
 }
@@ -71,7 +68,7 @@ export interface TickAttackEvent extends UnitEvent {
   flag: number;
 }
 
-export interface DamageSubEvent extends BaseRoundEvent {
+export interface DamageSubEvent extends BaseEvent {
   parent: DamageEvent;
   flag: number;
 }
@@ -107,12 +104,12 @@ export interface TickMagicEvent extends UnitEvent {
 export type RoundEvent = {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
-  [RoundEvents.Setup]: BaseRoundEvent;
+  [RoundEvents.Setup]: BaseEvent;
 
   // Start event begins the game.
   // Timeout events for the entire game should
   // be applied here (e.g. Poison damage)
-  [RoundEvents.Start]: BaseRoundEvent;
+  [RoundEvents.Start]: BaseEvent;
 
   // Event for when a player deals damage
   [RoundEvents.Damage]: DamageEvent;
@@ -235,25 +232,34 @@ export class Round extends EventEngine<RoundEvent> {
   }
 
   setup(): void {
-    this.emit(RoundEvents.Setup, { id: 'SetupEvent' });
+    this.emit(RoundEvents.Setup, { id: 'SetupEvent', disabled: false });
   }
 
   setupUnit(unit: Unit): void {
-    this.emit(RoundEvents.SetupUnit, { id: 'SetupUnitEvent', source: unit });
+    this.emit(RoundEvents.SetupUnit, {
+      id: 'SetupUnitEvent',
+      disabled: false,
+      source: unit,
+    });
   }
 
   start(): void {
-    this.emit(RoundEvents.Start, { id: 'StartEvent' });
+    this.emit(RoundEvents.Start, { id: 'StartEvent', disabled: false });
   }
 
   closed = false;
 
   tick(delta: number): void {
-    this.emit(RoundEvents.Tick, { id: 'TickEvent', delta });
+    this.emit(RoundEvents.Tick, { id: 'TickEvent', disabled: false, delta });
   }
 
   naturalHeal(source: Unit, flag: number): void {
-    this.emit(RoundEvents.TickHeal, { id: 'TickHealEvent', source, flag });
+    this.emit(RoundEvents.TickHeal, {
+      id: 'TickHealEvent',
+      disabled: false,
+      source,
+      flag,
+    });
   }
 
   heal(source: Unit, amount: number, flag: number): void {
@@ -261,20 +267,38 @@ export class Round extends EventEngine<RoundEvent> {
     if (amount === 0) {
       return;
     }
-    this.emit(RoundEvents.Heal, { id: 'HealEvent', source, amount, flag });
+    this.emit(RoundEvents.Heal, {
+      id: 'HealEvent',
+      disabled: false,
+      source,
+      amount,
+      flag,
+    });
   }
 
   naturalAttack(source: Unit, flag: number): void {
-    this.emit(RoundEvents.TickAttack, { id: 'TickAttackEvent', source, flag });
+    this.emit(RoundEvents.TickAttack, {
+      id: 'TickAttackEvent',
+      disabled: false,
+      source,
+      flag,
+    });
   }
 
   attack(source: Unit, amount: number, flag: number): void {
-    this.emit(RoundEvents.Attack, { id: 'AttackEvent', source, amount, flag });
+    this.emit(RoundEvents.Attack, {
+      id: 'AttackEvent',
+      disabled: false,
+      source,
+      amount,
+      flag,
+    });
   }
 
   dodge(parent: DamageEvent, flag: number): void {
     this.emit(RoundEvents.Dodge, {
       id: 'DodgeEvent',
+      disabled: false,
       parent,
       flag,
     });
@@ -283,6 +307,7 @@ export class Round extends EventEngine<RoundEvent> {
   critical(parent: DamageEvent, multiplier: number, flag: number): void {
     this.emit(RoundEvents.Critical, {
       id: 'CriticalEvent',
+      disabled: false,
       parent,
       flag,
       multiplier,
@@ -292,6 +317,7 @@ export class Round extends EventEngine<RoundEvent> {
   triggerArmor(parent: DamageEvent, value: number, flag: number): void {
     this.emit(RoundEvents.Armor, {
       id: 'ArmorEvent',
+      disabled: false,
       parent,
       flag,
       value,
@@ -301,6 +327,7 @@ export class Round extends EventEngine<RoundEvent> {
   triggerCorrosion(parent: DamageEvent, value: number, flag: number): void {
     this.emit(RoundEvents.Corrosion, {
       id: 'CorrosionEvent',
+      disabled: false,
       parent,
       flag,
       value,
@@ -310,6 +337,7 @@ export class Round extends EventEngine<RoundEvent> {
   tickSpeed(source: Unit, flag: number): void {
     this.emit(RoundEvents.TickSpeed, {
       id: 'TickSpeedEvent',
+      disabled: false,
       source,
       flag,
     });
@@ -318,6 +346,7 @@ export class Round extends EventEngine<RoundEvent> {
   tickSlow(source: Unit, flag: number): void {
     this.emit(RoundEvents.TickSlow, {
       id: 'TickSlowEvent',
+      disabled: false,
       source,
       flag,
     });
@@ -326,6 +355,7 @@ export class Round extends EventEngine<RoundEvent> {
   tickPoison(source: Unit, flag: number): void {
     this.emit(RoundEvents.TickPoison, {
       id: 'TickPoisonEvent',
+      disabled: false,
       source,
       flag,
     });
@@ -334,6 +364,7 @@ export class Round extends EventEngine<RoundEvent> {
   tickMagic(source: Unit, flag: number): void {
     this.emit(RoundEvents.TickMagic, {
       id: 'TickMagicEvent',
+      disabled: false,
       source,
       flag,
     });
@@ -352,6 +383,7 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(RoundEvents.Damage, {
       id: 'DamageEvent',
+      disabled: false,
       type,
       source,
       target,
@@ -363,6 +395,7 @@ export class Round extends EventEngine<RoundEvent> {
   consumeEnergy(type: Energy, source: Unit): void {
     this.emit(RoundEvents.ConsumeEnergy, {
       id: 'ConsumeEnergy',
+      disabled: false,
       type,
       source,
     });
@@ -376,6 +409,7 @@ export class Round extends EventEngine<RoundEvent> {
   ): void {
     this.emit(RoundEvents.SetEnergy, {
       id: 'SetEnergyEvent',
+      disabled: false,
       type,
       source,
       amount: amount | 0,
@@ -395,6 +429,7 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(RoundEvents.AddEnergy, {
       id: 'AddEnergyEvent',
+      disabled: false,
       type,
       source,
       amount,
@@ -414,6 +449,7 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(RoundEvents.RemoveEnergy, {
       id: 'RemoveEnergyEvent',
+      disabled: false,
       type,
       source,
       amount,
@@ -424,6 +460,7 @@ export class Round extends EventEngine<RoundEvent> {
   setStat(type: Stat, source: Unit, amount: number): void {
     this.emit(RoundEvents.SetStat, {
       id: 'SetStatEvent',
+      disabled: false,
       type,
       source,
       amount: amount | 0,
@@ -437,6 +474,7 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(RoundEvents.AddStat, {
       id: 'AddStatEvent',
+      disabled: false,
       type,
       source,
       amount,
@@ -450,6 +488,7 @@ export class Round extends EventEngine<RoundEvent> {
     }
     this.emit(RoundEvents.RemoveStat, {
       id: 'RemoveStatEvent',
+      disabled: false,
       type,
       source,
       amount,
@@ -464,7 +503,12 @@ export class Round extends EventEngine<RoundEvent> {
   }
 
   end(winner: Unit, loser: Unit): void {
-    this.emit(RoundEvents.End, { id: 'EndRoundEvent', winner, loser });
+    this.emit(RoundEvents.End, {
+      id: 'EndRoundEvent',
+      disabled: false,
+      winner,
+      loser,
+    });
   }
 }
 

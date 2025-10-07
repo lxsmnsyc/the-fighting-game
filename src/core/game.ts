@@ -1,19 +1,16 @@
 import { AleaRNG } from './alea';
 import type { CardInstance } from './card';
+import type { BaseEvent } from './event-emitter';
 import { EventEngine } from './event-engine';
 import { Player } from './player';
 import type { Round } from './round';
 import { GameEvents } from './types';
 
-export interface BaseGameEvent {
-  id: string;
-}
-
-export interface StartRoundGameEvent extends BaseGameEvent {
+export interface StartRoundGameEvent extends BaseEvent {
   round: Round;
 }
 
-export interface BaseCardGameEvent extends BaseGameEvent {
+export interface BaseCardGameEvent extends BaseEvent {
   card: CardInstance;
 }
 
@@ -22,10 +19,10 @@ export interface TriggerCardGameEvent extends BaseCardGameEvent {
 }
 
 type GameEvent = {
-  [GameEvents.Setup]: BaseGameEvent;
-  [GameEvents.Start]: BaseGameEvent;
-  [GameEvents.End]: BaseGameEvent;
-  [GameEvents.NextRound]: BaseGameEvent;
+  [GameEvents.Setup]: BaseEvent;
+  [GameEvents.Start]: BaseEvent;
+  [GameEvents.End]: BaseEvent;
+  [GameEvents.NextRound]: BaseEvent;
   [GameEvents.StartRound]: StartRoundGameEvent;
   [GameEvents.AcquireCard]: BaseCardGameEvent;
   [GameEvents.SellCard]: BaseCardGameEvent;
@@ -54,44 +51,44 @@ export class Game extends EventEngine<GameEvent> {
   }
 
   setup() {
-    this.emit(GameEvents.Setup, { id: 'Setup' });
+    this.emit(GameEvents.Setup, { id: 'Setup', disabled: false });
   }
 
   start() {
-    this.emit(GameEvents.Start, { id: 'Start' });
+    this.emit(GameEvents.Start, { id: 'Start', disabled: false });
   }
 
   nextRound() {
-    this.emit(GameEvents.NextRound, { id: 'NextRound' });
+    this.emit(GameEvents.NextRound, { id: 'NextRound', disabled: false });
   }
 
   startRound(round: Round) {
-    this.emit(GameEvents.StartRound, { id: 'StartRound', round });
+    this.emit(GameEvents.StartRound, { id: 'StartRound', disabled: false, round });
   }
 
   end() {
-    this.emit(GameEvents.End, { id: 'End' });
+    this.emit(GameEvents.End, { id: 'End', disabled: false });
   }
 
   enableCard(card: CardInstance) {
-    this.emit(GameEvents.EnableCard, { id: 'EnableCard', card });
+    this.emit(GameEvents.EnableCard, { id: 'EnableCard', disabled: false, card });
   }
 
   disableCard(card: CardInstance) {
-    this.emit(GameEvents.DisableCard, { id: 'DisableCard', card });
+    this.emit(GameEvents.DisableCard, { id: 'DisableCard', disabled: false, card });
   }
 
   acquireCard(card: CardInstance) {
-    this.emit(GameEvents.AcquireCard, { id: 'AcquireCard', card });
+    this.emit(GameEvents.AcquireCard, { id: 'AcquireCard', disabled: false, card });
   }
 
   sellCard(card: CardInstance) {
-    this.emit(GameEvents.SellCard, { id: 'SellCard', card });
+    this.emit(GameEvents.SellCard, { id: 'SellCard', disabled: false, card });
   }
 
   triggerCard(card: CardInstance, data: unknown) {
     if (card.enabled) {
-      this.emit(GameEvents.TriggerCard, { id: 'TriggerCard', card, data });
+      this.emit(GameEvents.TriggerCard, { id: 'TriggerCard', disabled: false, card, data });
     }
   }
 }
