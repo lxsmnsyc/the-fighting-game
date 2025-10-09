@@ -1,5 +1,6 @@
 import { AleaRNG } from './alea';
 import type { Game } from './game';
+import { lerp } from './lerp';
 import type { Player } from './player';
 import {
   type Aspect,
@@ -88,10 +89,7 @@ export class CardInstance {
     let result = value;
 
     if (this.print & Print.Error) {
-      const minValue = value * MIN_ERROR_VALUE;
-      const maxValue = value * MAX_ERROR_VALUE;
-
-      result = (minValue + Math.random() * (maxValue - minValue)) | 0;
+      result = lerp(value * MIN_ERROR_VALUE, value * MAX_ERROR_VALUE, Math.random());
     }
     if (this.print & Print.Monotone) {
       result *= 2;
