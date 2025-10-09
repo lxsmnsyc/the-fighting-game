@@ -12,6 +12,7 @@ import {
   RoundEvents,
   TriggerEnergyFlags,
 } from '../types';
+import { isMissedDamage } from './damage';
 
 const MIN_DODGE_CHANCE = 0;
 const MAX_DODGE_CHANCE = 100;
@@ -31,7 +32,7 @@ export function setupDodgeMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Dodge mechanics.');
     round.on(RoundEvents.Damage, DamagePriority.Dodge, event => {
-      if (event.flag & (DamageFlags.Missed | DamageFlags.Pierce)) {
+      if (isMissedDamage(event.flag)) {
         return;
       }
       if (event.type === DamageType.Attack) {

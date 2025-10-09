@@ -11,6 +11,7 @@ import {
   RoundEvents,
   TriggerEnergyFlags,
 } from '../types';
+import { isMissedDamage } from './damage';
 
 const CONSUMABLE_STACKS = 0.4;
 
@@ -20,7 +21,7 @@ export function setupCorrosionMechanics(game: Game): void {
 
     // Trigger Corrosion consumption when about to take damage.
     round.on(RoundEvents.Damage, DamagePriority.Corrosion, event => {
-      if (event.flag & (DamageFlags.Missed | DamageFlags.Corrosion)) {
+      if (isMissedDamage(event.flag) || event.flag & DamageFlags.Corrosion) {
         return;
       }
       if (event.type === DamageType.Poison || event.type === DamageType.Pure) {

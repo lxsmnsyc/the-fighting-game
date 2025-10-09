@@ -12,6 +12,7 @@ import {
   RoundEvents,
   TriggerEnergyFlags,
 } from '../types';
+import { isMissedDamage } from './damage';
 
 const DEFAULT_CRITICAL_MULTIPLIER = 2;
 const MIN_CRITICAL_CHANCE = 0;
@@ -32,7 +33,7 @@ export function setupCriticalMechanics(game: Game): void {
     log('Setting up Critical mechanics.');
 
     round.on(RoundEvents.Damage, DamagePriority.Critical, event => {
-      if (event.flag & (DamageFlags.Missed | DamageFlags.Critical)) {
+      if (isMissedDamage(event.flag) || event.flag & DamageFlags.Critical) {
         return;
       }
       // Check if player can crit
