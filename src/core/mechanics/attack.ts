@@ -8,7 +8,6 @@ import {
   GameEvents,
   RoundEvents,
   TriggerEnergyFlags,
-  TriggerFlags,
 } from '../types';
 import { createCooldown } from './tick';
 
@@ -41,15 +40,13 @@ export function setupAttackMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.Attack, EventPriority.Exact, event => {
-      if (!(event.flag & TriggerFlags.Disabled)) {
-        round.dealDamage(
-          DamageType.Attack,
-          event.source,
-          round.getEnemyUnit(event.source),
-          event.amount,
-          0,
-        );
-      }
+      round.dealDamage(
+        DamageType.Attack,
+        event.source,
+        round.getEnemyUnit(event.source),
+        event.amount,
+        0,
+      );
     });
 
     round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {

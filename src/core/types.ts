@@ -184,12 +184,7 @@ export const enum DamageFlags {
   Pierce = 0b10000
 }
 
-export const enum TriggerFlags {
-  Disabled = 0b0001,
-}
-
 export const enum TriggerEnergyFlags {
-  Disabled = 0b0001,
   Failed = 0b0010,
   NoConsume = 0b0100,
 }

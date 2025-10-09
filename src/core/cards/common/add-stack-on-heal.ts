@@ -8,7 +8,6 @@ import {
   GameEvents,
   Rarity,
   RoundEvents,
-  TriggerFlags,
 } from '../../types';
 
 const DEFAULT_CHANCE = 0.2;
@@ -63,7 +62,6 @@ function createAddEnergyOnHealCard({
               if (
                 context.card.enabled &&
                 event.source === source &&
-                !(event.flag & TriggerFlags.Disabled) &&
                 context.card.rng.random() <= DEFAULT_CHANCE
               ) {
                 const target = SELF_STACK[energy]

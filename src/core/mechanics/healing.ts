@@ -8,7 +8,6 @@ import {
   RoundEvents,
   Stat,
   TriggerEnergyFlags,
-  TriggerFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -39,10 +38,8 @@ export function setupHealingMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.Heal, EventPriority.Exact, event => {
-      if (!(event.flag & TriggerFlags.Disabled)) {
-        log(`${event.source.owner.name} healed ${event.amount} of Health`);
-        round.addStat(Stat.Health, event.source, event.amount);
-      }
+      log(`${event.source.owner.name} healed ${event.amount} of Health`);
+      round.addStat(Stat.Health, event.source, event.amount);
     });
 
     round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
