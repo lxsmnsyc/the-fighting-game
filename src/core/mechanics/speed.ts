@@ -1,3 +1,4 @@
+import { TriggerEnergyFlags } from '../flags';
 import type { Game } from '../game';
 import { log } from '../log';
 import {
@@ -6,7 +7,6 @@ import {
   EventPriority,
   GameEvents,
   RoundEvents,
-  TriggerEnergyFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -19,7 +19,7 @@ export function setupSpeedMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.tickSpeed(source, 0);
+        round.tickSpeed(source, TriggerEnergyFlags.Natural);
         return true;
       });
     });

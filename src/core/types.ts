@@ -158,37 +158,6 @@ export const enum DamageType {
   HealthLoss = 5,
 }
 
-/**
- * Damage flags
- */
-export const enum DamageFlags {
-  /**
-   * Damage missed
-   */
-  Missed = 0b00001,
-  /**
-   * Damage reduced by Armor
-   */
-  Armor = 0b00010,
-  /**
-   * Damage amplified by Corrosion
-   */
-  Corrosion = 0b00100,
-  /**
-   * Critical damage applied
-   */
-  Critical = 0b01000,
-  /**
-   * Damage bypasses Dodge
-   */
-  Pierce = 0b10000
-}
-
-export const enum TriggerEnergyFlags {
-  Failed = 0b0010,
-  NoConsume = 0b0100,
-}
-
 export const enum Stat {
   Health = 0,
   MaxHealth = 1,

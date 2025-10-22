@@ -62,7 +62,7 @@ function createAddEnergyOnHealCard({
               if (
                 context.card.enabled &&
                 event.source === source &&
-                context.card.rng.random() <= DEFAULT_CHANCE
+                event.source.rng.random() <= DEFAULT_CHANCE
               ) {
                 const target = SELF_STACK[energy]
                   ? source

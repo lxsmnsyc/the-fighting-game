@@ -253,7 +253,7 @@ export class Round extends EventEngine<RoundEvent> {
     this.emit(RoundEvents.Tick, { id: 'TickEvent', disabled: false, delta });
   }
 
-  naturalHeal(source: Unit, flag: number): void {
+  tickHeal(source: Unit, flag: number): void {
     this.emit(RoundEvents.TickHeal, {
       id: 'TickHealEvent',
       disabled: false,
@@ -276,7 +276,7 @@ export class Round extends EventEngine<RoundEvent> {
     });
   }
 
-  naturalAttack(source: Unit, flag: number): void {
+  tickAttack(source: Unit, flag: number): void {
     this.emit(RoundEvents.TickAttack, {
       id: 'TickAttackEvent',
       disabled: false,

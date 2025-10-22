@@ -1,3 +1,4 @@
+import { DamageFlags, TriggerEnergyFlags } from '../flags';
 import type { Game } from '../game';
 import { log } from '../log';
 import {
@@ -7,7 +8,6 @@ import {
   EventPriority,
   GameEvents,
   RoundEvents,
-  TriggerEnergyFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -20,7 +20,7 @@ export function setupPoisonMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.tickPoison(source, 0);
+        round.tickPoison(source, TriggerEnergyFlags.Natural);
         return true;
       });
     });
@@ -29,12 +29,16 @@ export function setupPoisonMechanics(game: Game): void {
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         const energy = event.source.getTotalEnergy(Energy.Poison);
         if (energy > 0) {
+          let flag = DamageFlags.Tick;
+          if (event.flag & TriggerEnergyFlags.Natural) {
+            flag |= DamageFlags.Natural;
+          }
           round.dealDamage(
             DamageType.Poison,
             round.getEnemyUnit(event.source),
             event.source,
             energy,
-            0,
+            flag,
           );
         } else {
           return;

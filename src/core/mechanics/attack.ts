@@ -1,3 +1,4 @@
+import { AttackFlags, DamageFlags, TriggerEnergyFlags } from '../flags';
 import type { Game } from '../game';
 import { log } from '../log';
 import {
@@ -7,7 +8,6 @@ import {
   EventPriority,
   GameEvents,
   RoundEvents,
-  TriggerEnergyFlags,
 } from '../types';
 import { createCooldown } from './tick';
 
@@ -22,7 +22,7 @@ export function setupAttackMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createCooldown(round, source, MIN_PERIOD, MAX_PERIOD, () => {
-        round.naturalAttack(source, 0);
+        round.tickAttack(source, TriggerEnergyFlags.Natural);
         return true;
       });
     });
@@ -31,7 +31,13 @@ export function setupAttackMechanics(game: Game): void {
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         const energy = event.source.getTotalEnergy(Energy.Attack);
         if (energy > 0) {
-          round.attack(event.source, energy, event.flag);
+          let flag = AttackFlags.Tick;
+          if (event.flag & TriggerEnergyFlags.Natural) {
+            flag |= AttackFlags.Natural;
+          }
+          round.attack(event.source, energy, flag);
+        } else {
+          return;
         }
       }
       if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
@@ -40,12 +46,19 @@ export function setupAttackMechanics(game: Game): void {
     });
 
     round.on(RoundEvents.Attack, EventPriority.Exact, event => {
+      let flag = 0;
+      if (event.flag & AttackFlags.Natural) {
+        flag |= DamageFlags.Natural;
+      }
+      if (event.flag & AttackFlags.Tick) {
+        flag |= DamageFlags.Tick;
+      }
       round.dealDamage(
         DamageType.Attack,
         event.source,
         round.getEnemyUnit(event.source),
         event.amount,
-        0,
+        flag,
       );
     });
 

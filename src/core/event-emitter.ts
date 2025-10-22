@@ -23,6 +23,9 @@ export class EventEmitter<T extends BaseEvent> {
   }
 
   emit(event: T): void {
+    if (event.disabled) {
+      return;
+    }
     const queue = [...this.queue];
     for (let i = 0, len = queue.length; i < len; i++) {
       const listeners = queue[i];

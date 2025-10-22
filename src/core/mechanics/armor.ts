@@ -1,7 +1,7 @@
+import { DamageFlags, TriggerEnergyFlags } from '../flags';
 import type { Game } from '../game';
 import { log } from '../log';
 import {
-  DamageFlags,
   DamagePriority,
   DamageType,
   Energy,
@@ -9,7 +9,6 @@ import {
   EventPriority,
   GameEvents,
   RoundEvents,
-  TriggerEnergyFlags,
 } from '../types';
 import { isMissedDamage } from './damage';
 

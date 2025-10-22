@@ -1,3 +1,4 @@
+import { HealFlags, TriggerEnergyFlags } from '../flags';
 import type { Game } from '../game';
 import { log } from '../log';
 import {
@@ -7,7 +8,6 @@ import {
   GameEvents,
   RoundEvents,
   Stat,
-  TriggerEnergyFlags,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -20,7 +20,7 @@ export function setupHealingMechanics(game: Game): void {
 
     round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
-        round.naturalHeal(source, 0);
+        round.tickHeal(source, TriggerEnergyFlags.Natural);
         return true;
       });
     });
@@ -29,7 +29,13 @@ export function setupHealingMechanics(game: Game): void {
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         const energy = event.source.getTotalEnergy(Energy.Healing);
         if (energy > 0) {
-          round.heal(event.source, energy, event.flag);
+          let flag = HealFlags.Tick;
+          if (event.flag & TriggerEnergyFlags.Natural) {
+            flag |= HealFlags.Natural;
+          }
+          round.heal(event.source, energy, flag);
+        } else {
+          return;
         }
       }
       if (!(event.flag & TriggerEnergyFlags.NoConsume)) {

@@ -1,3 +1,4 @@
+import { DamageFlags, TriggerEnergyFlags } from '../flags';
 import type { Game } from '../game';
 import { log } from '../log';
 import {
@@ -7,7 +8,6 @@ import {
   EventPriority,
   GameEvents,
   RoundEvents,
-  TriggerEnergyFlags,
 } from '../types';
 
 const CONSUMABLE_STACKS = 0.4;
@@ -25,8 +25,10 @@ export function setupMagicMechanics(game: Game): void {
             event.source,
             round.getEnemyUnit(event.source),
             energy,
-            0,
+            DamageFlags.Tick,
           );
+        } else {
+          return;
         }
       }
       if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
