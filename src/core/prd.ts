@@ -59,9 +59,6 @@ export default class PRD {
    */
   private progress = 1;
 
-  /**
-   * @param {Number} chance - must be in [0.0, 1.0]
-   */
   constructor(private rng: AleaRNG, public chance: number) {
     this.chance = chance;
     this.constantC = CfromP(chance);
@@ -69,7 +66,6 @@ export default class PRD {
 
   /**
    * Gets the next success from the PRD
-   * @returns Boolean
    */
   next() {
     // Roll
