@@ -20,7 +20,7 @@ export function setupAttackMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Attack mechanics.');
 
-    round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+    round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
       createCooldown(round, source, MIN_PERIOD, MAX_PERIOD, () => {
         round.tickAttack(source, TriggerEnergyFlags.Natural);
         return true;

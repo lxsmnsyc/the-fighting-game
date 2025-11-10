@@ -7,7 +7,6 @@ import {
   Rarity,
   RoundEvents,
   Stat,
-  StatPriority,
   ValuePriority,
 } from '../../types';
 

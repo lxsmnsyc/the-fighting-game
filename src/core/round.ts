@@ -130,7 +130,7 @@ export interface RoundEventMap extends EventMap {
   [RoundEvents.ConsumeEnergy]: [ConsumeEnergyEvent, EventPriority];
 
   [RoundEvents.Heal]: [HealEvent, ValuePriority];
-  [RoundEvents.SetupUnit]: [UnitEvent, EventPriority];
+  [RoundEvents.SetupUnit]: [UnitEvent, ValuePriority];
   [RoundEvents.Attack]: [AttackEvent, ValuePriority];
   [RoundEvents.TickAttack]: [TickAttackEvent, EventPriority];
   [RoundEvents.TickHeal]: [TickHealEvent, EventPriority];

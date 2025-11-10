@@ -3,10 +3,10 @@ import type { Game } from '../game';
 import { log } from '../log';
 import {
   Energy,
-  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
+  ValuePriority,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -17,20 +17,20 @@ export function setupSlowMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Slow mechanics.');
 
-    round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+    round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
         round.tickSlow(source, TriggerEnergyFlags.Natural);
         return true;
       });
     });
 
-    round.on(RoundEvents.TickSlow, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.TickSlow, EventPriority.Exact, event => {
       if (!(event.flag & TriggerEnergyFlags.NoConsume)) {
         round.consumeEnergy(Energy.Slow, event.source);
       }
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, EventPriority.Exact, event => {
       if (event.type === Energy.Slow) {
         const consumable = event.source.getEnergy(Energy.Slow, false);
         round.removeEnergy(
@@ -42,14 +42,14 @@ export function setupSlowMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.SetEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Slow) {
         log(`${event.source.owner.name}'s Slow changed to ${event.amount}`);
         event.source.setEnergy(Energy.Slow, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.AddEnergy, ValuePriority.Exact, event => {
       if (event.type !== Energy.Slow) {
         return;
       }
@@ -85,7 +85,7 @@ export function setupSlowMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.RemoveEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Slow) {
         log(`${event.source.owner.name} lost ${event.amount} energy of Slow`);
         round.setEnergy(

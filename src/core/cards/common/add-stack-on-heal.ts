@@ -55,7 +55,7 @@ function createAddEnergyOnHealCard({
         GameEvents.StartRound,
         EventPriority.Exact,
         ({ round }) => {
-          round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+          round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
             if (source.owner !== context.card.owner) {
               return;
             }

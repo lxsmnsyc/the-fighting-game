@@ -8,6 +8,7 @@ import {
   GameEvents,
   Rarity,
   RoundEvents,
+  ValuePriority,
 } from '../../types';
 
 interface AddEnergyOnStartCardOptions {
@@ -53,7 +54,7 @@ function createAddEnergyOnStartCard({
         GameEvents.StartRound,
         EventPriority.Post,
         ({ round }) => {
-          round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+          round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
             if (source.owner === context.card.owner && context.card.enabled) {
               const target = SELF_STACK[energy]
                 ? source

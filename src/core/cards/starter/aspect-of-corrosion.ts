@@ -8,6 +8,7 @@ import {
   GameEvents,
   Rarity,
   RoundEvents,
+  ValuePriority,
 } from '../../types';
 
 const DEFAULT_AMOUNT = 25;
@@ -35,7 +36,7 @@ export default createCard({
       GameEvents.StartRound,
       EventPriority.Post,
       ({ round }: StartRoundGameEvent) => {
-        round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+        round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
           if (source.owner === context.card.owner && context.card.enabled) {
             context.game.triggerCard(context.card, { round, source });
           }
