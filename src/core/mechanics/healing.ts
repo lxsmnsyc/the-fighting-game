@@ -3,11 +3,11 @@ import type { Game } from '../game';
 import { log } from '../log';
 import {
   Energy,
-  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
   Stat,
+  ValuePriority,
 } from '../types';
 import { createTimer } from './tick';
 
@@ -18,7 +18,7 @@ export function setupHealingMechanics(game: Game): void {
   game.on(GameEvents.StartRound, EventPriority.Pre, ({ round }) => {
     log('Setting up Healing mechanics.');
 
-    round.on(RoundEvents.SetupUnit, EventPriority.Post, ({ source }) => {
+    round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
       createTimer(round, DEFAULT_PERIOD, () => {
         round.tickHeal(source, TriggerEnergyFlags.Natural);
         return true;
@@ -43,24 +43,30 @@ export function setupHealingMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.Heal, EventPriority.Exact, event => {
+    round.on(RoundEvents.Heal, ValuePriority.Exact, event => {
       log(`${event.source.owner.name} healed ${event.amount} of Health`);
       round.addStat(Stat.Health, event.source, event.amount);
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Initial, event => {
       if (event.type === Energy.Healing) {
         const current = event.source.getEnergy(Energy.Healing, false);
+        event.amount = current === 1 ? current : current * CONSUMABLE_STACKS;
+      }
+    });
+
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Exact, event => {
+      if (event.type === Energy.Healing) {
         round.removeEnergy(
           Energy.Healing,
           event.source,
-          current === 1 ? current : current * CONSUMABLE_STACKS,
+          event.amount,
           false,
         );
       }
     });
 
-    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.SetEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Healing) {
         const clamped = Math.max(0, event.amount);
         log(
@@ -70,7 +76,7 @@ export function setupHealingMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.AddEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Healing) {
         log(
           `${event.source.owner.name} gained ${event.amount} energy of Healing`,
@@ -85,7 +91,7 @@ export function setupHealingMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.RemoveEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Healing) {
         log(
           `${event.source.owner.name} lost ${event.amount} energy of Healing`,

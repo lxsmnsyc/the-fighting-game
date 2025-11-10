@@ -64,13 +64,19 @@ export function setupDodgeMechanics(game: Game): void {
       round.consumeEnergy(Energy.Dodge, event.parent.source);
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EventPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Initial, event => {
       if (event.type === Energy.Dodge) {
         const current = event.source.getEnergy(Energy.Dodge, false);
+        event.amount = current === 1 ? current : current * CONSUMABLE_STACKS;
+      }
+    });
+
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Exact, event => {
+      if (event.type === Energy.Dodge) {
         round.removeEnergy(
           Energy.Dodge,
           event.source,
-          Math.abs(current) === 1 ? current : current * CONSUMABLE_STACKS,
+          event.amount,
           false,
         );
       }

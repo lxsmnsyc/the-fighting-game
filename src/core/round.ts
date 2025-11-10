@@ -50,7 +50,7 @@ export interface EndRoundEvent extends BaseEvent {
   loser: Unit;
 }
 
-export interface ConsumeEnergyEvent extends UnitEvent {
+export interface ConsumeEnergyEvent extends UnitValueEvent {
   type: Energy;
 }
 
@@ -127,7 +127,7 @@ export interface RoundEventMap extends EventMap {
   [RoundEvents.End]: [EndRoundEvent, EventPriority];
   [RoundEvents.Tick]: [TickEvent, EventPriority];
 
-  [RoundEvents.ConsumeEnergy]: [ConsumeEnergyEvent, EventPriority];
+  [RoundEvents.ConsumeEnergy]: [ConsumeEnergyEvent, ValuePriority];
 
   [RoundEvents.Heal]: [HealEvent, ValuePriority];
   [RoundEvents.SetupUnit]: [UnitEvent, ValuePriority];
@@ -401,6 +401,7 @@ export class Round extends EventEngine<RoundEventMap> {
       disabled: false,
       type,
       source,
+      amount: 0,
     });
   }
 

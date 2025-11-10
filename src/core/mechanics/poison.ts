@@ -49,15 +49,16 @@ export function setupPoisonMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EventPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Initial, event => {
       if (event.type === Energy.Poison) {
         const current = event.source.getEnergy(Energy.Poison, false);
-        round.removeEnergy(
-          Energy.Poison,
-          event.source,
-          current === 1 ? current : current * CONSUMABLE_STACKS,
-          false,
-        );
+        event.amount = current === 1 ? current : current * CONSUMABLE_STACKS;
+      }
+    });
+
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Exact, event => {
+      if (event.type === Energy.Poison) {
+        round.removeEnergy(Energy.Poison, event.source, event.amount, false);
       }
     });
 

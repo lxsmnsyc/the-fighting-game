@@ -5,10 +5,10 @@ import {
   DamagePriority,
   DamageType,
   Energy,
-  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
+  ValuePriority,
 } from '../types';
 import { isMissedDamage } from './damage';
 
@@ -32,7 +32,7 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.Armor, EventPriority.Exact, event => {
+    round.on(RoundEvents.Armor, ValuePriority.Exact, event => {
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         event.parent.amount = Math.max(0, event.parent.amount - event.value);
         event.parent.flag |= DamageFlags.Armor;
@@ -42,19 +42,25 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Initial, event => {
       if (event.type === Energy.Armor) {
         const current = event.source.getEnergy(Energy.Armor, false);
+        event.amount = current === 1 ? current : current * CONSUMABLE_STACKS;
+      }
+    });
+
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Exact, event => {
+      if (event.type === Energy.Armor) {
         round.removeEnergy(
           Energy.Armor,
           event.source,
-          current === 1 ? current : current * CONSUMABLE_STACKS,
+          event.amount,
           false,
         );
       }
     });
 
-    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.SetEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Armor) {
         log(
           `${event.source.owner.name}'s Armor energy changed to ${event.amount}`,
@@ -63,7 +69,7 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.AddEnergy, ValuePriority.Exact, event => {
       if (event.type !== Energy.Armor) {
         return;
       }
@@ -98,7 +104,7 @@ export function setupArmorMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.RemoveEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Armor) {
         log(`${event.source.owner.name} lost ${event.amount} energy of Armor`);
         round.setEnergy(

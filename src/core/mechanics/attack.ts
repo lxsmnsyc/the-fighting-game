@@ -62,13 +62,19 @@ export function setupAttackMechanics(game: Game): void {
       );
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EventPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Initial, event => {
       if (event.type === Energy.Attack) {
-        const consumable = event.source.getEnergy(Energy.Attack, false);
+        const current = event.source.getEnergy(Energy.Attack, false);
+        event.amount = current === 1 ? current : current * CONSUMABLE_STACKS;
+      }
+    });
+
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Exact, event => {
+      if (event.type === Energy.Attack) {
         round.removeEnergy(
           Energy.Attack,
           event.source,
-          consumable === 1 ? consumable : consumable * CONSUMABLE_STACKS,
+          event.amount,
           false,
         );
       }

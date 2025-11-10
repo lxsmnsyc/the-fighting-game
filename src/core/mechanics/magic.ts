@@ -4,10 +4,10 @@ import { log } from '../log';
 import {
   DamageType,
   Energy,
-  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
+  ValuePriority,
 } from '../types';
 
 const CONSUMABLE_STACKS = 0.4;
@@ -36,19 +36,20 @@ export function setupMagicMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Initial, event => {
       if (event.type === Energy.Magic) {
-        const consumable = event.source.getEnergy(Energy.Magic, false);
-        round.removeEnergy(
-          Energy.Magic,
-          event.source,
-          consumable === 1 ? consumable : consumable * CONSUMABLE_STACKS,
-          false,
-        );
+        const current = event.source.getEnergy(Energy.Magic, false);
+        event.amount = current === 1 ? current : current * CONSUMABLE_STACKS;
       }
     });
 
-    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Exact, event => {
+      if (event.type === Energy.Magic) {
+        round.removeEnergy(Energy.Magic, event.source, event.amount, false);
+      }
+    });
+
+    round.on(RoundEvents.SetEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Magic) {
         log(
           `${event.source.owner.name}'s Magic energy changed to ${event.amount}`,
@@ -57,7 +58,7 @@ export function setupMagicMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.AddEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Magic) {
         log(
           `${event.source.owner.name} gained ${event.amount} energy of Magic`,
@@ -71,7 +72,7 @@ export function setupMagicMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.RemoveEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Magic) {
         log(`${event.source.owner.name} lost ${event.amount} energy of Magic`);
         round.setEnergy(

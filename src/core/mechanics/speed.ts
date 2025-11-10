@@ -30,15 +30,16 @@ export function setupSpeedMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EventPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Initial, event => {
       if (event.type === Energy.Speed) {
-        const consumable = event.source.getEnergy(Energy.Speed, false);
-        round.removeEnergy(
-          Energy.Speed,
-          event.source,
-          consumable === 1 ? consumable : consumable * CONSUMABLE_STACKS,
-          false,
-        );
+        const current = event.source.getEnergy(Energy.Speed, false);
+        event.amount = current === 1 ? current : current * CONSUMABLE_STACKS;
+      }
+    });
+
+    round.on(RoundEvents.ConsumeEnergy, ValuePriority.Exact, event => {
+      if (event.type === Energy.Speed) {
+        round.removeEnergy(Energy.Speed, event.source, event.amount, false);
       }
     });
 
