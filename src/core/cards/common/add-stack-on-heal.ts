@@ -8,6 +8,7 @@ import {
   GameEvents,
   Rarity,
   RoundEvents,
+  ValuePriority,
 } from '../../types';
 
 const DEFAULT_CHANCE = 0.2;
@@ -58,7 +59,7 @@ function createAddEnergyOnHealCard({
             if (source.owner !== context.card.owner) {
               return;
             }
-            round.on(RoundEvents.Heal, EventPriority.Post, event => {
+            round.on(RoundEvents.Heal, ValuePriority.Post, event => {
               if (
                 context.card.enabled &&
                 event.source === source &&

@@ -4,12 +4,11 @@ import { lerp } from '../lerp';
 import { log } from '../log';
 import {
   DamagePriority,
-  DamageType,
   Energy,
-  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
+  ValuePriority,
 } from '../types';
 import { isMissedDamage } from './damage';
 
@@ -36,7 +35,7 @@ export function setupCriticalMechanics(game: Game): void {
         return;
       }
       // Check if player can crit
-      if (event.type === DamageType.Attack) {
+      if (event.flag & DamageFlags.Attack) {
         const energy = event.source.getTotalEnergy(Energy.Critical);
         // If there's no critical energy
         if (energy === 0) {
@@ -54,7 +53,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.Critical, EventPriority.Exact, event => {
+    round.on(RoundEvents.Critical, ValuePriority.Exact, event => {
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         event.parent.amount *= event.multiplier;
         log(`${event.parent.source.owner.name} triggered a critical.`);
@@ -65,7 +64,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, EventPriority.Exact, event => {
       if (event.type === Energy.Critical) {
         const current = event.source.getEnergy(Energy.Critical, false);
         round.removeEnergy(
@@ -77,7 +76,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.SetEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Critical) {
         log(
           `${event.source.owner.name}'s Critical energy changed to ${event.amount}`,
@@ -86,7 +85,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.AddEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Critical) {
         log(
           `${event.source.owner.name} gained ${event.amount} energy of Critical`,
@@ -101,7 +100,7 @@ export function setupCriticalMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.RemoveEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Critical) {
         log(
           `${event.source.owner.name} lost ${event.amount} energy of Critical`,

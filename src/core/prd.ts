@@ -73,8 +73,6 @@ export default class PRD {
 
     // Check for the random success
     if (r < this.progress * this.constantC) {
-      // Reset progress
-      this.progress = 1;
       return true;
     }
 

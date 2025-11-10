@@ -5,11 +5,11 @@ import type { SetEnergyEvent } from '../../round';
 import {
   Aspect,
   Energy,
-  EnergyPriority,
   EventPriority,
   GameEvents,
   Rarity,
   RoundEvents,
+  ValuePriority,
 } from '../../types';
 
 interface AddEnergyBonusCardOptions {
@@ -54,7 +54,7 @@ function createAddEnergyBonusCard({
             if (source.owner !== context.card.owner) {
               return;
             }
-            round.on(RoundEvents.AddEnergy, EnergyPriority.Additive, event => {
+            round.on(RoundEvents.AddEnergy, ValuePriority.Additive, event => {
               const target = SELF_STACK[energy]
                 ? source
                 : round.getEnemyUnit(source);

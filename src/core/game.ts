@@ -1,10 +1,10 @@
 import { AleaRNG } from './alea';
 import type { CardInstance } from './card';
 import type { BaseEvent } from './event-emitter';
-import { EventEngine } from './event-engine';
+import { EventEngine, type EventMap } from './event-engine';
 import { Player } from './player';
 import type { Round } from './round';
-import { GameEvents } from './types';
+import { type EventPriority, GameEvents } from './types';
 
 export interface StartRoundGameEvent extends BaseEvent {
   round: Round;
@@ -18,20 +18,20 @@ export interface TriggerCardGameEvent extends BaseCardGameEvent {
   data: unknown;
 }
 
-type GameEvent = {
-  [GameEvents.Setup]: BaseEvent;
-  [GameEvents.Start]: BaseEvent;
-  [GameEvents.End]: BaseEvent;
-  [GameEvents.NextRound]: BaseEvent;
-  [GameEvents.StartRound]: StartRoundGameEvent;
-  [GameEvents.AcquireCard]: BaseCardGameEvent;
-  [GameEvents.SellCard]: BaseCardGameEvent;
-  [GameEvents.EnableCard]: BaseCardGameEvent;
-  [GameEvents.DisableCard]: BaseCardGameEvent;
-  [GameEvents.TriggerCard]: TriggerCardGameEvent;
-};
+interface GameEventMap extends EventMap {
+  [GameEvents.Setup]: [BaseEvent, EventPriority];
+  [GameEvents.Start]: [BaseEvent, EventPriority];
+  [GameEvents.End]: [BaseEvent, EventPriority];
+  [GameEvents.NextRound]: [BaseEvent, EventPriority];
+  [GameEvents.StartRound]: [StartRoundGameEvent, EventPriority];
+  [GameEvents.AcquireCard]: [BaseCardGameEvent, EventPriority];
+  [GameEvents.SellCard]: [BaseCardGameEvent, EventPriority];
+  [GameEvents.EnableCard]: [BaseCardGameEvent, EventPriority];
+  [GameEvents.DisableCard]: [BaseCardGameEvent, EventPriority];
+  [GameEvents.TriggerCard]: [TriggerCardGameEvent, EventPriority];
+}
 
-export class Game extends EventEngine<GameEvent> {
+export class Game extends EventEngine<GameEventMap> {
   public player: Player;
 
   public rng: {
@@ -63,7 +63,11 @@ export class Game extends EventEngine<GameEvent> {
   }
 
   startRound(round: Round) {
-    this.emit(GameEvents.StartRound, { id: 'StartRound', disabled: false, round });
+    this.emit(GameEvents.StartRound, {
+      id: 'StartRound',
+      disabled: false,
+      round,
+    });
   }
 
   end() {
@@ -71,15 +75,27 @@ export class Game extends EventEngine<GameEvent> {
   }
 
   enableCard(card: CardInstance) {
-    this.emit(GameEvents.EnableCard, { id: 'EnableCard', disabled: false, card });
+    this.emit(GameEvents.EnableCard, {
+      id: 'EnableCard',
+      disabled: false,
+      card,
+    });
   }
 
   disableCard(card: CardInstance) {
-    this.emit(GameEvents.DisableCard, { id: 'DisableCard', disabled: false, card });
+    this.emit(GameEvents.DisableCard, {
+      id: 'DisableCard',
+      disabled: false,
+      card,
+    });
   }
 
   acquireCard(card: CardInstance) {
-    this.emit(GameEvents.AcquireCard, { id: 'AcquireCard', disabled: false, card });
+    this.emit(GameEvents.AcquireCard, {
+      id: 'AcquireCard',
+      disabled: false,
+      card,
+    });
   }
 
   sellCard(card: CardInstance) {
@@ -88,7 +104,12 @@ export class Game extends EventEngine<GameEvent> {
 
   triggerCard(card: CardInstance, data: unknown) {
     if (card.enabled) {
-      this.emit(GameEvents.TriggerCard, { id: 'TriggerCard', disabled: false, card, data });
+      this.emit(GameEvents.TriggerCard, {
+        id: 'TriggerCard',
+        disabled: false,
+        card,
+        data,
+      });
     }
   }
 }

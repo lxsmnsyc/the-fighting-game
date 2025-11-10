@@ -4,7 +4,7 @@ import { log } from '../log';
 import {
   DamageType,
   Energy,
-  EnergyPriority,
+  ValuePriority,
   EventPriority,
   GameEvents,
   RoundEvents,
@@ -45,8 +45,8 @@ export function setupAttackMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.Attack, EventPriority.Exact, event => {
-      let flag = 0;
+    round.on(RoundEvents.Attack, ValuePriority.Exact, event => {
+      let flag = DamageFlags.Attack;
       if (event.flag & AttackFlags.Natural) {
         flag |= DamageFlags.Natural;
       }
@@ -54,7 +54,7 @@ export function setupAttackMechanics(game: Game): void {
         flag |= DamageFlags.Tick;
       }
       round.dealDamage(
-        DamageType.Attack,
+        DamageType.Physical,
         event.source,
         round.getEnemyUnit(event.source),
         event.amount,
@@ -62,7 +62,7 @@ export function setupAttackMechanics(game: Game): void {
       );
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, EventPriority.Exact, event => {
       if (event.type === Energy.Attack) {
         const consumable = event.source.getEnergy(Energy.Attack, false);
         round.removeEnergy(
@@ -74,7 +74,7 @@ export function setupAttackMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.SetEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Attack) {
         log(
           `${event.source.owner.name}'s Attack energy changed to ${event.amount}`,
@@ -83,7 +83,7 @@ export function setupAttackMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.AddEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Attack) {
         log(
           `${event.source.owner.name} gained ${event.amount} energy of Attack`,
@@ -97,7 +97,7 @@ export function setupAttackMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.RemoveEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Attack) {
         log(`${event.source.owner.name} lost ${event.amount} energy of Attack`);
         round.setEnergy(

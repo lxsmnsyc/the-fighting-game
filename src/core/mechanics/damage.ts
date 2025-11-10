@@ -1,7 +1,7 @@
+import { DamageFlags } from '../flags';
 import type { Game } from '../game';
 import { log } from '../log';
 import {
-  DamageFlags,
   DamagePriority,
   EventPriority,
   GameEvents,

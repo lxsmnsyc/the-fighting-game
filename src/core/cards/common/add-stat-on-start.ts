@@ -8,6 +8,7 @@ import {
   RoundEvents,
   Stat,
   StatPriority,
+  ValuePriority,
 } from '../../types';
 
 const DEFAULT_MULTIPLIER = 100;
@@ -31,10 +32,10 @@ function createAddStatOnStartCard(
             round: Round;
             target: Unit;
           };
-          round.addStat(
+          round.setStat(
             stat,
             target,
-            context.card.getValue(DEFAULT_MULTIPLIER),
+            target.stats[stat] + context.card.getValue(DEFAULT_MULTIPLIER),
           );
         }
       });
@@ -45,7 +46,7 @@ function createAddStatOnStartCard(
         ({ round }) => {
           round.on(
             RoundEvents.SetupUnit,
-            StatPriority.Additive,
+            ValuePriority.Additive,
             ({ source }) => {
               if (source.owner !== context.card.owner) {
                 return;

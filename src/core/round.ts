@@ -1,15 +1,17 @@
 import { AleaRNG } from './alea';
 import { DEFAULT_MAX_HEALTH } from './constants';
 import type { BaseEvent } from './event-emitter';
-import { EventEngine } from './event-engine';
+import { EventEngine, type EventMap } from './event-engine';
 import type { Game } from './game';
 import type { Player } from './player';
 import {
+  type DamagePriority,
   type DamageType,
   Energy,
   EventPriority,
   RoundEvents,
   Stat,
+  type ValuePriority,
 } from './types';
 
 export interface TickEvent extends BaseEvent {
@@ -101,46 +103,46 @@ export interface TickMagicEvent extends UnitEvent {
   flag: number;
 }
 
-export type RoundEvent = {
+export interface RoundEventMap extends EventMap {
   // Setup event takes place before start.
   // Stat adjustments should be made here.
-  [RoundEvents.Setup]: BaseEvent;
+  [RoundEvents.Setup]: [BaseEvent, EventPriority];
 
   // Start event begins the game.
   // Timeout events for the entire game should
   // be applied here (e.g. Poison damage)
-  [RoundEvents.Start]: BaseEvent;
+  [RoundEvents.Start]: [BaseEvent, EventPriority];
 
   // Event for when a player deals damage
-  [RoundEvents.Damage]: DamageEvent;
+  [RoundEvents.Damage]: [DamageEvent, DamagePriority];
 
-  [RoundEvents.SetStat]: SetStatEvent;
-  [RoundEvents.AddStat]: SetStatEvent;
-  [RoundEvents.RemoveStat]: SetStatEvent;
+  [RoundEvents.SetStat]: [SetStatEvent, ValuePriority];
+  [RoundEvents.AddStat]: [SetStatEvent, ValuePriority];
+  [RoundEvents.RemoveStat]: [SetStatEvent, ValuePriority];
 
-  [RoundEvents.AddEnergy]: SetEnergyEvent;
-  [RoundEvents.RemoveEnergy]: SetEnergyEvent;
-  [RoundEvents.SetEnergy]: SetEnergyEvent;
+  [RoundEvents.AddEnergy]: [SetEnergyEvent, ValuePriority];
+  [RoundEvents.RemoveEnergy]: [SetEnergyEvent, ValuePriority];
+  [RoundEvents.SetEnergy]: [SetEnergyEvent, ValuePriority];
 
-  [RoundEvents.End]: EndRoundEvent;
-  [RoundEvents.Tick]: TickEvent;
+  [RoundEvents.End]: [EndRoundEvent, EventPriority];
+  [RoundEvents.Tick]: [TickEvent, EventPriority];
 
-  [RoundEvents.ConsumeEnergy]: ConsumeEnergyEvent;
+  [RoundEvents.ConsumeEnergy]: [ConsumeEnergyEvent, EventPriority];
 
-  [RoundEvents.Heal]: HealEvent;
-  [RoundEvents.SetupUnit]: UnitEvent;
-  [RoundEvents.Attack]: AttackEvent;
-  [RoundEvents.TickAttack]: TickAttackEvent;
-  [RoundEvents.TickHeal]: TickHealEvent;
-  [RoundEvents.Dodge]: DamageSubEvent;
-  [RoundEvents.Critical]: CriticalEvent;
-  [RoundEvents.Armor]: ArmorEvent;
-  [RoundEvents.Corrosion]: CorrosionEvent;
-  [RoundEvents.TickSpeed]: TickSpeedEvent;
-  [RoundEvents.TickSlow]: TickSlowEvent;
-  [RoundEvents.TickPoison]: TickPoisonEvent;
-  [RoundEvents.TickMagic]: TickMagicEvent;
-};
+  [RoundEvents.Heal]: [HealEvent, ValuePriority];
+  [RoundEvents.SetupUnit]: [UnitEvent, EventPriority];
+  [RoundEvents.Attack]: [AttackEvent, ValuePriority];
+  [RoundEvents.TickAttack]: [TickAttackEvent, EventPriority];
+  [RoundEvents.TickHeal]: [TickHealEvent, EventPriority];
+  [RoundEvents.Dodge]: [DamageSubEvent, ValuePriority];
+  [RoundEvents.Critical]: [CriticalEvent, ValuePriority];
+  [RoundEvents.Armor]: [ArmorEvent, ValuePriority];
+  [RoundEvents.Corrosion]: [CorrosionEvent, ValuePriority];
+  [RoundEvents.TickSpeed]: [TickSpeedEvent, EventPriority];
+  [RoundEvents.TickSlow]: [TickSlowEvent, EventPriority];
+  [RoundEvents.TickPoison]: [TickPoisonEvent, EventPriority];
+  [RoundEvents.TickMagic]: [TickMagicEvent, EventPriority];
+}
 
 export interface UnitStats {
   [Stat.Health]: number;
@@ -215,8 +217,9 @@ export class Unit {
   }
 }
 
-export class Round extends EventEngine<RoundEvent> {
+export class Round extends EventEngine<RoundEventMap> {
   constructor(
+    public number: number,
     public game: Game,
     public unitA: Unit,
     public unitB: Unit,

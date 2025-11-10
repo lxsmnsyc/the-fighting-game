@@ -42,23 +42,13 @@ export const enum Rarity {
 /**
  * Stat application priority
  */
-export const enum StatPriority {
+export const enum ValuePriority {
   Initial = 0,
   Additive = 1,
   Multiplicative = 2,
-  Exact = 3,
-  Post = 4,
-}
-
-/**
- * Energy application priority
- */
-export const enum EnergyPriority {
-  Initial = 0,
-  Additive = 1,
-  Multiplicative = 2,
-  Exact = 3,
-  Post = 4,
+  Pre = 3,
+  Exact = 4,
+  Post = 5,
 }
 
 /**
@@ -147,9 +137,6 @@ export const enum RoundEvents {
 export const enum DamageType {
   Magical = 0,
   Physical = 1,
-
-  Attack = 2,
-
   // Does not trigger normal damage events either
   Poison = 3,
   // Can trigger some damage events

@@ -10,11 +10,10 @@
 
 - Attack
   - Consumed by rate of Speed.
-  - When consumed, deals `Attack` damage equal to the current Attack energy.
+  - When consumed, deals `Physical` damage equal to the current Attack energy.
   - After consumption, lose 40% of the current Attack energy.
   - Empowered by `Corrosion`
   - Reduced by `Armor`
-  - Dodged by `Dodge` (upon Attack)
 - Magic
   - When consumed, deals `Magical` damage equal to the current Magic energy.
   - After consumption, lose 40% of the current Magic energy.
@@ -58,8 +57,8 @@
 
 ## Damage types
 
-- Attack
 - Physical
 - Magical
 - Poison
 - Pure
+- Health Loss

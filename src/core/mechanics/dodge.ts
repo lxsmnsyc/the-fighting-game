@@ -4,12 +4,11 @@ import { lerp } from '../lerp';
 import { log } from '../log';
 import {
   DamagePriority,
-  DamageType,
   Energy,
-  EnergyPriority,
   EventPriority,
   GameEvents,
   RoundEvents,
+  ValuePriority,
 } from '../types';
 import { isMissedDamage } from './damage';
 
@@ -34,7 +33,7 @@ export function setupDodgeMechanics(game: Game): void {
       if (isMissedDamage(event.flag)) {
         return;
       }
-      if (event.type === DamageType.Attack) {
+      if (event.flag & DamageFlags.Attack) {
         // Check if player can evade it
         const energy = event.target.getTotalEnergy(Energy.Dodge);
         // If there's an dodge energy
@@ -52,7 +51,7 @@ export function setupDodgeMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.Dodge, EventPriority.Exact, event => {
+    round.on(RoundEvents.Dodge, ValuePriority.Exact, event => {
       if (!(event.flag & TriggerEnergyFlags.Failed)) {
         log(
           `${event.parent.target.owner.name} dodged ${event.parent.amount} of damage.`,
@@ -65,7 +64,7 @@ export function setupDodgeMechanics(game: Game): void {
       round.consumeEnergy(Energy.Dodge, event.parent.source);
     });
 
-    round.on(RoundEvents.ConsumeEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.ConsumeEnergy, EventPriority.Exact, event => {
       if (event.type === Energy.Dodge) {
         const current = event.source.getEnergy(Energy.Dodge, false);
         round.removeEnergy(
@@ -77,14 +76,14 @@ export function setupDodgeMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.SetEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.SetEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Dodge) {
         log(`${event.source.owner.name}'s Dodge changed to ${event.amount}`);
         event.source.setEnergy(Energy.Dodge, event.amount, event.permanent);
       }
     });
 
-    round.on(RoundEvents.AddEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.AddEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Dodge) {
         log(
           `${event.source.owner.name} gained ${event.amount} energy of Dodge`,
@@ -98,7 +97,7 @@ export function setupDodgeMechanics(game: Game): void {
       }
     });
 
-    round.on(RoundEvents.RemoveEnergy, EnergyPriority.Exact, event => {
+    round.on(RoundEvents.RemoveEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Dodge) {
         log(`${event.source.owner.name} lost ${event.amount} energy of Dodge`);
         round.setEnergy(

@@ -5,10 +5,10 @@ export interface BaseEvent {
 
 export type EventEmitterListener<T> = (event: T) => void;
 
-export class EventEmitter<T extends BaseEvent> {
+export class EventEmitter<T extends BaseEvent, P extends number> {
   queue: Set<EventEmitterListener<T>>[] = [];
 
-  on(priority: number, listener: EventEmitterListener<T>): () => void {
+  on(priority: P, listener: EventEmitterListener<T>): () => void {
     if (!(priority in this.queue)) {
       this.queue[priority] = new Set();
     }
@@ -16,7 +16,7 @@ export class EventEmitter<T extends BaseEvent> {
     return this.off.bind(this, priority, listener);
   }
 
-  off(priority: number, listener: EventEmitterListener<T>): void {
+  off(priority: P, listener: EventEmitterListener<T>): void {
     if (priority in this.queue) {
       this.queue[priority].delete(listener);
     }

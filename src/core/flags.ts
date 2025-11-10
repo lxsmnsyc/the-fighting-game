@@ -29,9 +29,17 @@ export const enum DamageFlags {
    */
   Tick = 0x20,
   /**
-   * Damage is from natural source
+   * Damage is from a natural tick
    */
   Natural = 0x40,
+  /**
+   * Damage is from an attack
+   */
+  Attack = 0x80,
+  /**
+   * Damage is non-lethal
+   */
+  NonLethal = 0x100
 }
 
 export const enum TriggerEnergyFlags {
