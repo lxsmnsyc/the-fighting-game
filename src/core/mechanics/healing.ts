@@ -9,7 +9,7 @@ import {
   Stat,
   ValuePriority,
 } from '../types';
-import { createTimer } from './tick';
+import { Timer } from './tick';
 
 const DEFAULT_PERIOD = 1.0 * 1000;
 const CONSUMABLE_STACKS = 0.4;
@@ -19,9 +19,8 @@ export function setupHealingMechanics(game: Game): void {
     log('Setting up Healing mechanics.');
 
     round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
-      createTimer(round, DEFAULT_PERIOD, () => {
+      new Timer(round, DEFAULT_PERIOD, () => {
         round.tickHeal(source, TriggerEnergyFlags.Natural);
-        return true;
       });
     });
 
@@ -57,12 +56,7 @@ export function setupHealingMechanics(game: Game): void {
 
     round.on(RoundEvents.ConsumeEnergy, ValuePriority.Exact, event => {
       if (event.type === Energy.Healing) {
-        round.removeEnergy(
-          Energy.Healing,
-          event.source,
-          event.amount,
-          false,
-        );
+        round.removeEnergy(Energy.Healing, event.source, event.amount, false);
       }
     });
 

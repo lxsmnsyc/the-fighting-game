@@ -40,7 +40,7 @@ export default createCard({
             return;
           }
           round.on(RoundEvents.Critical, ValuePriority.Additive, event => {
-            if (event.parent.source !== source) {
+            if (context.card.disabled || event.parent.source !== source) {
               return;
             }
             // Compute health

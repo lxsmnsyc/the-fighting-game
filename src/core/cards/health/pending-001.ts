@@ -63,7 +63,7 @@ function createAddEnergyOnStatLostCard({
             let currentHeathLost = 0;
             round.on(RoundEvents.RemoveStat, ValuePriority.Post, event => {
               if (
-                context.card.enabled &&
+                !context.card.disabled &&
                 event.type === Stat.Health &&
                 event.source === source
               ) {

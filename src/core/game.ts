@@ -103,7 +103,7 @@ export class Game extends EventEngine<GameEventMap> {
   }
 
   triggerCard(card: CardInstance, data: unknown) {
-    if (card.enabled) {
+    if (!card.disabled) {
       this.emit(GameEvents.TriggerCard, {
         id: 'TriggerCard',
         disabled: false,

@@ -59,7 +59,7 @@ function createAddEnergyBonusCard({
                 ? source
                 : round.getEnemyUnit(source);
               if (
-                context.card.enabled &&
+                !context.card.disabled &&
                 event.type === energy &&
                 target === event.source &&
                 event.permanent === permanent

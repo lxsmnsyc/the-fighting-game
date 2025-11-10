@@ -61,8 +61,9 @@ function createAddEnergyOnHealCard({
             }
             round.on(RoundEvents.Heal, ValuePriority.Post, event => {
               if (
-                context.card.enabled &&
+                !context.card.disabled &&
                 event.source === source &&
+                // TODO PRD
                 event.source.rng.random() <= DEFAULT_CHANCE
               ) {
                 const target = SELF_STACK[energy]

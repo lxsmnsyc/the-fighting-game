@@ -55,12 +55,13 @@ function createAddEnergyOnStartCard({
         EventPriority.Post,
         ({ round }) => {
           round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
-            if (source.owner === context.card.owner && context.card.enabled) {
-              const target = SELF_STACK[energy]
-                ? source
-                : round.getEnemyUnit(source);
-              context.game.triggerCard(context.card, { round, target });
+            if (context.card.disabled || source.owner !== context.card.owner) {
+              return;
             }
+            const target = SELF_STACK[energy]
+              ? source
+              : round.getEnemyUnit(source);
+            context.game.triggerCard(context.card, { round, target });
           });
         },
       );

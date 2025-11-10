@@ -51,7 +51,11 @@ export default createCard({
             return;
           }
           round.on(RoundEvents.Damage, DamagePriority.Post, event => {
-            if (event.source !== source || isMissedDamage(event.flag)) {
+            if (
+              context.card.disabled ||
+              event.source !== source ||
+              isMissedDamage(event.flag)
+            ) {
               return;
             }
             if (event.flag & DamageFlags.Attack) {

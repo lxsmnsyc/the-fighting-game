@@ -42,10 +42,10 @@ export function setupGame(game: Game): void {
   });
 
   game.on(GameEvents.EnableCard, EventPriority.Exact, ({ card }) => {
-    card.enabled = true;
+    card.disabled = false;
   });
 
   game.on(GameEvents.DisableCard, EventPriority.Exact, ({ card }) => {
-    card.enabled = false;
+    card.disabled = true;
   });
 }

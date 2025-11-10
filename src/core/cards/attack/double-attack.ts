@@ -47,7 +47,7 @@ export default createCard({
             return;
           }
           round.on(RoundEvents.Attack, ValuePriority.Post, event => {
-            if (event.source !== source) {
+            if (context.card.disabled || event.source !== source) {
               return;
             }
             if (event.flag & (AttackFlags.Natural | AttackFlags.Tick)) {

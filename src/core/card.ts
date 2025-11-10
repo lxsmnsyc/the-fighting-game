@@ -72,7 +72,7 @@ export class CardInstance {
 
   public print: number;
 
-  public enabled = true;
+  public disabled = false;
 
   public rng: AleaRNG;
 

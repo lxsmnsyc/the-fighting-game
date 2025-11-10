@@ -47,13 +47,15 @@ function createAddStatOnStartCard(
             RoundEvents.SetupUnit,
             ValuePriority.Additive,
             ({ source }) => {
-              if (source.owner !== context.card.owner) {
-                return;
+              if (
+                !context.card.disabled &&
+                source.owner === context.card.owner
+              ) {
+                context.game.triggerCard(context.card, {
+                  round,
+                  target: source,
+                });
               }
-              context.game.triggerCard(context.card, {
-                round,
-                target: source,
-              });
             },
           );
         },

@@ -1,4 +1,3 @@
-
 import { createCard } from '../../card';
 import { AttackFlags } from '../../flags';
 import type { StartRoundGameEvent } from '../../game';
@@ -17,7 +16,7 @@ const DEFAULT_MULTIPLIER = 0.5;
 /**
  * Causes natural Attack to deal 50% damage
  * but repeats the Attack with the same amount immediately.
- * 
+ *
  * Second attack does not consume energy.
  */
 export default createCard({
@@ -45,16 +44,18 @@ export default createCard({
           if (source.owner !== context.card.owner) {
             return;
           }
+          // Reduce main attack
           round.on(RoundEvents.Attack, ValuePriority.Pre, event => {
-            if (event.source !== source) {
+            if (context.card.disabled || event.source !== source) {
               return;
             }
             if (event.flag & AttackFlags.Natural) {
               event.amount *= context.card.getValue(DEFAULT_MULTIPLIER);
             }
           });
+          // Trigger another attack
           round.on(RoundEvents.Attack, ValuePriority.Post, event => {
-            if (event.source !== source) {
+            if (context.card.disabled || event.source !== source) {
               return;
             }
             if (event.flag & (AttackFlags.Natural | AttackFlags.Tick)) {

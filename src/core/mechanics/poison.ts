@@ -9,7 +9,7 @@ import {
   RoundEvents,
   ValuePriority,
 } from '../types';
-import { createTimer } from './tick';
+import { Timer } from './tick';
 
 const DEFAULT_PERIOD = 1.0 * 1000;
 const CONSUMABLE_STACKS = 0.4;
@@ -19,9 +19,8 @@ export function setupPoisonMechanics(game: Game): void {
     log('Setting up Poison mechanics.');
 
     round.on(RoundEvents.SetupUnit, ValuePriority.Post, ({ source }) => {
-      createTimer(round, DEFAULT_PERIOD, () => {
+      new Timer(round, DEFAULT_PERIOD, () => {
         round.tickPoison(source, TriggerEnergyFlags.Natural);
-        return true;
       });
     });
 

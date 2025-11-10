@@ -35,56 +35,62 @@ export function setupTickMechanics(game: Game): void {
   });
 }
 
-/**
- * Return `true` if timer should be reset. Return `false` if
- * it should re-run immediately on next tick.
- */
-type TimerCallback = () => boolean;
+export class Timer {
+  private elapsed = 0;
 
-export function createTimer(
-  round: Round,
-  period: number,
-  callback: TimerCallback,
-): void {
-  let elapsed = 0;
-  let ready = true;
+  private ready = false;
 
-  round.on(RoundEvents.Tick, EventPriority.Exact, event => {
-    if (!ready) {
-      elapsed += event.delta;
-      if (elapsed >= period) {
-        elapsed -= period;
-        ready = true;
+  private paused = false;
+
+  private lastPeriod: number;
+
+  constructor(
+    public round: Round,
+    public period: number | (() => number),
+    public callback: () => void,
+  ) {
+    const readPeriod = typeof period === 'function' ? period : () => period;
+    this.lastPeriod = readPeriod();
+
+    round.on(RoundEvents.Tick, EventPriority.Exact, event => {
+      if (!(this.paused || this.ready)) {
+        this.elapsed += event.delta;
+        if (this.elapsed >= this.lastPeriod) {
+          this.elapsed -= this.lastPeriod;
+          this.ready = true;
+        }
       }
-    }
-    if (ready) {
-      ready = !callback();
-    }
-  });
-}
+      if (this.ready) {
+        callback();
 
-export function createDynamicTimer(
-  round: Round,
-  period: () => number,
-  callback: TimerCallback,
-): void {
-  let elapsed = 0;
-  let lastPeriod = period();
-  let ready = true;
-
-  round.on(RoundEvents.Tick, EventPriority.Exact, event => {
-    if (!ready) {
-      elapsed += event.delta;
-      if (elapsed >= lastPeriod) {
-        elapsed -= lastPeriod;
-        ready = true;
+        this.ready = false;
+        this.lastPeriod = readPeriod();
       }
-    }
-    if (ready) {
-      ready = !callback();
-      lastPeriod = period();
-    }
-  });
+    });
+  }
+
+  reset(): void {
+    this.paused = false;
+    this.ready = true;
+  }
+
+  start(): void {
+    this.paused = false;
+    this.elapsed = 0;
+  }
+
+  stop(): void {
+    this.paused = true;
+    this.elapsed = 0;
+  }
+
+  pause(): void {
+    this.paused = true;
+  }
+
+  resume(): void {
+    this.paused = false;
+  }
 }
 
 const MAX_SPEED = 1000;
@@ -95,14 +101,17 @@ export function createCooldown(
   unit: Unit,
   min: number,
   max: number,
-  callback: TimerCallback,
-): void {
-  createDynamicTimer(
+  callback: () => void,
+): Timer {
+  return new Timer(
     round,
     () => {
       const currentSpeed = unit.getTotalEnergy(Energy.Speed);
       const currentSlow = unit.getTotalEnergy(Energy.Slow);
-      const total = Math.max(-MAX_SLOW, Math.min(currentSpeed - currentSlow, MAX_SPEED));
+      const total = Math.max(
+        -MAX_SLOW,
+        Math.min(currentSpeed - currentSlow, MAX_SPEED),
+      );
       return lerp(
         max * 1000,
         min * 1000,
