@@ -85,6 +85,9 @@ for the secret cards. Repeats run inside the first trigger, so the chain rule
 covers them, and a repeat is never repeated. A card that changes the triggering
 event inline applies the change once per time.
 
+Cards cannot provide permanent energy. Energy gained while a card trigger
+resolves is always consumable, whatever asked for it.
+
 `battle.cardTriggers` lists the triggers still resolving, the innermost last.
 Anything that happens while one resolves was set off by that card.
 

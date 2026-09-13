@@ -3,13 +3,13 @@ import CARDS from '../cards';
 import type CardId from '../cards/ids';
 import type AleaRNG from '../core/alea';
 import { AbilityInstance, getAbilityBias } from './ability';
-import { type Card, rollCardInstance } from './card';
-import { BOSS_BUDGET_MULTIPLIER, CARD_PRICES, COPY_LIMITS } from './constants';
+import { type Card, CardInstance, getRandomPrint } from './card';
+import { BOSS_BUDGET_MULTIPLIER, CARD_PRICES } from './constants';
 import { getRoundBudget } from './economy';
 import type Game from './game';
 import { Player } from './player';
-import { rollAbilities, rollCard } from './pool';
-import { Aspect } from './types';
+import { isUnderCopyLimit, rollAbilities, rollCard } from './pool';
+import { Aspect, Print } from './types';
 
 const ASPECTS: Aspect[] = [
   Aspect.Health,
@@ -44,12 +44,17 @@ export class Opponent extends Player {
 }
 
 /**
- * Cards in `pool` that fit in `budget` and are under their copy limit.
+ * Cards in `pool` that fit in `budget` and, as a copy with `print`,
+ * under their copy limit.
  */
-function getAffordableCards(pool: Card[], budget: number, copies: Map<CardId, number>): Card[] {
+function getAffordableCards(
+  pool: Card[],
+  budget: number,
+  print: number,
+  copies: Map<CardId, number>,
+): Card[] {
   return pool.filter(
-    (card) =>
-      CARD_PRICES[card.rarity] <= budget && (copies.get(card.id) ?? 0) < COPY_LIMITS[card.rarity],
+    (card) => CARD_PRICES[card.rarity] <= budget && isUnderCopyLimit(card, print, copies),
   );
 }
 
@@ -87,13 +92,18 @@ export default function createOpponent(game: Game, rng: AleaRNG): Opponent {
 
   for (const pool of [matching, CARDS]) {
     for (;;) {
-      const card = rollCard(rng, getAffordableCards(pool, budget, copies), phase, getWeight);
+      // The print comes first, since a Negative copy may go past the limit
+      const print = getRandomPrint(rng, opponent.printSpawnChance);
+      const affordable = getAffordableCards(pool, budget, print, copies);
+      const card = rollCard(rng, affordable, phase, getWeight);
       if (!card) {
         break;
       }
       budget -= CARD_PRICES[card.rarity];
-      copies.set(card.id, (copies.get(card.id) ?? 0) + 1);
-      opponent.deck.push(rollCardInstance(opponent, card, rng));
+      if ((print & Print.Negative) === 0) {
+        copies.set(card.id, (copies.get(card.id) ?? 0) + 1);
+      }
+      opponent.deck.push(new CardInstance(opponent, card, print));
     }
   }
 

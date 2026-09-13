@@ -19,7 +19,6 @@ function createAddEnergyOnHealthLostCard({
   energy,
   aspect,
   amount,
-  permanent = false,
   image = '',
 }: EnergyCardOptions): Card {
   return createCard({
@@ -48,7 +47,7 @@ function createAddEnergyOnHealthLostCard({
             }
           }
         }),
-        addEnergyOnTrigger(battle, card, energy, permanent),
+        addEnergyOnTrigger(battle, card, energy),
       ]);
     },
   });

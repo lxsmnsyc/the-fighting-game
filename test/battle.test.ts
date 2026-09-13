@@ -13,7 +13,7 @@ import { MergedLifecycle } from '../src/core/lifecycle';
 import { type Card, CardInstance, createCard } from '../src/game/card';
 import { Player } from '../src/game/player';
 import { fieldPlayer } from '../src/game/round';
-import { Rarity } from '../src/game/types';
+import { Print, Rarity } from '../src/game/types';
 
 const FRAME = 1000 / 60;
 
@@ -266,6 +266,42 @@ describe('cards', () => {
     expect(defender.getEnergy(Energy.Slow, false)).toBe(30);
   });
 
+  it('never provide permanent energy', () => {
+    // Asks for permanent Armor when the battle starts
+    const permanentArmor = createCard({
+      id: CardId.Harden,
+      name: 'Harden',
+      image: '',
+      rarity: Rarity.Common,
+      aspect: [],
+      description: () => [],
+      setup: ({ battle, unit, card }) =>
+        new MergedLifecycle([
+          battle.on(BattleEvents.UnitEntersBattle, EventPriority.Post, (event) => {
+            if (event.source === unit) {
+              unit.triggerCard(card, unit, 30);
+            }
+          }),
+          battle.on(BattleEvents.UnitTriggerCard, EventPriority.Exact, (event) => {
+            if (event.card === card) {
+              unit.addEnergy(Energy.Armor, event.value, true);
+            }
+          }),
+        ]),
+    });
+
+    const battle = createBattle('permanent');
+    const [unit] = createSide(battle, [createPlayer([permanentArmor])]).units;
+    battle.start();
+
+    expect(unit.getEnergy(Energy.Armor, true)).toBe(0);
+    expect(unit.getEnergy(Energy.Armor, false)).toBe(30);
+
+    // Outside a card trigger, permanent energy still works
+    unit.addEnergy(Energy.Armor, 10, true);
+    expect(unit.getEnergy(Energy.Armor, true)).toBe(10);
+  });
+
   it('return dodged damage as the same type with Riposte', () => {
     const battle = createBattle('riposte');
     const [attacker] = createSide(battle, [createPlayer()]).units;
@@ -316,6 +352,16 @@ describe('cards', () => {
     expect(unit.getEnergy(Energy.Attack, false)).toBe(40);
     expect(other.getEnergy(Energy.Attack, false)).toBe(20);
     expect(triggers).toEqual([CardId.Ambush, CardId.Savage, CardId.Ambush]);
+  });
+
+  it('repeat once however many copies of the secret there are', () => {
+    const battle = createBattle('secret-copies');
+    const player = createPlayer([getCard(CardId.Ambush), getCard(CardId.Savage)]);
+    player.deck.push(new CardInstance(player, getCard(CardId.Savage), Print.Negative));
+    const [unit] = createSide(battle, [player]).units;
+    battle.start();
+
+    expect(unit.getEnergy(Energy.Attack, false)).toBe(40);
   });
 
   it('apply inline effects once per repeat', () => {

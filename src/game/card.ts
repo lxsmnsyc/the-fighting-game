@@ -130,10 +130,3 @@ export class CardInstance {
     return this.print & Print.Error ? lerp(min, max, rng.random()) : min;
   }
 }
-
-/**
- * A new copy of a card, with its print rolled.
- */
-export function rollCardInstance(owner: Player, source: Card, rng: AleaRNG): CardInstance {
-  return new CardInstance(owner, source, getRandomPrint(rng, owner.printSpawnChance));
-}

@@ -23,8 +23,9 @@ export interface GameOptions {
 }
 
 export interface ShopState {
-  // An empty slot is a card that was bought
-  offers: (Card | undefined)[];
+  // Each offer is the copy to be bought, print included. An empty slot
+  // is a card that was bought.
+  offers: (CardInstance | undefined)[];
   rerolls: number;
 }
 
@@ -222,7 +223,7 @@ export default class Game extends EventEngine<GameEventMap> {
       disabled: false,
       slot,
       card,
-      value: this.checkCardPrice(card),
+      value: this.checkCardPrice(card.source),
     };
     this.emit(GameEvents.BuyCard, event);
     return !event.disabled;

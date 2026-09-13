@@ -3,11 +3,11 @@ import CARDS from '../cards';
 import type CardId from '../cards/ids';
 import type AleaRNG from '../core/alea';
 import type { Ability } from './ability';
-import type { Card } from './card';
+import { type Card, CardInstance, getRandomPrint } from './card';
 import { ABILITY_OFFER_SIZE, COPY_LIMITS, SHOP_SIZE } from './constants';
 import type Game from './game';
 import type { Player } from './player';
-import { RARITIES, Rarity } from './types';
+import { Print, RARITIES, Rarity } from './types';
 
 /**
  * How likely each rarity is to be rolled in a phase. Later phases lean
@@ -98,25 +98,56 @@ export function isCardUnlocked(game: Game, card: Card): boolean {
 }
 
 /**
- * A fresh set of shop offers. A card is only offered while its copies,
- * owned and already offered, stay under its rarity's limit. Cards that
- * share aspects with the player's abilities are rolled more often.
+ * How many copies of each card count toward its copy limit. Negative
+ * copies do not.
  */
-export function rollShopOffers(game: Game): (Card | undefined)[] {
-  const copies = countOwnedCards(game.player);
-  const offers: (Card | undefined)[] = [];
+export function countLimitedCopies(player: Player): Map<CardId, number> {
+  const copies = new Map<CardId, number>();
+  for (const card of player.deck) {
+    if ((card.print & Print.Negative) === 0) {
+      copies.set(card.source.id, (copies.get(card.source.id) ?? 0) + 1);
+    }
+  }
+  return copies;
+}
+
+/**
+ * Whether one more copy of `card` with `print` fits under its copy
+ * limit. A Negative copy always fits.
+ */
+export function isUnderCopyLimit(card: Card, print: number, copies: Map<CardId, number>): boolean {
+  return (print & Print.Negative) !== 0 || (copies.get(card.id) ?? 0) < COPY_LIMITS[card.rarity];
+}
+
+/**
+ * A fresh set of shop offers, each a copy with its print. A card is only
+ * offered while its copies, owned and already offered, stay under its
+ * rarity's limit, unless the offer is Negative. Cards that share aspects
+ * with the player's abilities are rolled more often.
+ */
+export function rollShopOffers(game: Game): (CardInstance | undefined)[] {
+  const { player } = game;
+  const rng = game.rng.shop;
+  const copies = countLimitedCopies(player);
+  const offers: (CardInstance | undefined)[] = [];
 
   for (let slot = 0; slot < SHOP_SIZE; slot++) {
+    // The print comes first, since a Negative copy may go past the limit
+    const print = getRandomPrint(rng, player.printSpawnChance);
     const available = CARDS.filter(
-      (card) => isCardUnlocked(game, card) && (copies.get(card.id) ?? 0) < COPY_LIMITS[card.rarity],
+      (card) => isCardUnlocked(game, card) && isUnderCopyLimit(card, print, copies),
     );
-    const card = rollCard(game.rng.shop, available, game.getPhase(), (current) =>
+    const card = rollCard(rng, available, game.getPhase(), (current) =>
       game.checkCardWeight(current),
     );
-    if (card) {
+    if (!card) {
+      offers.push(undefined);
+      continue;
+    }
+    if ((print & Print.Negative) === 0) {
       copies.set(card.id, (copies.get(card.id) ?? 0) + 1);
     }
-    offers.push(card);
+    offers.push(new CardInstance(player, card, print));
   }
 
   return offers;

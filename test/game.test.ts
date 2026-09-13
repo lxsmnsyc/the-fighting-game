@@ -19,10 +19,18 @@ import type Game from '../src/game/game';
 import { createRoundRNG } from '../src/game/game';
 import { getRoundBudget } from '../src/game/economy';
 import createOpponent from '../src/game/opponent';
-import { countOwnedCards, isCardUnlocked } from '../src/game/pool';
+import { countLimitedCopies, isCardUnlocked, isUnderCopyLimit } from '../src/game/pool';
 import { resumeGame, saveGame } from '../src/game/save';
 import createGame from '../src/game/setup';
-import { Aspect, BattleResult, GameStage, PlayerStat, Rarity, RunResult } from '../src/game/types';
+import {
+  Aspect,
+  BattleResult,
+  GameStage,
+  PlayerStat,
+  Print,
+  Rarity,
+  RunResult,
+} from '../src/game/types';
 
 // Starts a run and picks the first ability, which opens the first shop
 function startGame(): Game {
@@ -221,7 +229,7 @@ describe('run', () => {
     finishBattle(game, BattleResult.Won);
 
     const save = saveGame(game);
-    const offers = game.shop.offers.map((card) => card?.id);
+    const offers = game.shop.offers.map((card) => card?.source.id);
     game.startBattle();
 
     const resumed = resumeGame(save);
@@ -231,7 +239,7 @@ describe('run', () => {
     expect(resumed.stage).toBe(GameStage.Shop);
     expect(resumed.player.stats).toEqual(game.player.stats);
     expect(saveGame(resumed)).toEqual(save);
-    expect(resumed.shop.offers.map((card) => card?.id)).toEqual(offers);
+    expect(resumed.shop.offers.map((card) => card?.source.id)).toEqual(offers);
 
     resumed.startBattle();
     expect(resumed.battle?.seed).toBe(game.battle?.seed);
@@ -277,8 +285,8 @@ describe('shop', () => {
     }
 
     expect(game.buyCard(slot)).toBe(true);
-    expect(game.player.stats[PlayerStat.Gold]).toBe(100 - CARD_PRICES[card.rarity]);
-    expect(game.player.deck.map((instance) => instance.source)).toEqual([card]);
+    expect(game.player.stats[PlayerStat.Gold]).toBe(100 - CARD_PRICES[card.source.rarity]);
+    expect(game.player.deck).toEqual([card]);
     expect(game.shop.offers[slot]).toBeUndefined();
     expect(game.buyCard(slot)).toBe(false);
   });
@@ -302,11 +310,38 @@ describe('shop', () => {
       game.rerollShop();
     }
 
-    const owned = countOwnedCards(game.player);
+    const owned = countLimitedCopies(game.player);
     expect(owned.size).toBeGreaterThan(0);
     for (const card of CARDS) {
       expect(owned.get(card.id) ?? 0).toBeLessThanOrEqual(COPY_LIMITS[card.rarity]);
     }
+  });
+
+  it('lets Negative copies go past the copy limit', () => {
+    const game = startGame();
+    const rare = CARDS.find((card) => card.rarity === Rarity.Rare);
+    if (!rare) {
+      throw new Error('The card pool has no rare card');
+    }
+
+    game.player.deck.push(new CardInstance(game.player, rare));
+    const copies = countLimitedCopies(game.player);
+    expect(isUnderCopyLimit(rare, 0, copies)).toBe(false);
+    expect(isUnderCopyLimit(rare, Print.Negative, copies)).toBe(true);
+
+    // A Negative copy is not counted, so the next plain copy still does not fit
+    game.player.deck.push(new CardInstance(game.player, rare, Print.Negative));
+    expect(countLimitedCopies(game.player).get(rare.id)).toBe(1);
+
+    // With every offer Negative, the shop offers the rare again
+    game.player.printSpawnChance[Print.Negative] = 1;
+    game.setStat(PlayerStat.Gold, 1_000_000);
+    let offered = false;
+    for (let i = 0; i < 300 && !offered; i++) {
+      offered = game.shop.offers.some((offer) => offer?.source === rare);
+      game.rerollShop();
+    }
+    expect(offered).toBe(true);
   });
 
   it('favors cards that share aspects with owned abilities', () => {

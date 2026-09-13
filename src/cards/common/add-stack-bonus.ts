@@ -20,7 +20,6 @@ function createAddEnergyBonusCard({
   energy,
   aspect,
   amount,
-  permanent = false,
   image = '',
 }: EnergyCardOptions): Card {
   return createCard({
@@ -42,7 +41,8 @@ function createAddEnergyBonusCard({
           ? event.source === unit
           : event.source.team.alliance !== unit.team.alliance;
 
-        if (event.energy !== energy || event.permanent !== permanent || !receives) {
+        // Only consumable gains get the bonus, and the bonus is consumable too
+        if (event.energy !== energy || event.permanent || !receives) {
           return;
         }
         const bonus = card.getValue(amount, unit.rng);

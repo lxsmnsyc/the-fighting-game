@@ -1,5 +1,5 @@
 import { type Accessor, Index, type JSX, Show } from 'solid-js';
-import type { Card } from '../../game/card';
+import type { CardInstance } from '../../game/card';
 import type Game from '../../game/game';
 import { BattleResult, PlayerStat } from '../../game/types';
 import CardRow from './card-row';
@@ -80,7 +80,7 @@ function ShopBar(props: ShopScreenProps): JSX.Element {
 }
 
 export default function ShopScreen(props: ShopScreenProps): JSX.Element {
-  const offers = (): (Card | undefined)[] => {
+  const offers = (): (CardInstance | undefined)[] => {
     props.version();
     return [...props.game.shop.offers];
   };
@@ -108,10 +108,11 @@ export default function ShopScreen(props: ShopScreenProps): JSX.Element {
               >
                 {(card) => (
                   <CardView
-                    card={card()}
+                    card={card().source}
+                    instance={card()}
                     placement="top"
-                    price={props.game.checkCardPrice(card())}
-                    disabled={gold() < props.game.checkCardPrice(card())}
+                    price={props.game.checkCardPrice(card().source)}
+                    disabled={gold() < props.game.checkCardPrice(card().source)}
                     onClick={() => {
                       props.game.buyCard(slot);
                     }}

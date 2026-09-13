@@ -43,9 +43,14 @@ card with no print, such as a shop offer.
 
 Cards can have an effect multiplier called prints. Each prints increases the multiplier by 1 and energies on one another, giving a maximum multiplier of 5.
 
-- Negative
-- Error
-- Monotone
+- Error: values roll between 75% and 125% on every use.
+- Monotone: values are doubled.
+- Negative: the copy does not count toward the card's copy limit. The shop rolls
+  an offer's print before its card, so a card at its limit can still be offered
+  as a Negative copy.
+
+Cards only ever provide consumable energy. Energy gained while a card trigger
+resolves is consumable, even when permanent energy was asked for.
 
 ## Editions
 

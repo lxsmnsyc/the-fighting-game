@@ -1,10 +1,13 @@
-import { BattleEvents } from '../../battle/events';
+import { BattleEvents, type CheckUnitCardRepeatsEvent } from '../../battle/events';
 import { Energy, ValuePriority } from '../../battle/types';
 import type { Lifecycle } from '../../core/lifecycle';
 import { type Card, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import CardId from '../ids';
+
+// The secrets that already added a repeat to each check
+const countedSecrets = new WeakMap<CheckUnitCardRepeatsEvent, Set<CardId>>();
 
 interface RepeatTriggerCardOptions {
   id: CardId;
@@ -44,7 +47,14 @@ function createRepeatTriggerCard({
         ) {
           return;
         }
-        event.repeats += unit.triggerCard(card, parent.target, 1) > 0 ? 1 : 0;
+        // Copies of a secret, such as a Negative one, still add one repeat
+        const counted = countedSecrets.get(event) ?? new Set<CardId>();
+        if (counted.has(card.source.id) || unit.triggerCard(card, parent.target, 1) === 0) {
+          return;
+        }
+        counted.add(card.source.id);
+        countedSecrets.set(event, counted);
+        event.repeats += 1;
       });
     },
   });

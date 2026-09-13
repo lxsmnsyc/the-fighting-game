@@ -60,7 +60,7 @@ export function describePrint(print: Print): Description {
   if (print === Print.Monotone) {
     return describe`Values are multiplied by ${token.multiplier(MONOTONE_MULTIPLIER)}.`;
   }
-  return describe`No effect yet.`;
+  return describe`Does not count toward the card's copy limit.`;
 }
 
 const physical = token.damage(DamageType.Physical);

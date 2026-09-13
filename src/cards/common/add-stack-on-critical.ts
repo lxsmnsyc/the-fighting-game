@@ -22,7 +22,6 @@ function createAddEnergyOnCriticalCard({
   energy,
   aspect,
   amount,
-  permanent = false,
   image = '',
 }: EnergyCardOptions): Card {
   return createCard({
@@ -43,7 +42,7 @@ function createAddEnergyOnCriticalCard({
           const target = SELF_STACK[energy] ? unit : event.parent.target;
           unit.triggerCard(card, target, card.getValue(amount, unit.rng));
         }),
-        addEnergyOnTrigger(battle, card, energy, permanent),
+        addEnergyOnTrigger(battle, card, energy),
       ]);
     },
   });

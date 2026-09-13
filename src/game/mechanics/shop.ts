@@ -1,6 +1,5 @@
 import { ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
-import { rollCardInstance } from '../card';
 import { BASE_REROLL_COST, CARD_PRICES, REROLL_COST_STEP, SELL_RATIO } from '../constants';
 import { GameEvents } from '../events';
 import type Game from '../game';
@@ -58,7 +57,7 @@ export default function setupShopMechanics(game: Game): void {
   game.on(GameEvents.BuyCard, EventPriority.Exact, (event) => {
     game.removeStat(PlayerStat.Gold, event.value);
     game.shop.offers[event.slot] = undefined;
-    game.acquireCard(rollCardInstance(game.player, event.card, game.rng.shop));
+    game.acquireCard(event.card);
   });
 
   game.on(GameEvents.AcquireCard, EventPriority.Exact, ({ card }) => {

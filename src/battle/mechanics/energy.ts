@@ -18,6 +18,15 @@ export default function setupEnergyMechanics(battle: Battle): void {
     field[event.energy] = Math.max(0, event.value);
   });
 
+  // Cards cannot provide permanent energy: anything gained while a card
+  // trigger resolves is consumable. On `Initial`, so modifiers already
+  // see it as consumable.
+  battle.on(BattleEvents.UnitAddEnergy, ValuePriority.Initial, (event) => {
+    if (event.permanent && battle.cardTriggers.length > 0) {
+      event.permanent = false;
+    }
+  });
+
   battle.on(BattleEvents.UnitAddEnergy, ValuePriority.Exact, (event) => {
     const { source, energy, permanent } = event;
     const counter = COUNTERS[energy];

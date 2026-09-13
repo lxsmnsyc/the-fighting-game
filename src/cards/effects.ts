@@ -17,23 +17,21 @@ export interface EnergyCardOptions {
   energy: Energy;
   aspect: Aspect;
   amount: number;
-  permanent?: boolean;
   image?: string;
 }
 
 /**
  * The most common card effect: the trigger's target gains its value
- * as energy.
+ * as energy. Cards only ever hand out consumable energy.
  */
 export function addEnergyOnTrigger(
   battle: Battle,
   card: CardInstance,
   energy: Energy,
-  permanent: boolean,
 ): EventListenerLifecycle<UnitTriggerCardEvent> {
   return battle.on(BattleEvents.UnitTriggerCard, EventPriority.Exact, (event) => {
     if (event.card === card) {
-      event.target.addEnergy(energy, event.value, permanent);
+      event.target.addEnergy(energy, event.value, false);
     }
   });
 }

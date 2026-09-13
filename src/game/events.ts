@@ -71,7 +71,7 @@ export interface RerollShopGameEvent extends BaseEvent {
  */
 export interface BuyCardGameEvent extends BaseEvent {
   slot: number;
-  card: Card;
+  card: CardInstance;
   value: number;
 }
 
