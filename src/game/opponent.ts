@@ -44,6 +44,14 @@ export class Opponent extends Player {
 }
 
 /**
+ * Whether every aspect of `card` is one of `aspects`. Universal cards
+ * fit any aspects.
+ */
+export function isAffiliatedCard(card: Card, aspects: Aspect[]): boolean {
+  return card.aspect.every((aspect) => aspect === Aspect.Universal || aspects.includes(aspect));
+}
+
+/**
  * Cards in `pool` that fit in `budget` and, as a copy with `print`,
  * under their copy limit.
  */
@@ -90,8 +98,8 @@ function getCheapestIndex(deck: CardInstance[]): number {
  *    one, until no swap fits the budget.
  *
  * A boss gets a bigger budget, and as many abilities as the player is
- * due. Its first ability decides its aspects, and all of them bias its
- * cards.
+ * due. Its first ability decides its aspects. It only takes cards whose
+ * aspects all belong to its abilities, and all of them bias its cards.
  */
 export default function createOpponent(game: Game, rng: AleaRNG): Opponent {
   const boss = game.isBossRound();
@@ -112,8 +120,12 @@ export default function createOpponent(game: Game, rng: AleaRNG): Opponent {
   let budget = Math.floor(getRoundBudget(game.round) * (boss ? BOSS_BUDGET_MULTIPLIER : 1));
   const copies = new Map<CardId, number>();
   const getWeight = (card: Card): number => 1 + getAbilityBias(abilities, card);
-  const matching = CARDS.filter((card) => card.aspect.some((aspect) => aspects.includes(aspect)));
-  const pools = [matching, CARDS];
+  // A boss only takes cards of its abilities' aspects, even if it leaves
+  // slots empty. Other opponents lean on their aspects, then take anything.
+  const affiliated = abilities.flatMap((ability) => ability.aspects);
+  const pools = boss
+    ? [CARDS.filter((card) => isAffiliatedCard(card, affiliated))]
+    : [CARDS.filter((card) => card.aspect.some((aspect) => aspects.includes(aspect))), CARDS];
   const printChances = game.checkPrintChances(opponent);
 
   for (const pool of pools) {

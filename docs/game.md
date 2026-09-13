@@ -86,6 +86,9 @@ resumed round meets the same opponent.
 - A boss spends `BOSS_BUDGET_MULTIPLIER` (1.5) times the budget and gets as many
   abilities as the player is due. Its first ability decides its aspects, and all
   of them bias its cards.
+- A boss only takes cards whose aspects all belong to its abilities. Universal
+  cards fit any boss. A boss leaves a slot empty rather than take a card that
+  does not help it.
 
 ## Modes
 

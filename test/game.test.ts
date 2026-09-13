@@ -21,7 +21,7 @@ import {
 import type Game from '../src/game/game';
 import { createRoundRNG } from '../src/game/game';
 import { getCardSlots, getRoundBudget, getSellPrice } from '../src/game/economy';
-import createOpponent from '../src/game/opponent';
+import createOpponent, { isAffiliatedCard } from '../src/game/opponent';
 import {
   countLimitedCopies,
   isCardUnlocked,
@@ -265,6 +265,21 @@ describe('run', () => {
     expect(
       units.some((unit) => unit.team.player !== game.player && unit.abilities.size === 1),
     ).toBe(true);
+  });
+
+  it('only gives bosses cards of their abilities aspects', () => {
+    const game = startGame();
+
+    for (let phase = 1; phase <= 20; phase++) {
+      game.round = phase * ROUNDS_PER_PHASE;
+      const boss = createOpponent(game, createRoundRNG(game.seed, game.round).battle);
+      const aspects = boss.abilities.flatMap((ability) => ability.source.aspects);
+
+      expect(boss.deck.length).toBeGreaterThan(0);
+      for (const card of boss.deck) {
+        expect(isAffiliatedCard(card.source, aspects)).toBe(true);
+      }
+    }
   });
 
   it('resumes a saved round with the same shop, opponent, cards and abilities', () => {
