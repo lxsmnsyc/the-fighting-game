@@ -4,7 +4,7 @@ import type Battle from '../src/battle/core';
 import { BattleEvents } from '../src/battle/events';
 import { DamageFlags } from '../src/battle/flags';
 import createBattle from '../src/battle/setup';
-import { DamageType, Energy, Stat, ValuePriority } from '../src/battle/types';
+import { DamagePriority, DamageType, Energy, Stat, ValuePriority } from '../src/battle/types';
 import type Unit from '../src/battle/unit';
 import { getCard } from '../src/cards';
 import CardId from '../src/cards/ids';
@@ -264,6 +264,34 @@ describe('cards', () => {
 
     expect(attacker.getEnergy(Energy.Critical, false)).toBe(30);
     expect(defender.getEnergy(Energy.Slow, false)).toBe(30);
+  });
+
+  it('return dodged damage as the same type with Riposte', () => {
+    const battle = createBattle('riposte');
+    const [attacker] = createSide(battle, [createPlayer()]).units;
+    const [defender] = createSide(battle, [createPlayer([getCard(CardId.Riposte)])]).units;
+    battle.start();
+
+    const returned: DamageType[] = [];
+    battle.on(BattleEvents.UnitDamage, DamagePriority.Post, (event) => {
+      if (event.source === defender) {
+        returned.push(event.type);
+      }
+    });
+
+    // Every attack is dodged
+    defender.addEnergy(Energy.Dodge, 1000, true);
+    const attacks = 20;
+    for (let i = 0; i < attacks; i++) {
+      attacker.dealDamage(defender, DamageType.Magical, 10, DamageFlags.Attack);
+    }
+
+    expect(defender.stats[Stat.Health]).toBe(1000);
+    // About half come back, each as the full dodged damage
+    expect(returned.length).toBeGreaterThan(0);
+    expect(returned.length).toBeLessThan(attacks);
+    expect(returned.every((type) => type === DamageType.Magical)).toBe(true);
+    expect(attacker.stats[Stat.Health]).toBe(1000 - 10 * returned.length);
   });
 
   it('repeat once with the secret of their energy', () => {

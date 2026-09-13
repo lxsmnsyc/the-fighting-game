@@ -4,11 +4,12 @@ import ambidextrous from './attack/dual-wield';
 import vampiric from './attack/life-steal';
 import COMMON_CARDS from './common';
 import merciless from './critical/coup-de-grace';
+import riposte from './dodge/riposte';
 import endure from './health/endure';
 import type CardId from './ids';
 import REPEAT_TRIGGER_CARDS from './secret/repeat-trigger';
 
-const RARE_CARDS: Card[] = [relentless, ambidextrous, vampiric, merciless, endure];
+const RARE_CARDS: Card[] = [relentless, ambidextrous, vampiric, merciless, endure, riposte];
 
 const CARDS: Card[] = [...COMMON_CARDS, ...RARE_CARDS, ...REPEAT_TRIGGER_CARDS];
 

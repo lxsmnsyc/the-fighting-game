@@ -86,6 +86,7 @@ const enum CardId {
   Vampiric = 902,
   Merciless = 903,
   Endure = 904,
+  Riposte = 905,
 
   // Secret: repeats card triggers of an energy once
   Savage = 1000,
