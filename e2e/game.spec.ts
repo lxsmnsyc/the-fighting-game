@@ -68,11 +68,10 @@ test('picks an ability, buys cards in the shop and fights a battle', async ({ pa
 
   // The countdown gives way to the time limit
   await expect(timer).toHaveText(/^(60|59|58|57)$/);
-  // Energy a card hands out flies from that card
-  await expect(
-    page.locator('[data-testid="projectile"][data-kind="energy"]').first(),
-  ).toBeAttached();
-  await page.screenshot({ path: testInfo.outputPath('energy-projectile.png') });
+  // Attacks always fire projectiles. Which cards fire energy ones depends
+  // on what the shop rolled, so the test does not wait for those.
+  await expect(page.getByTestId('projectile').first()).toBeAttached({ timeout: 10_000 });
+  await page.screenshot({ path: testInfo.outputPath('projectile.png') });
 
   await page.waitForTimeout(4000);
   await page.screenshot({ path: testInfo.outputPath('battle.png') });

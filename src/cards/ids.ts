@@ -99,6 +99,61 @@ const enum CardId {
   Evasive = 1007,
   Lethal = 1008,
   Blessed = 1009,
+
+  // Energy when dodging an attack
+  Darting = 1100,
+  Opportune = 1101,
+  Counter = 1102,
+  Entangle = 1103,
+
+  // Energy when an attack damages the unit
+  Toughen = 1200,
+  Recover = 1201,
+  Acidic = 1202,
+  Thorny = 1203,
+
+  // Energy when Armor blocks damage
+  Bash = 1300,
+  Absorb = 1301,
+  Parry = 1302,
+
+  // Energy when taking a critical hit
+  Steel = 1400,
+  Flinch = 1401,
+  Soothe = 1402,
+
+  // Energy when dealing Magical damage
+  Focused = 1500,
+  Dissolve = 1501,
+  Hex = 1502,
+
+  // Energy when an enemy takes Poison damage
+  Siphon = 1600,
+  Leech = 1601,
+  Weaken = 1602,
+
+  // Energy when an ability triggers
+  Inspired = 1700,
+  Attuned = 1701,
+  Shielded = 1702,
+  Spurred = 1703,
+  Honed = 1704,
+
+  // Energy when Armor or Speed cancels Corrosion or Slow
+  Resilient = 1800,
+  Unhindered = 1801,
+  Slippery = 1802,
+
+  // Energy when an energy is spent
+  Salvage = 1900,
+  Poised = 1901,
+  Ruthless = 1902,
+  Drifting = 1903,
+
+  // Energy the first time Health drops below half
+  Cornered = 2000,
+  Resolute = 2001,
+  Skittish = 2002,
 }
 
 export default CardId;

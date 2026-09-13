@@ -29,6 +29,31 @@ print changes in battle are shown changed: a Monotone print doubles them, and an
 Error print shows the range they roll in, such as `15–25 Armor`. Pass 0 for a
 card with no print, such as a shop offer.
 
+## Trigger families
+
+Most common cards hand out one energy when something happens. The energy goes
+to the unit when it stacks on its owner, and to the enemy involved otherwise.
+New families are built with `createTriggerCard` in
+[src/cards/effects.ts](../src/cards/effects.ts).
+
+| Family         | Sets it off                                | Chance | Amount |
+| -------------- | ------------------------------------------ | ------ | ------ |
+| On start       | The battle starts                          | Always | 20     |
+| On attack      | The unit attacks                           | 25%    | 20     |
+| On critical    | The unit lands a critical hit              | Always | 30     |
+| On heal        | The unit is healed                         | 20%    | 50     |
+| On gain        | The unit gains the energy (bonus)          | Always | 20     |
+| On dodge       | The unit dodges an attack                  | Always | 20     |
+| On hit         | An attack damages the unit                 | 25%    | 20     |
+| On block       | The unit's Armor blocks damage             | 25%    | 20     |
+| Critical taken | The unit takes a critical hit              | Always | 30     |
+| On magic       | The unit deals Magical damage              | Always | 20     |
+| On poison tick | An enemy takes Poison damage               | Always | 10     |
+| On ability     | One of the unit's abilities triggers       | Always | 30     |
+| On counter     | The unit's Armor or Speed cancels its pair | 25%    | 20     |
+| On consume     | The unit's energy of one kind is spent     | 25%    | 20     |
+| Low health     | Health first drops below half, once        | Always | 100    |
+
 ## Rarity
 
 - Common: Each Common card has 5 copies that can be bought.

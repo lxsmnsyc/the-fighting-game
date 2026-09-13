@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { getAbility } from '../src/abilities';
+import AbilityId from '../src/abilities/ids';
 import Alliance from '../src/battle/alliance';
 import type Battle from '../src/battle/core';
 import { BattleEvents } from '../src/battle/events';
@@ -10,6 +12,7 @@ import { getCard } from '../src/cards';
 import CardId from '../src/cards/ids';
 import { EventPriority } from '../src/core/event-emitter';
 import { MergedLifecycle } from '../src/core/lifecycle';
+import { AbilityInstance } from '../src/game/ability';
 import { type Card, CardInstance, createCard } from '../src/game/card';
 import { Player } from '../src/game/player';
 import { fieldPlayer } from '../src/game/round';
@@ -374,6 +377,39 @@ describe('cards', () => {
     // 10 gained, plus Ferocious's 20 bonus twice
     unit.addEnergy(Energy.Attack, 10, false);
     expect(unit.getEnergy(Energy.Attack, false)).toBe(50);
+  });
+
+  it('hand out energy from the trigger families', () => {
+    const battle = createBattle('families');
+    disableEnergyGain(battle);
+    const player = createPlayer([
+      getCard(CardId.Darting),
+      getCard(CardId.Inspired),
+      getCard(CardId.Resolute),
+    ]);
+    player.abilities.push(new AbilityInstance(player, getAbility(AbilityId.Turtle)));
+    const [unit] = createSide(battle, [player]).units;
+    const [enemy] = createSide(battle, [createPlayer([getCard(CardId.Siphon)])]).units;
+    battle.start();
+
+    // Darting: a dodged attack gives Speed
+    unit.addEnergy(Energy.Dodge, 1000, true);
+    enemy.dealDamage(unit, DamageType.Physical, 10, DamageFlags.Attack);
+    expect(unit.getEnergy(Energy.Speed, false)).toBe(20);
+
+    // Inspired: an ability trigger gives Attack
+    unit.triggerAbility([...unit.abilities.keys()][0]);
+    expect(unit.getEnergy(Energy.Attack, false)).toBe(30);
+
+    // Resolute: only the first drop below half Health gives Healing
+    unit.removeStat(Stat.Health, 600);
+    unit.removeStat(Stat.Health, 100);
+    expect(unit.getEnergy(Energy.Healing, false)).toBe(100);
+
+    // Siphon: the enemy gains Magic when the unit takes Poison damage
+    unit.addEnergy(Energy.Poison, 50, false);
+    run(battle, 1000 + FRAME);
+    expect(enemy.getEnergy(Energy.Magic, false)).toBe(10);
   });
 
   it('expose the trigger that is still resolving', () => {
