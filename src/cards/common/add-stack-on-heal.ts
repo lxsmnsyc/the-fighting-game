@@ -40,7 +40,7 @@ function createAddEnergyOnHealCard({
           }
           const target = unit.checkEnergyTarget(energy);
           if (target) {
-            unit.triggerCard(card, target, card.getValue(amount));
+            unit.triggerCard(card, target, card.getValue(amount, unit.rng));
           }
         }),
         addEnergyOnTrigger(battle, card, energy, permanent),

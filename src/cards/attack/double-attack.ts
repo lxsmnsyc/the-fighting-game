@@ -31,7 +31,11 @@ export default createCard({
         }
         // TODO use PRD
         if (unit.rng.random() <= DEFAULT_CHANCE) {
-          unit.triggerCard(card, event.target, event.value * card.getValue(DEFAULT_MULTIPLIER));
+          unit.triggerCard(
+            card,
+            event.target,
+            event.value * card.getValue(DEFAULT_MULTIPLIER, unit.rng),
+          );
         }
       }),
       // Does not consume energy

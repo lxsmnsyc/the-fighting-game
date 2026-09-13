@@ -45,7 +45,7 @@ function createAddEnergyBonusCard({
         if (event.energy !== energy || event.permanent !== permanent || !receives) {
           return;
         }
-        const bonus = card.getValue(amount);
+        const bonus = card.getValue(amount, unit.rng);
         if (unit.triggerCard(card, event.source, bonus)) {
           event.value += bonus;
         }

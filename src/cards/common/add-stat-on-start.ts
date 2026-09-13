@@ -40,7 +40,7 @@ function createAddStatOnStartCard({
       return new MergedLifecycle([
         battle.on(BattleEvents.UnitEntersBattle, EventPriority.Post, (event) => {
           if (event.source === unit) {
-            unit.triggerCard(card, unit, card.getValue(DEFAULT_AMOUNT));
+            unit.triggerCard(card, unit, card.getValue(DEFAULT_AMOUNT, unit.rng));
           }
         }),
         battle.on(BattleEvents.UnitTriggerCard, EventPriority.Exact, (event) => {

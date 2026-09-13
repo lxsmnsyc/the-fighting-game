@@ -29,6 +29,11 @@ export interface BattleOptions {
    * Log what happens to the console.
    */
   debug?: boolean;
+  /**
+   * How long the battle may run, in milliseconds, before it ends in a
+   * draw. Zero or unset means no limit.
+   */
+  timeLimit?: number;
 }
 
 /**
@@ -64,7 +69,7 @@ export default function createBattle(seed: string, options?: BattleOptions): Bat
   }
 
   // Last, so it sees each tick after everything else resolved
-  setupOutcomeMechanics(battle);
+  setupOutcomeMechanics(battle, options?.timeLimit ?? 0);
 
   if (options?.realtime === true) {
     setupRealtimeMechanics(battle);

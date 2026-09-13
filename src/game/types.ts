@@ -39,6 +39,34 @@ export const enum Rarity {
   Secret = 4,
 }
 
+export const RARITIES: Rarity[] = [
+  Rarity.Starter,
+  Rarity.Common,
+  Rarity.Uncommon,
+  Rarity.Rare,
+  Rarity.Secret,
+];
+
+export const enum GameStage {
+  // Between stages, and before the run starts
+  Idle = 0,
+  Shop = 1,
+  Battle = 2,
+  Ended = 3,
+}
+
+export const enum RunResult {
+  Ongoing = 0,
+  Won = 1,
+  Lost = 2,
+}
+
+export const enum BattleResult {
+  Won = 0,
+  Draw = 1,
+  Lost = 2,
+}
+
 export const enum PlayerStat {
   Life = 0,
   Gold = 1,

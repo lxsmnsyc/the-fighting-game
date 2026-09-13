@@ -44,7 +44,7 @@ function createAddEnergyOnHealthLostCard({
             lost -= DEFAULT_HEALTH_THRESHOLD;
             const target = unit.checkEnergyTarget(energy);
             if (target) {
-              unit.triggerCard(card, target, card.getValue(amount));
+              unit.triggerCard(card, target, card.getValue(amount, unit.rng));
             }
           }
         }),

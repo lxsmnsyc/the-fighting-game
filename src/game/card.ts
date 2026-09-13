@@ -1,7 +1,7 @@
 import type Battle from '../battle/core';
 import type Unit from '../battle/unit';
 import type CardId from '../cards/ids';
-import AleaRNG from '../core/alea';
+import type AleaRNG from '../core/alea';
 import lerp from '../core/lerp';
 import type { Lifecycle } from '../core/lifecycle';
 import type { Description } from './description';
@@ -76,36 +76,36 @@ export function getRandomPrint(rng: AleaRNG, multiplier: PrintSpawnChance): numb
 const MIN_ERROR_VALUE = 0.75;
 const MAX_ERROR_VALUE = 1.25;
 
+/**
+ * One copy of a card. It holds no RNG: its print is rolled once when it
+ * is created, so saving its fields is enough to restore it.
+ */
 export class CardInstance {
-  readonly edition: Edition;
-
-  readonly print: number;
-
   /**
    * Whether the card is out of play for the run, such as after being
    * sold.
    */
   disabled = false;
 
-  readonly rng: AleaRNG;
-
   constructor(
     readonly owner: Player,
     readonly source: Card,
+    readonly print = 0,
+    readonly edition = Edition.Common,
   ) {
-    this.rng = new AleaRNG(owner.rng.card.int32().toString());
-    this.print = getRandomPrint(this.rng, owner.printSpawnChance);
-    this.edition = Edition.Common;
+    // no-op
   }
 
   /**
-   * A value from the card's effect, adjusted by its print.
+   * A value from the card's effect, adjusted by its print. An Error
+   * print rolls the value again on every use, so pass an RNG from the
+   * battle, such as the unit's.
    */
-  getValue(value: number): number {
+  getValue(value: number, rng: AleaRNG): number {
     let result = value;
 
     if (this.print & Print.Error) {
-      result = lerp(value * MIN_ERROR_VALUE, value * MAX_ERROR_VALUE, this.rng.random());
+      result = lerp(value * MIN_ERROR_VALUE, value * MAX_ERROR_VALUE, rng.random());
     }
     if (this.print & Print.Monotone) {
       result *= 2;
@@ -113,4 +113,11 @@ export class CardInstance {
 
     return result;
   }
+}
+
+/**
+ * A new copy of a card, with its print rolled.
+ */
+export function rollCardInstance(owner: Player, source: Card, rng: AleaRNG): CardInstance {
+  return new CardInstance(owner, source, getRandomPrint(rng, owner.printSpawnChance));
 }

@@ -1,16 +1,13 @@
-import AleaRNG from '../core/alea';
 import type { Card, CardInstance } from './card';
 import { DEFAULT_GOLD, DEFAULT_LIFE } from './constants';
 import { PlayerStat, Print, type PrintSpawnChance } from './types';
 
 export type PlayerStats = Record<PlayerStat, number>;
 
-interface PlayerRNG {
-  self: AleaRNG;
-  unit: AleaRNG;
-  card: AleaRNG;
-}
-
+/**
+ * Holds no RNG: the rounds of a run own the randomness, so a player can
+ * be restored from its stats and deck alone.
+ */
 export class Player {
   readonly stats: PlayerStats = {
     [PlayerStat.Life]: DEFAULT_LIFE,
@@ -22,17 +19,6 @@ export class Player {
     [Print.Monotone]: 0.1,
     [Print.Negative]: 0.1,
   };
-
-  readonly rng: PlayerRNG;
-
-  constructor(seed: number) {
-    const self = new AleaRNG(seed.toString());
-    this.rng = {
-      self,
-      unit: new AleaRNG(self.int32().toString()),
-      card: new AleaRNG(self.int32().toString()),
-    };
-  }
 
   name: string | undefined;
 

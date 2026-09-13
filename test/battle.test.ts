@@ -13,18 +13,13 @@ import { MergedLifecycle } from '../src/core/lifecycle';
 import { type Card, CardInstance, createCard } from '../src/game/card';
 import { Player } from '../src/game/player';
 import { fieldPlayer } from '../src/game/round';
-import { Print, Rarity } from '../src/game/types';
+import { Rarity } from '../src/game/types';
 
 const FRAME = 1000 / 60;
 
-let seed = 0;
-
-// Prints are turned off so card values are exact
+// Copies are made without a print, so card values are exact
 function createPlayer(cards: Card[] = []): Player {
-  const player = new Player(seed++);
-  player.printSpawnChance[Print.Error] = 0;
-  player.printSpawnChance[Print.Monotone] = 0;
-  player.printSpawnChance[Print.Negative] = 0;
+  const player = new Player();
   for (const card of cards) {
     player.deck.push(new CardInstance(player, card));
   }

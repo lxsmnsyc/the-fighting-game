@@ -18,7 +18,8 @@ import { type DamageType, type Energy, Stat, type UnitStats, createEnergyField }
  */
 export default class Unit {
   /**
-   * Rolls for chance-based effects, such as Dodge and Critical.
+   * Rolls for chance-based effects, such as Dodge and Critical. Seeded
+   * from the battle, so units are seeded in the order they are created.
    */
   readonly rng: AleaRNG;
 
@@ -26,7 +27,7 @@ export default class Unit {
     readonly battle: Battle,
     readonly team: Team,
   ) {
-    this.rng = new AleaRNG(team.player.rng.unit.int32().toString());
+    this.rng = new AleaRNG(battle.rng.int32().toString());
   }
 
   /**

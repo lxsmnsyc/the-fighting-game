@@ -3,7 +3,6 @@ import type Battle from '../battle/core';
 import createBattle, { type BattleOptions } from '../battle/setup';
 import Team from '../battle/team';
 import Unit from '../battle/unit';
-import type Game from './game';
 import type { Player } from './player';
 
 /**
@@ -32,15 +31,16 @@ export function fieldPlayer(battle: Battle, alliance: Alliance, player: Player):
  * Each enemy fields their own team.
  */
 export default function createRound(
-  game: Game,
+  seed: string,
+  player: Player,
   enemies: Player[],
   options?: BattleOptions,
 ): Battle {
-  const battle = createBattle(game.rng.world.int32().toString(), options);
+  const battle = createBattle(seed, options);
 
   const allies = new Alliance(battle);
   battle.addAlliance(allies);
-  fieldPlayer(battle, allies, game.player);
+  fieldPlayer(battle, allies, player);
 
   const opponents = new Alliance(battle);
   battle.addAlliance(opponents);

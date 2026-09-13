@@ -52,7 +52,7 @@ export default createCard({
       ) {
         return;
       }
-      const reduced = (event.value * card.getValue(DEFAULT_REDUCTION)) | 0;
+      const reduced = (event.value * card.getValue(DEFAULT_REDUCTION, unit.rng)) | 0;
       if (reduced > 0 && unit.triggerCard(card, unit, reduced)) {
         event.value -= reduced;
         collected += reduced;

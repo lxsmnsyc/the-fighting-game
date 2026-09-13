@@ -28,7 +28,7 @@ export default createCard({
           (event.flags & DamageFlags.Attack) !== 0 &&
           !isMissedDamage(event.flags)
         ) {
-          unit.triggerCard(card, unit, event.value * card.getValue(DEFAULT_MULTIPLIER));
+          unit.triggerCard(card, unit, event.value * card.getValue(DEFAULT_MULTIPLIER, unit.rng));
         }
       }),
       battle.on(BattleEvents.UnitTriggerCard, EventPriority.Exact, (event) => {

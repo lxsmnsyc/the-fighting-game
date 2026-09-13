@@ -27,7 +27,7 @@ export default createCard({
       // Halve the attack, unless it is this card's own repeat
       battle.on(BattleEvents.UnitAttack, ValuePriority.Pre, (event) => {
         if (isNaturalAttack(event) && !battle.triggeringCards.has(card.source.id)) {
-          event.value *= card.getValue(DEFAULT_MULTIPLIER);
+          event.value *= card.getValue(DEFAULT_MULTIPLIER, unit.rng);
         }
       }),
       battle.on(BattleEvents.UnitAttack, ValuePriority.Post, (event) => {
