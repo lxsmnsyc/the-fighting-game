@@ -90,6 +90,14 @@ export interface UnitTriggerCardEvent extends UnitCardEvent {
   value: number;
 }
 
+/**
+ * `repeats` is how many more times `parent` runs.
+ */
+export interface CheckUnitCardRepeatsEvent extends UnitEvent {
+  parent: UnitTriggerCardEvent;
+  repeats: number;
+}
+
 export interface UnitAbilityEvent extends UnitEvent {
   ability: AbilityInstance;
 }

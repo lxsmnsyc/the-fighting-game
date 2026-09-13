@@ -266,6 +266,42 @@ describe('cards', () => {
     expect(defender.getEnergy(Energy.Slow, false)).toBe(30);
   });
 
+  it('repeat once with the secret of their energy', () => {
+    const battle = createBattle('secret');
+    const [unit] = createSide(battle, [
+      createPlayer([getCard(CardId.Ambush), getCard(CardId.Savage)]),
+    ]).units;
+    const [other] = createSide(battle, [
+      createPlayer([getCard(CardId.Ambush), getCard(CardId.Fortified)]),
+    ]).units;
+
+    const triggers: CardId[] = [];
+    battle.on(BattleEvents.UnitTriggerCard, EventPriority.Post, (event) => {
+      if (event.source === unit) {
+        triggers.push(event.card.source.id);
+      }
+    });
+
+    battle.start();
+
+    // Ambush runs twice with Savage, and once with an Armor secret
+    expect(unit.getEnergy(Energy.Attack, false)).toBe(40);
+    expect(other.getEnergy(Energy.Attack, false)).toBe(20);
+    expect(triggers).toEqual([CardId.Ambush, CardId.Savage, CardId.Ambush]);
+  });
+
+  it('apply inline effects once per repeat', () => {
+    const battle = createBattle('secret-inline');
+    const [unit] = createSide(battle, [
+      createPlayer([getCard(CardId.Ferocious), getCard(CardId.Savage)]),
+    ]).units;
+    battle.start();
+
+    // 10 gained, plus Ferocious's 20 bonus twice
+    unit.addEnergy(Energy.Attack, 10, false);
+    expect(unit.getEnergy(Energy.Attack, false)).toBe(50);
+  });
+
   it('expose the trigger that is still resolving', () => {
     const battle = createBattle('resolving');
     const [unit] = createSide(battle, [createPlayer([getCard(CardId.Ambush)])]).units;

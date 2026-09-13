@@ -28,9 +28,7 @@ export default createCard({
         return;
       }
       const bonus = card.getValue(DEFAULT_MULTIPLIER, unit.rng);
-      if (unit.triggerCard(card, target, bonus)) {
-        event.multiplier += bonus;
-      }
+      event.multiplier += bonus * unit.triggerCard(card, target, bonus);
     });
   },
 });

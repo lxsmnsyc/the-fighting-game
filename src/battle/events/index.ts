@@ -2,6 +2,7 @@ export { default as BattleEvents } from './names';
 export type { AllianceEvent, AllianceTeamEvent, TeamUnitEvent, TickEvent } from './field';
 export type {
   CheckUnitAbilityCooldownEvent,
+  CheckUnitCardRepeatsEvent,
   CheckUnitEnemyEvent,
   CheckUnitEnergyGainEvent,
   CheckUnitEnergyPeriodEvent,

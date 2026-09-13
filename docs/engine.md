@@ -79,6 +79,12 @@ refuses any card already there. This holds through any chain of events and
 other cards, and for copies of the same card. An effect that emits events must
 therefore run on `UnitTriggerCard`, where the rule can see it.
 
+`triggerCard` returns how many times the trigger went through. After a trigger
+goes through, `CheckUnitCardRepeats` asks how many more times it runs, such as
+for the secret cards. Repeats run inside the first trigger, so the chain rule
+covers them, and a repeat is never repeated. A card that changes the triggering
+event inline applies the change once per time.
+
 `battle.cardTriggers` lists the triggers still resolving, the innermost last.
 Anything that happens while one resolves was set off by that card.
 

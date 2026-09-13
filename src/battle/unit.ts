@@ -6,6 +6,7 @@ import type Battle from './core';
 import {
   BattleEvents,
   type CheckUnitAbilityCooldownEvent,
+  type CheckUnitCardRepeatsEvent,
   type CheckUnitEnemyEvent,
   type CheckUnitEnergyGainEvent,
   type CheckUnitEnergyPeriodEvent,
@@ -371,18 +372,41 @@ export default class Unit {
   }
 
   /**
-   * Returns whether the trigger went through. A card that changes the
-   * event which set it off applies the change only when this is true.
+   * Returns how many times the trigger went through: 0 when it was
+   * stopped, and more than 1 when it was repeated. A card that changes
+   * the event which set it off applies the change that many times.
    *
    * A card cannot trigger from anything its own trigger sets off, either
    * directly or through other cards. Copies of a card share the rule.
+   * Repeats run inside the first trigger, so the rule covers them too.
    */
-  triggerCard(card: CardInstance, target: Unit, value: number): boolean {
+  triggerCard(card: CardInstance, target: Unit, value: number): number {
     const { triggeringCards } = this.battle;
     const { id } = card.source;
     if (triggeringCards.has(id)) {
-      return false;
+      return 0;
     }
+    triggeringCards.add(id);
+    try {
+      const first = this.emitTriggerCard(card, target, value);
+      if (first.disabled) {
+        return 0;
+      }
+      let times = 1;
+      const repeats = this.checkCardRepeats(first);
+      for (let repeat = 0; repeat < repeats; repeat++) {
+        if (!this.emitTriggerCard(card, target, value).disabled) {
+          times++;
+        }
+      }
+      return times;
+    } finally {
+      triggeringCards.delete(id);
+    }
+  }
+
+  // One run of a card trigger
+  private emitTriggerCard(card: CardInstance, target: Unit, value: number): UnitTriggerCardEvent {
     const event: UnitTriggerCardEvent = {
       id: 'UnitTriggerCard',
       disabled: false,
@@ -391,15 +415,28 @@ export default class Unit {
       target,
       value,
     };
-    triggeringCards.add(id);
     this.battle.cardTriggers.push(event);
     try {
       this.battle.emit(BattleEvents.UnitTriggerCard, event);
     } finally {
-      triggeringCards.delete(id);
       this.battle.cardTriggers.pop();
     }
-    return !event.disabled;
+    return event;
+  }
+
+  /**
+   * How many more times a card trigger that went through runs again.
+   */
+  checkCardRepeats(parent: UnitTriggerCardEvent): number {
+    const event: CheckUnitCardRepeatsEvent = {
+      id: 'CheckUnitCardRepeats',
+      disabled: false,
+      source: this,
+      parent,
+      repeats: 0,
+    };
+    this.battle.emit(BattleEvents.CheckUnitCardRepeats, event);
+    return Math.max(0, event.repeats);
   }
 
   // Abilities

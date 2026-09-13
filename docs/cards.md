@@ -34,7 +34,10 @@ card with no print, such as a shop offer.
 - Common: Each Common card has 5 copies that can be bought.
 - Uncommon: Unlocked after acquiring 10 Common cards. Each Uncommon card has 3 copies that can be bought.
 - Rare: Unlocked after acquiring 10 Uncommon cards. Each Rare card only has one copy.
-- Secret: Unlocked after acquiring all of the Rare cards in a given aspect.
+- Secret: Unlocked after acquiring all of the Rare cards in a given aspect. Each
+  energy has one secret card. Whenever another of the player's cards of that
+  energy's aspect triggers, the secret triggers too and the card's trigger runs
+  once more.
 
 ## Prints
 

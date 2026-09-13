@@ -46,9 +46,7 @@ function createAddEnergyBonusCard({
           return;
         }
         const bonus = card.getValue(amount, unit.rng);
-        if (unit.triggerCard(card, event.source, bonus)) {
-          event.value += bonus;
-        }
+        event.value += bonus * unit.triggerCard(card, event.source, bonus);
       });
     },
   });

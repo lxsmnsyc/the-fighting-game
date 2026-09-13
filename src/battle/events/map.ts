@@ -5,6 +5,7 @@ import type { AllianceEvent, AllianceTeamEvent, TeamUnitEvent, TickEvent } from 
 import type BattleEvents from './names';
 import type {
   CheckUnitAbilityCooldownEvent,
+  CheckUnitCardRepeatsEvent,
   CheckUnitEnemyEvent,
   CheckUnitEnergyGainEvent,
   CheckUnitEnergyPeriodEvent,
@@ -74,4 +75,6 @@ export interface BattleEventMap extends EventMap {
   [BattleEvents.CheckUnitAbilityCooldown]: [CheckUnitAbilityCooldownEvent, ValuePriority];
 
   [BattleEvents.CheckUnitEnergyGain]: [CheckUnitEnergyGainEvent, ValuePriority];
+
+  [BattleEvents.CheckUnitCardRepeats]: [CheckUnitCardRepeatsEvent, ValuePriority];
 }

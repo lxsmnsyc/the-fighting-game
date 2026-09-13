@@ -86,6 +86,18 @@ const enum CardId {
   Vampiric = 902,
   Merciless = 903,
   Endure = 904,
+
+  // Secret: repeats card triggers of an energy once
+  Savage = 1000,
+  Resonant = 1001,
+  Virulent = 1002,
+  Fortified = 1003,
+  Corrosive = 1004,
+  Rapid = 1005,
+  Glacial = 1006,
+  Evasive = 1007,
+  Lethal = 1008,
+  Blessed = 1009,
 }
 
 export default CardId;

@@ -95,6 +95,12 @@ const enum BattleEvents {
    * do not stack on their owner.
    */
   CheckUnitEnergyGain = 39,
+
+  /**
+   * How many more times a card trigger that went through runs again.
+   * Asked once per trigger, so a repeat is never repeated.
+   */
+  CheckUnitCardRepeats = 40,
 }
 
 export default BattleEvents;

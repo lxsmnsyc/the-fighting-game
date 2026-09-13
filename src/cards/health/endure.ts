@@ -53,9 +53,14 @@ export default createCard({
         return;
       }
       const reduced = (event.value * card.getValue(DEFAULT_REDUCTION, unit.rng)) | 0;
-      if (reduced > 0 && unit.triggerCard(card, unit, reduced)) {
-        event.value -= reduced;
-        collected += reduced;
+      if (reduced <= 0) {
+        return;
+      }
+      // Repeats reduce it again, but never below nothing
+      const total = Math.min(event.value, reduced * unit.triggerCard(card, unit, reduced));
+      if (total > 0) {
+        event.value -= total;
+        collected += total;
         timer.start();
       }
     });
