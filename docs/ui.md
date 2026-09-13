@@ -1,7 +1,25 @@
 # UI
 
 The UI is Solid with Tailwind CSS, in [src/ui](../src/ui). Run it with
-`pnpm dev`. Add `?seed=` to the URL to replay a run.
+`pnpm dev`. Add `?seed=` to the URL to skip the menu and replay a Standard run.
+
+## Menus
+
+The game opens on the main menu:
+
+- Start sets up a run. The player picks a game mode, then a random seed or
+  their own. The same seed and mode always deal the same shops, drafts and
+  opponents.
+- Options holds the settings. They are kept in local storage.
+
+| Option           | Effect                                                             |
+| ---------------- | ------------------------------------------------------------------ |
+| Shake            | Cards and abilities shake when they trigger.                       |
+| Projectiles      | Damage and energy fly across the screen in battle.                 |
+| Battle countdown | Battles count down 3 seconds before they begin, from the next run. |
+
+When a run ends, the player can start a new run in the same mode, retry the
+same seed, or go back to the main menu. The end screen shows the seed.
 
 The browser tests in [e2e](../e2e) drive the real game with Playwright. Run
 them with `pnpm test:e2e`.
@@ -37,6 +55,11 @@ the right half is the enemy. The timer sits in the middle. It counts down 3
 seconds before the battle starts, then counts down the time limit. Each side
 shows its abilities, then its energies as icons. Hovering one shows what it
 does. A ring around each ability fills as its cooldown charges.
+
+When a battle ends, its summary opens over the battle. It shows the result, the
+gold earned, the lives left, how long the fight lasted, and each side's damage,
+healing, attacks, critical hits, dodges and triggers. Continue opens the next
+shop, or the run over screen after the last life.
 
 ## Effects
 

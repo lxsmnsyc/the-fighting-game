@@ -4,7 +4,7 @@ import type CardId from '../cards/ids';
 import type AleaRNG from '../core/alea';
 import type { Ability } from './ability';
 import { type Card, CardInstance, getRandomPrint } from './card';
-import { ABILITY_OFFER_SIZE, COPY_LIMITS, SHOP_SIZE } from './constants';
+import { ABILITY_OFFER_SIZE, COPY_LIMITS, RARITY_UNLOCK_COUNT, SHOP_SIZE } from './constants';
 import type Game from './game';
 import type { Player } from './player';
 import { Print, RARITIES, Rarity } from './types';
@@ -82,19 +82,43 @@ export function countOwnedCards(player: Player): Map<CardId, number> {
 }
 
 /**
- * Secret cards unlock once the player owns every rare card of their
- * first aspect. Every other card is always unlocked.
+ * Whether cards of `rarity` can be rolled. Each rarity unlocks the next:
+ *
+ * 1. Picking an ability unlocks Common cards.
+ * 2. Acquiring `RARITY_UNLOCK_COUNT` Common cards unlocks Uncommon ones.
+ * 3. Acquiring as many Uncommon cards unlocks Rare ones.
+ * 4. Secret cards need Rare ones, and then unlock one by one. See
+ *    `isCardUnlocked`.
+ */
+export function isRarityUnlocked(game: Game, rarity: Rarity): boolean {
+  const { player } = game;
+  if (rarity === Rarity.Common) {
+    return player.abilities.length > 0;
+  }
+  if (rarity === Rarity.Uncommon) {
+    return player.acquired[Rarity.Common] >= RARITY_UNLOCK_COUNT;
+  }
+  if (rarity === Rarity.Rare) {
+    return player.acquired[Rarity.Uncommon] >= RARITY_UNLOCK_COUNT;
+  }
+  return isRarityUnlocked(game, Rarity.Rare);
+}
+
+/**
+ * Whether `card` can be rolled. A secret card unlocks once the player
+ * owns every rare card of its first aspect. An aspect with no rare card
+ * keeps its secret locked.
  */
 export function isCardUnlocked(game: Game, card: Card): boolean {
   if (card.rarity !== Rarity.Secret) {
-    return true;
+    return isRarityUnlocked(game, card.rarity);
   }
   const [aspect] = card.aspect;
-  const owned = countOwnedCards(game.player);
-  return CARDS.every(
-    (other) =>
-      other.rarity !== Rarity.Rare || !other.aspect.includes(aspect) || owned.has(other.id),
+  const rares = CARDS.filter(
+    (other) => other.rarity === Rarity.Rare && other.aspect.includes(aspect),
   );
+  const owned = countOwnedCards(game.player);
+  return rares.length > 0 && rares.every((rare) => owned.has(rare.id));
 }
 
 /**
@@ -130,10 +154,11 @@ export function rollShopOffers(game: Game): (CardInstance | undefined)[] {
   const rng = game.rng.shop;
   const copies = countLimitedCopies(player);
   const offers: (CardInstance | undefined)[] = [];
+  const printChances = game.checkPrintChances(player);
 
   for (let slot = 0; slot < SHOP_SIZE; slot++) {
     // The print comes first, since a Negative copy may go past the limit
-    const print = getRandomPrint(rng, player.printSpawnChance);
+    const print = getRandomPrint(rng, printChances);
     const available = CARDS.filter(
       (card) => isCardUnlocked(game, card) && isUnderCopyLimit(card, print, copies),
     );

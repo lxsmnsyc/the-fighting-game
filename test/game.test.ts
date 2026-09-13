@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Stat } from '../src/battle/types';
+import { DamageType, Stat } from '../src/battle/types';
 import CARDS from '../src/cards';
 import CardId from '../src/cards/ids';
 import { MergedLifecycle } from '../src/core/lifecycle';
@@ -14,6 +14,7 @@ import {
   DEFAULT_GOLD,
   DEFAULT_LIFE,
   PHASE_CARD_SLOTS,
+  RARITY_UNLOCK_COUNT,
   ROUNDS_PER_PHASE,
   SHOP_SIZE,
 } from '../src/game/constants';
@@ -21,7 +22,12 @@ import type Game from '../src/game/game';
 import { createRoundRNG } from '../src/game/game';
 import { getCardSlots, getRoundBudget, getSellPrice } from '../src/game/economy';
 import createOpponent from '../src/game/opponent';
-import { countLimitedCopies, isCardUnlocked, isUnderCopyLimit } from '../src/game/pool';
+import {
+  countLimitedCopies,
+  isCardUnlocked,
+  isRarityUnlocked,
+  isUnderCopyLimit,
+} from '../src/game/pool';
 import { resumeGame, saveGame } from '../src/game/save';
 import createGame from '../src/game/setup';
 import {
@@ -42,9 +48,9 @@ function startGame(): Game {
   return game;
 }
 
-// Starts the battle, knocks out the units that should fall, then lets
-// the battle settle
-function finishBattle(game: Game, result: BattleResult): void {
+// Starts the battle, knocks out the units that should fall, lets the
+// battle settle, then continues past the summary
+function finishBattle(game: Game, result: BattleResult, proceed = true): void {
   game.startBattle();
   const { battle } = game;
   if (!battle) {
@@ -58,6 +64,9 @@ function finishBattle(game: Game, result: BattleResult): void {
     }
   }
   battle.tick(1000 / 60);
+  if (proceed) {
+    game.continueRun();
+  }
 }
 
 function getOpponentCards(game: Game): CardId[] {
@@ -295,6 +304,84 @@ describe('run', () => {
     expect(resumed.stage).toBe(GameStage.Draft);
     expect(resumed.draft.offers).toEqual(game.draft.offers);
   });
+
+  it('sums up the battle, then waits for the player to continue', () => {
+    const game = startGame();
+    const gold = game.player.stats[PlayerStat.Gold];
+    const income = game.checkRoundIncome();
+
+    game.startBattle();
+    const { battle } = game;
+    if (!battle) {
+      throw new Error('No battle is running');
+    }
+    const units = [...battle.units()];
+    const own = units.find((unit) => unit.team.player === game.player);
+    const enemy = units.find((unit) => unit.team.player !== game.player);
+    if (!own || !enemy) {
+      throw new Error('A side is missing');
+    }
+
+    own.dealDamage(enemy, DamageType.Pure, 100, 0);
+    enemy.dealDamage(own, DamageType.Pure, 60, 0);
+    own.heal(own, 40, 0);
+    // Only 20 Health is missing by now, so the rest is overhealing
+    own.heal(own, 100, 0);
+    enemy.removeStat(Stat.Health, enemy.stats[Stat.Health]);
+    battle.tick(1000 / 60);
+
+    expect(game.stage).toBe(GameStage.Summary);
+    expect(game.round).toBe(1);
+    expect(game.player.stats[PlayerStat.Gold]).toBe(gold + income);
+
+    const { summary } = game;
+    expect(summary?.result).toBe(BattleResult.Won);
+    expect(summary?.gold).toBe(income);
+    expect(summary?.livesLost).toBe(0);
+    expect(summary?.player.damageDealt).toBe(100);
+    expect(summary?.player.damageTaken).toBe(60);
+    expect(summary?.player.healing).toBe(60);
+    expect(summary?.enemy.damageTaken).toBe(100);
+    expect(summary?.enemy.damageDealt).toBe(60);
+
+    // No new battle starts from the summary
+    game.startBattle();
+    expect(game.stage).toBe(GameStage.Summary);
+    expect(game.battle).toBe(battle);
+
+    expect(game.continueRun()).toBe(true);
+    expect(game.round).toBe(2);
+    expect(game.stage).toBe(GameStage.Shop);
+    expect(game.continueRun()).toBe(false);
+  });
+
+  it('rolls a new shop but meets the same opponent when a round is replayed', () => {
+    const game = startGame();
+    const getOffers = (current: Game): (CardId | undefined)[] =>
+      current.shop.offers.map((card) => card?.source.id);
+    const offers = getOffers(game);
+
+    finishBattle(game, BattleResult.Lost);
+    const seed = game.battle?.seed;
+    const opponent = getOpponentCards(game);
+
+    expect(game.round).toBe(1);
+    expect(game.attempt).toBe(1);
+    expect(getOffers(game)).not.toEqual(offers);
+
+    // A save keeps the attempt, so a resumed replay rolls the same new shop
+    const resumed = resumeGame(saveGame(game));
+    resumed.start();
+    expect(getOffers(resumed)).toEqual(getOffers(game));
+
+    game.startBattle();
+    expect(game.battle?.seed).toBe(seed);
+    expect(getOpponentCards(game)).toEqual(opponent);
+
+    finishBattle(game, BattleResult.Won);
+    expect(game.round).toBe(2);
+    expect(game.attempt).toBe(0);
+  });
 });
 
 describe('shop', () => {
@@ -371,7 +458,9 @@ describe('shop', () => {
     game.player.deck.push(new CardInstance(game.player, rare, Print.Negative));
     expect(countLimitedCopies(game.player).get(rare.id)).toBe(1);
 
-    // With every offer Negative, the shop offers the rare again
+    // With Rare cards unlocked and every offer Negative, the shop offers
+    // the rare again
+    game.player.acquired[Rarity.Uncommon] = RARITY_UNLOCK_COUNT;
     game.player.printSpawnChance[Print.Negative] = 1;
     game.setStat(PlayerStat.Gold, 1_000_000);
     let offered = false;
@@ -395,6 +484,66 @@ describe('shop', () => {
 
     expect(game.checkCardWeight(matching)).toBeGreaterThanOrEqual(1 + ABILITY_BIAS);
     expect(game.checkCardWeight(unrelated)).toBe(1);
+  });
+
+  it('unlocks each rarity after the one before it', () => {
+    const game = createGame('run');
+    game.start();
+    expect(isRarityUnlocked(game, Rarity.Common)).toBe(false);
+
+    game.pickAbility(0);
+    expect(isRarityUnlocked(game, Rarity.Common)).toBe(true);
+    expect(isRarityUnlocked(game, Rarity.Uncommon)).toBe(false);
+    expect(isRarityUnlocked(game, Rarity.Rare)).toBe(false);
+    expect(isRarityUnlocked(game, Rarity.Secret)).toBe(false);
+    expect(game.shop.offers.every((offer) => offer?.source.rarity === Rarity.Common)).toBe(true);
+
+    game.player.acquired[Rarity.Common] = RARITY_UNLOCK_COUNT - 1;
+    expect(isRarityUnlocked(game, Rarity.Uncommon)).toBe(false);
+
+    game.player.acquired[Rarity.Common] = RARITY_UNLOCK_COUNT;
+    expect(isRarityUnlocked(game, Rarity.Uncommon)).toBe(true);
+    expect(isRarityUnlocked(game, Rarity.Rare)).toBe(false);
+
+    game.player.acquired[Rarity.Uncommon] = RARITY_UNLOCK_COUNT;
+    expect(isRarityUnlocked(game, Rarity.Rare)).toBe(true);
+    expect(isRarityUnlocked(game, Rarity.Secret)).toBe(true);
+  });
+
+  it('counts a card toward unlocks once acquired, even after selling it', () => {
+    const game = startGame();
+    game.setStat(PlayerStat.Gold, 100);
+    const slot = game.shop.offers.findIndex((card) => card != null);
+    const card = game.shop.offers[slot];
+    if (!card) {
+      throw new Error('The shop offered nothing');
+    }
+
+    game.buyCard(slot);
+    game.sellCard(card);
+
+    expect(game.player.deck).toHaveLength(0);
+    expect(game.player.acquired[card.source.rarity]).toBe(1);
+  });
+
+  it('keeps a secret card locked when its aspect has no rare card', () => {
+    const game = startGame();
+    const hasRare = CARDS.some(
+      (card) => card.rarity === Rarity.Rare && card.aspect.includes(Aspect.Universal),
+    );
+    expect(hasRare).toBe(false);
+
+    const secret = createCard({
+      id: CardId.Relentless,
+      name: 'Secret',
+      image: '',
+      rarity: Rarity.Secret,
+      aspect: [Aspect.Universal],
+      description: () => [],
+      setup: () => new MergedLifecycle([]),
+    });
+
+    expect(isCardUnlocked(game, secret)).toBe(false);
   });
 
   it('keeps a secret card locked until every rare of its aspect is owned', () => {

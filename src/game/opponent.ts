@@ -114,11 +114,12 @@ export default function createOpponent(game: Game, rng: AleaRNG): Opponent {
   const getWeight = (card: Card): number => 1 + getAbilityBias(abilities, card);
   const matching = CARDS.filter((card) => card.aspect.some((aspect) => aspects.includes(aspect)));
   const pools = [matching, CARDS];
+  const printChances = game.checkPrintChances(opponent);
 
   for (const pool of pools) {
     while (deck.length < slots) {
       // The print comes first, since a Negative copy may go past the limit
-      const print = getRandomPrint(rng, opponent.printSpawnChance);
+      const print = getRandomPrint(rng, printChances);
       const card = rollCard(rng, getAffordableCards(pool, budget, print, copies), phase, getWeight);
       if (!card) {
         break;
@@ -139,7 +140,7 @@ export default function createOpponent(game: Game, rng: AleaRNG): Opponent {
       }
       const weakest = deck[index];
       const refund = CARD_PRICES[weakest.source.rarity];
-      const print = getRandomPrint(rng, opponent.printSpawnChance);
+      const print = getRandomPrint(rng, printChances);
 
       countCopy(copies, weakest, -1);
       const upgrades = getAffordableCards(pool, budget + refund, print, copies).filter(

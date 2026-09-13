@@ -6,8 +6,9 @@ import { AbilityInstance } from './ability';
 import { CardInstance } from './card';
 import type Game from './game';
 import type { GameOptions } from './game';
+import type GameModeId from './modes/ids';
 import createGame from './setup';
-import { type Edition, PlayerStat } from './types';
+import { type Edition, PlayerStat, type Rarity } from './types';
 
 export interface CardSave {
   id: CardId;
@@ -18,16 +19,22 @@ export interface CardSave {
 
 /**
  * What it takes to resume a run at the start of a round. The shop, the
- * ability offers and the opponent are derived again from the seed and
- * the round number.
+ * ability offers and the opponent are derived again from the seed, the
+ * round number and the attempt.
  */
 export interface GameSave {
   seed: string;
+  mode: GameModeId;
   round: number;
+  attempt: number;
   lives: number;
   gold: number;
   cards: CardSave[];
   abilities: AbilityId[];
+  /**
+   * Cards acquired over the run, by rarity, for unlocks.
+   */
+  acquired: Record<Rarity, number>;
 }
 
 /**
@@ -37,7 +44,9 @@ export interface GameSave {
 export function saveGame(game: Game): GameSave {
   return {
     seed: game.seed,
+    mode: game.mode,
     round: game.round,
+    attempt: game.attempt,
     lives: game.player.stats[PlayerStat.Life],
     gold: game.player.stats[PlayerStat.Gold],
     cards: game.player.deck.map((card) => ({
@@ -47,6 +56,7 @@ export function saveGame(game: Game): GameSave {
       disabled: card.disabled,
     })),
     abilities: game.player.abilities.map((ability) => ability.source.id),
+    acquired: { ...game.player.acquired },
   };
 }
 
@@ -55,8 +65,10 @@ export function saveGame(game: Game): GameSave {
  * an ability draft first if one was never picked.
  */
 export function resumeGame(save: GameSave, options?: GameOptions): Game {
-  const game = createGame(save.seed, options);
+  const game = createGame(save.seed, { ...options, mode: save.mode });
   game.round = save.round;
+  game.attempt = save.attempt;
+  Object.assign(game.player.acquired, save.acquired);
   game.setStat(PlayerStat.Life, save.lives);
   game.setStat(PlayerStat.Gold, save.gold);
 

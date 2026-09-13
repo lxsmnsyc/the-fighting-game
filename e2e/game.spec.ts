@@ -24,6 +24,9 @@ async function expectTooltipInView(page: Page): Promise<void> {
 }
 
 test('picks an ability, buys cards in the shop and fights a battle', async ({ page }, testInfo) => {
+  // A battle can run for its whole time limit
+  test.setTimeout(120_000);
+
   const errors: string[] = [];
   page.on('pageerror', (error) => {
     errors.push(error.message);
@@ -73,8 +76,16 @@ test('picks an ability, buys cards in the shop and fights a battle', async ({ pa
   await expect(page.getByTestId('projectile').first()).toBeAttached({ timeout: 10_000 });
   await page.screenshot({ path: testInfo.outputPath('projectile.png') });
 
-  await page.waitForTimeout(4000);
-  await page.screenshot({ path: testInfo.outputPath('battle.png') });
+  // The battle ends by its time limit at the latest, then shows its summary
+  const summary = page.getByTestId('battle-summary');
+  await expect(summary).toBeVisible({ timeout: 75_000 });
+  await expect(summary.getByTestId('summary-gold')).toHaveText(/^\+\d+g$/);
+  await page.screenshot({ path: testInfo.outputPath('summary.png') });
+
+  // Whatever the result, the run has lives left, so a shop opens next
+  await summary.getByRole('button', { name: 'Continue' }).click();
+  await expect(summary).toBeHidden();
+  await expect(start).toBeVisible();
 
   expect(errors).toEqual([]);
 });

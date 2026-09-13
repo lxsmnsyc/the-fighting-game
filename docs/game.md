@@ -12,6 +12,7 @@ game.pickAbility(0); // opens the shop
 game.rerollShop();
 game.buyCard(0);
 game.startBattle();
+game.continueRun(); // once the battle ends, leaves its summary
 ```
 
 ## Structure
@@ -32,9 +33,12 @@ game.startBattle();
 2. The shop opens with 5 offers.
 3. The player buys cards, rerolls, or starts the battle.
 4. The battle ends and the player earns gold. Income rises with the phase.
-5. The result decides what comes next:
+5. The battle summary opens. `game.summary` holds the result, the gold earned,
+   the lives lost, how long the fight lasted and what each side did.
+6. The player calls `game.continueRun()`. The result decides what comes next:
    - A win or a draw moves to the next round.
-   - A loss costs a life and replays the same round.
+   - A loss costs a life and replays the same round. The replay rolls a new
+     shop, but meets the same opponent.
    - Losing the last life ends the run.
 
 A battle that runs past `BATTLE_TIME_LIMIT` (60 seconds) is a draw.
@@ -60,6 +64,9 @@ See [abilities.md](abilities.md) for how abilities work.
 - Cards that share aspects with the player's abilities weigh more.
 - The player can own a limited number of copies of each card: 5 per common, 3
   per uncommon, and 1 per rare or secret.
+- Rarities unlock in order, and the shop only rolls unlocked cards. Picking an
+  ability unlocks Common cards. Acquiring `RARITY_UNLOCK_COUNT` (10) cards of a
+  rarity unlocks the next one, up to Rare. See [cards.md](cards.md#rarity).
 - A secret card stays locked until the player owns every rare card of its first
   aspect.
 
@@ -79,6 +86,28 @@ resumed round meets the same opponent.
 - A boss spends `BOSS_BUDGET_MULTIPLIER` (1.5) times the budget and gets as many
   abilities as the player is due. Its first ability decides its aspects, and all
   of them bias its cards.
+
+## Modes
+
+A mode changes the rules of a run. Each mode is a file in
+[src/game/modes](../src/game/modes) that listens to game events, like cards do.
+`createGame(seed, { mode })` picks the mode, and a save keeps it.
+
+| Mode        | Rules                                            |
+| ----------- | ------------------------------------------------ |
+| Standard    | The rules as they are.                           |
+| Hardcore    | The run starts with 1 life.                      |
+| Chaos       | Prints are 3 times as likely, for opponents too. |
+| Beastmaster | An ability draft every 2 phases. Bosses keep up. |
+| Gambler     | Rerolls are free. Every card costs 2 more gold.  |
+
+Modes change the rules through these checks:
+
+- `CheckMaxLife` answers the lives a run starts with.
+- `CheckAbilityInterval` answers the phases between ability drafts.
+- `CheckPrintChance` answers how likely a print is on a card the player or an
+  opponent gets.
+- `CheckRerollCost` and `CheckCardPrice` answer what the shop charges.
 
 ## Saving
 

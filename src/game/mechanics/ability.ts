@@ -1,6 +1,7 @@
 import { ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { AbilityInstance, getAbilityBias } from '../ability';
+import { ABILITY_PHASE_INTERVAL } from '../constants';
 import { GameEvents } from '../events';
 import type Game from '../game';
 import { isAbilityOwed, rollAbilityOffers } from '../pool';
@@ -50,6 +51,10 @@ export default function setupAbilityMechanics(game: Game): void {
 
   game.on(GameEvents.AcquireAbility, EventPriority.Exact, ({ ability }) => {
     game.player.abilities.push(ability);
+  });
+
+  game.on(GameEvents.CheckAbilityInterval, ValuePriority.Initial, (event) => {
+    event.value = ABILITY_PHASE_INTERVAL;
   });
 
   game.on(GameEvents.CheckCardWeight, ValuePriority.Initial, (event) => {

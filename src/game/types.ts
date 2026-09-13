@@ -43,6 +43,8 @@ export const enum GameStage {
   Ended = 3,
   // Choosing an ability, before the shop
   Draft = 4,
+  // Looking back at the battle that just ended, before moving on
+  Summary = 5,
 }
 
 /**

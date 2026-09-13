@@ -10,6 +10,7 @@ import type { AbilityInstance } from '../game/ability';
 import type { CardInstance } from '../game/card';
 import { GameEvents } from '../game/events';
 import type Game from '../game/game';
+import options from './options';
 
 /**
  * A signal that changes whenever the run changes. Read it inside a
@@ -37,6 +38,7 @@ export function createGameVersion(game: Game): Accessor<number> {
     game.on(GameEvents.OfferAbilities, EventPriority.Post, bump),
     game.on(GameEvents.PickAbility, EventPriority.Post, bump),
     game.on(GameEvents.AcquireAbility, EventPriority.Post, bump),
+    game.on(GameEvents.ContinueRun, EventPriority.Post, bump),
   ]);
   onCleanup(() => {
     lifecycle.stop();
@@ -107,7 +109,9 @@ export function createBattleView(game: Game, battle: Battle): BattleView {
     setVersion((value) => value + 1);
   };
   const addProjectile = (projectile: Projectile): void => {
-    setProjectiles((current) => [...current, projectile]);
+    if (options.projectiles) {
+      setProjectiles((current) => [...current, projectile]);
+    }
   };
   const getSide = (unit: Unit): Side =>
     unit.team.player === game.player ? Side.Player : Side.Enemy;

@@ -65,13 +65,24 @@ the chain rule stops them.
 
 ## Rarity
 
-- Common: Each Common card has 5 copies that can be bought.
-- Uncommon: Unlocked after acquiring 10 Common cards. Each Uncommon card has 3 copies that can be bought.
-- Rare: Unlocked after acquiring 10 Uncommon cards. Each Rare card only has one copy.
-- Secret: Unlocked after acquiring all of the Rare cards in a given aspect. Each
-  energy has one secret card. Whenever another of the player's cards of that
-  energy's aspect triggers, the secret triggers too and the card's trigger runs
-  once more.
+Rarities unlock in order: ability, then Common, Uncommon, Rare and Secret. The
+shop only rolls cards that are unlocked, so the first shop only has Common
+cards.
+
+- Common: Unlocked by picking an ability. Each Common card has 5 copies that can
+  be bought.
+- Uncommon: Unlocked after acquiring 10 Common cards. Each Uncommon card has 3
+  copies that can be bought.
+- Rare: Unlocked after acquiring 10 Uncommon cards. Each Rare card only has one
+  copy.
+- Secret: Unlocked after owning all of the Rare cards in its aspect. An aspect
+  with no Rare card keeps its secret locked. Each energy has one secret card.
+  Whenever another of the player's cards of that energy's aspect triggers, the
+  secret triggers too and the card's trigger runs once more.
+
+Acquired cards are counted over the whole run, so selling a card keeps its
+rarity's progress. `isRarityUnlocked` and `isCardUnlocked` in
+[src/game/pool.ts](../src/game/pool.ts) hold the rules.
 
 ## Prints
 

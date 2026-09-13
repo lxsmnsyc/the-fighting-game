@@ -1,6 +1,7 @@
 import { type Accessor, For, type JSX, Show, createSignal } from 'solid-js';
 import type { Ability } from '../../game/ability';
 import { ASPECT_NAMES } from '../../game/info';
+import options from '../options';
 import createShakeKeyframes from '../spring';
 import { ASPECT_COLORS } from '../theme';
 import DescriptionText from './description-text';
@@ -134,7 +135,9 @@ export function AbilityBadge(props: AbilityBadgeProps): JSX.Element {
   const [hovered, setHovered] = createSignal(false);
 
   props.onTrigger?.(() => {
-    face?.animate(SHAKE_KEYFRAMES, { duration: SHAKE_DURATION });
+    if (options.shake) {
+      face?.animate(SHAKE_KEYFRAMES, { duration: SHAKE_DURATION });
+    }
   });
 
   const ring = (): string => {

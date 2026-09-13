@@ -6,9 +6,11 @@ way. Every RNG is an Alea instance.
 ## Seed tree
 
 - **World** is the run seed.
-  - **Round `n`** is derived from the seed and the round number only.
+  - **Round `n`** is derived from the seed and the round number.
     - **Shop** rolls the offers when the shop opens and on each reroll. It
-      also rolls the print of each card bought.
+      also rolls the print of each card bought. A round replayed after a loss
+      adds the attempt number to the shop seed, so the replay rolls new
+      offers.
     - **Battle** rolls the opponent and a boss's abilities, then seeds the
       battle.
       - **Unit** gets one RNG per unit, for chance-based effects such as Dodge
@@ -23,12 +25,13 @@ phase 2.
 
 ## Resuming
 
-A round depends only on the seed and its number. So a run resumes at the start
-of any round from a save of:
+A round depends only on the seed, its number and the attempt. So a run resumes
+at the start of any round from a save of:
 
-- The seed.
-- The round number.
+- The seed and the game mode.
+- The round number and the attempt.
 - Lives and gold.
+- How many cards of each rarity were acquired, for unlocks.
 - The cards: id, edition, print and whether each is disabled.
 - The ability ids.
 

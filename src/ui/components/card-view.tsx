@@ -2,6 +2,7 @@ import { For, type JSX, Show, createSignal } from 'solid-js';
 import type { Card, CardInstance } from '../../game/card';
 import { PRINTS, PRINT_NAMES, RARITY_NAMES, describePrint, describeRarity } from '../../game/info';
 import type { Print } from '../../game/types';
+import options from '../options';
 import createShakeKeyframes from '../spring';
 import { RARITY_COLORS } from '../theme';
 import DescriptionText from './description-text';
@@ -83,7 +84,9 @@ export default function CardView(props: CardViewProps): JSX.Element {
   const [hovered, setHovered] = createSignal(false);
 
   props.onTrigger?.(() => {
-    face?.animate(SHAKE_KEYFRAMES, { duration: SHAKE_DURATION });
+    if (options.shake) {
+      face?.animate(SHAKE_KEYFRAMES, { duration: SHAKE_DURATION });
+    }
   });
 
   const liftClass = (): string =>

@@ -4,7 +4,8 @@ import type { BaseEvent, EventPriority } from '../core/event-emitter';
 import type { EventMap } from '../core/event-engine';
 import type { Ability, AbilityInstance } from './ability';
 import type { Card, CardInstance } from './card';
-import type { BattleResult, PlayerStat, RunResult } from './types';
+import type { Player } from './player';
+import type { BattleResult, PlayerStat, PrintSpawnChance, RunResult } from './types';
 
 /**
  * Events of a run, around and between battles.
@@ -53,6 +54,24 @@ export const enum GameEvents {
    * How many cards the player can hold.
    */
   CheckCardSlots = 23,
+
+  /**
+   * How many lives a run starts with.
+   */
+  CheckMaxLife = 24,
+  /**
+   * Phases between ability drafts.
+   */
+  CheckAbilityInterval = 25,
+  /**
+   * How likely a card a player gets is to have a print.
+   */
+  CheckPrintChance = 26,
+
+  /**
+   * Leaves the battle summary for what the result leads to.
+   */
+  ContinueRun = 27,
 }
 
 export interface EndGameEvent extends BaseEvent {
@@ -112,6 +131,15 @@ export interface CheckCardWeightGameEvent extends BaseEvent {
   value: number;
 }
 
+/**
+ * `player` is who gets the card, the run's player or an opponent.
+ */
+export interface CheckPrintChanceGameEvent extends BaseEvent {
+  player: Player;
+  print: keyof PrintSpawnChance;
+  value: number;
+}
+
 export interface GameEventMap extends EventMap {
   [GameEvents.Start]: [BaseEvent, EventPriority];
   [GameEvents.End]: [EndGameEvent, EventPriority];
@@ -142,4 +170,10 @@ export interface GameEventMap extends EventMap {
   [GameEvents.AcquireAbility]: [AbilityGameEvent, EventPriority];
   [GameEvents.CheckCardWeight]: [CheckCardWeightGameEvent, ValuePriority];
   [GameEvents.CheckCardSlots]: [GameValueEvent, ValuePriority];
+
+  [GameEvents.CheckMaxLife]: [GameValueEvent, ValuePriority];
+  [GameEvents.CheckAbilityInterval]: [GameValueEvent, ValuePriority];
+  [GameEvents.CheckPrintChance]: [CheckPrintChanceGameEvent, ValuePriority];
+
+  [GameEvents.ContinueRun]: [BaseEvent, EventPriority];
 }

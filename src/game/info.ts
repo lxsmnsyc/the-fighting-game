@@ -10,7 +10,7 @@ import { MAX_CRITICAL_STACKS } from '../battle/mechanics/critical';
 import { MAX_DODGE_STACKS } from '../battle/mechanics/dodge';
 import { DamageType, Energy, Stat } from '../battle/types';
 import { MAX_ERROR_VALUE, MIN_ERROR_VALUE, MONOTONE_MULTIPLIER } from './card';
-import { COPY_LIMITS } from './constants';
+import { COPY_LIMITS, RARITY_UNLOCK_COUNT } from './constants';
 import { type Description, describe, token } from './description';
 import { Aspect, Print, Rarity } from './types';
 
@@ -47,10 +47,16 @@ export const PRINTS: Print[] = [Print.Error, Print.Monotone, Print.Negative];
 export function describeRarity(rarity: Rarity): Description {
   const limit = COPY_LIMITS[rarity];
   const copies = describe`${token.value(limit)} ${limit === 1 ? 'copy' : 'copies'}`;
-  if (rarity === Rarity.Secret) {
-    return describe`Unlocks once you own every rare card of its aspect. Own up to ${copies}.`;
+  if (rarity === Rarity.Common) {
+    return describe`Unlocks once you pick an ability. Own up to ${copies}.`;
   }
-  return describe`Own up to ${copies}.`;
+  if (rarity === Rarity.Uncommon) {
+    return describe`Unlocks once you acquire ${token.value(RARITY_UNLOCK_COUNT)} Common cards. Own up to ${copies}.`;
+  }
+  if (rarity === Rarity.Rare) {
+    return describe`Unlocks once you acquire ${token.value(RARITY_UNLOCK_COUNT)} Uncommon cards. Own up to ${copies}.`;
+  }
+  return describe`Unlocks once you own every rare card of its aspect. Own up to ${copies}.`;
 }
 
 export function describePrint(print: Print): Description {

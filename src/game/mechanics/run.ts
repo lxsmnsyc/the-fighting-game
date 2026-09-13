@@ -1,5 +1,6 @@
 import { ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
+import { DEFAULT_LIFE } from '../constants';
 import { getRoundIncome } from '../economy';
 import { GameEvents } from '../events';
 import type Game from '../game';
@@ -33,11 +34,15 @@ export default function setupRunMechanics(game: Game): void {
   });
 
   game.on(GameEvents.StartRound, EventPriority.Exact, () => {
-    game.rng = createRoundRNG(game.seed, game.round);
+    game.rng = createRoundRNG(game.seed, game.round, game.attempt);
   });
 
   game.on(GameEvents.StartRound, EventPriority.Post, () => {
     openRoundStage(game);
+  });
+
+  game.on(GameEvents.CheckMaxLife, ValuePriority.Initial, (event) => {
+    event.value = DEFAULT_LIFE;
   });
 
   game.on(GameEvents.CheckRoundIncome, ValuePriority.Initial, (event) => {
@@ -52,6 +57,7 @@ export default function setupRunMechanics(game: Game): void {
 
   game.on(GameEvents.NextRound, EventPriority.Exact, () => {
     game.round++;
+    game.attempt = 0;
   });
 
   game.on(GameEvents.NextRound, EventPriority.Post, () => {

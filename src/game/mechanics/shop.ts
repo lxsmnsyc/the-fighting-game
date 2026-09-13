@@ -45,6 +45,10 @@ export default function setupShopMechanics(game: Game): void {
     event.value = CARD_PRICES[event.card.rarity];
   });
 
+  game.on(GameEvents.CheckPrintChance, ValuePriority.Initial, (event) => {
+    event.value = event.player.printSpawnChance[event.print];
+  });
+
   game.on(GameEvents.CheckCardSlots, ValuePriority.Initial, (event) => {
     event.value = getCardSlots(game.getPhase());
   });
@@ -68,6 +72,7 @@ export default function setupShopMechanics(game: Game): void {
 
   game.on(GameEvents.AcquireCard, EventPriority.Exact, ({ card }) => {
     game.player.deck.push(card);
+    game.player.acquired[card.source.rarity]++;
   });
 
   game.on(GameEvents.SellCard, EventPriority.Pre, (event) => {

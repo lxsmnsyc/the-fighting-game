@@ -2,24 +2,39 @@ import type Battle from '../battle/core';
 import type { BattleOptions } from '../battle/setup';
 import AleaRNG from '../core/alea';
 import { EventEngine } from '../core/event-engine';
+import type { BaseEvent } from '../core/event-emitter';
 import type { Ability, AbilityInstance } from './ability';
 import type { Card, CardInstance } from './card';
-import { ABILITY_PHASE_INTERVAL, ROUNDS_PER_PHASE } from './constants';
+import { ROUNDS_PER_PHASE } from './constants';
 import {
   type BuyCardGameEvent,
   type CheckCardPriceGameEvent,
   type CheckCardWeightGameEvent,
+  type CheckPrintChanceGameEvent,
   type GameEventMap,
   GameEvents,
   type GameValueEvent,
   type PickAbilityGameEvent,
   type RerollShopGameEvent,
 } from './events';
+import GameModeId from './modes/ids';
 import { Player } from './player';
-import { type BattleResult, GameStage, type PlayerStat, RunResult } from './types';
+import type { BattleSummary } from './summary';
+import {
+  type BattleResult,
+  GameStage,
+  type PlayerStat,
+  Print,
+  type PrintSpawnChance,
+  RunResult,
+} from './types';
 
 export interface GameOptions {
   battle?: BattleOptions;
+  /**
+   * The rules the run plays by. Standard when unset.
+   */
+  mode?: GameModeId;
 }
 
 export interface ShopState {
@@ -46,11 +61,13 @@ export interface RoundRNG {
  * Derived from the run seed and the round number alone, so a round
  * plays out the same whenever it is reached, including after a resume.
  */
-export function createRoundRNG(seed: string, round: number): RoundRNG {
+export function createRoundRNG(seed: string, round: number, attempt = 0): RoundRNG {
   const rng = new AleaRNG(`${seed}:round:${round}`);
   // Drawn in this order, so adding a stage never changes the others
+  const shop = rng.int32().toString();
   return {
-    shop: new AleaRNG(rng.int32().toString()),
+    // A replay rolls a new shop, but meets the same opponent
+    shop: new AleaRNG(attempt === 0 ? shop : `${shop}:attempt:${attempt}`),
     battle: new AleaRNG(rng.int32().toString()),
     draft: new AleaRNG(rng.int32().toString()),
   };
@@ -85,11 +102,25 @@ export default class Game extends EventEngine<GameEventMap> {
    */
   battle: Battle | undefined;
 
+  /**
+   * How many times the current round was replayed after a loss. Each
+   * replay rolls a new shop.
+   */
+  attempt = 0;
+
+  /**
+   * What happened in the last battle that ended.
+   */
+  summary: BattleSummary | undefined;
+
+  readonly mode: GameModeId;
+
   constructor(
     readonly seed: string,
     readonly options: GameOptions = {},
   ) {
     super();
+    this.mode = options.mode ?? GameModeId.Standard;
     this.rng = createRoundRNG(seed, this.round);
   }
 
@@ -113,10 +144,46 @@ export default class Game extends EventEngine<GameEventMap> {
 
   /**
    * How many abilities a player should have by the current phase: one
-   * from the start, and one more every `ABILITY_PHASE_INTERVAL` phases.
+   * from the start, and one more every `CheckAbilityInterval` phases.
    */
   getAbilityCount(): number {
-    return Math.floor((this.getPhase() - 1) / ABILITY_PHASE_INTERVAL) + 1;
+    return Math.floor((this.getPhase() - 1) / this.checkAbilityInterval()) + 1;
+  }
+
+  checkAbilityInterval(): number {
+    const event: GameValueEvent = { id: 'CheckAbilityInterval', disabled: false, value: 0 };
+    this.emit(GameEvents.CheckAbilityInterval, event);
+    // At least 1, so every phase at most offers one
+    return Math.max(1, event.value);
+  }
+
+  checkMaxLife(): number {
+    const event: GameValueEvent = { id: 'CheckMaxLife', disabled: false, value: 0 };
+    this.emit(GameEvents.CheckMaxLife, event);
+    return Math.max(1, event.value);
+  }
+
+  checkPrintChance(player: Player, print: keyof PrintSpawnChance): number {
+    const event: CheckPrintChanceGameEvent = {
+      id: 'CheckPrintChance',
+      disabled: false,
+      player,
+      print,
+      value: 0,
+    };
+    this.emit(GameEvents.CheckPrintChance, event);
+    return event.value;
+  }
+
+  /**
+   * How likely each print is on a card `player` gets.
+   */
+  checkPrintChances(player: Player): PrintSpawnChance {
+    return {
+      [Print.Error]: this.checkPrintChance(player, Print.Error),
+      [Print.Monotone]: this.checkPrintChance(player, Print.Monotone),
+      [Print.Negative]: this.checkPrintChance(player, Print.Negative),
+    };
   }
 
   // Run
@@ -284,5 +351,14 @@ export default class Game extends EventEngine<GameEventMap> {
 
   endBattle(battle: Battle, result: BattleResult): void {
     this.emit(GameEvents.EndBattle, { id: 'EndBattle', disabled: false, battle, result });
+  }
+
+  /**
+   * Leaves the battle summary. Returns whether it went through.
+   */
+  continueRun(): boolean {
+    const event: BaseEvent = { id: 'ContinueRun', disabled: false };
+    this.emit(GameEvents.ContinueRun, event);
+    return !event.disabled;
   }
 }

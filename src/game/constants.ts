@@ -55,6 +55,12 @@ export const BASE_REROLL_COST = 1;
  */
 export const REROLL_COST_STEP = 1;
 
+/**
+ * Cards of one rarity to acquire before the next rarity unlocks: Common
+ * cards unlock Uncommon ones, and Uncommon cards unlock Rare ones.
+ */
+export const RARITY_UNLOCK_COUNT = 10;
+
 export const CARD_PRICES: Record<Rarity, number> = {
   [Rarity.Common]: 3,
   [Rarity.Uncommon]: 5,
