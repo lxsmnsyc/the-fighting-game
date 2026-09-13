@@ -1,40 +1,29 @@
-import {
-  CardInstance,
-  DEFAULT_PRINT_SPAWN_CHANCE_MULTIPLIER,
-} from './core/card';
-import dagger from './core/effects/starter/dagger';
-import { Game } from './core/game';
-import { Player } from './core/player';
-import { Round, Unit } from './core/round';
-import { Edition } from './core/types';
+import STARTER_CARDS from './cards/starter';
+import Boss from './game/boss';
+import { CardInstance } from './game/card';
+import Game from './game/game';
+import createRound from './game/round';
+import setupGame from './game/setup';
 
-const game = new Game('ALEXIS', 'Alexis');
+const game = new Game('ALEXIS');
+setupGame(game);
+game.player.name = 'Alexis';
 
-const enemy = new Player(game.rng.int32(), 'Enemy');
+const enemy = new Boss(game.rng.boss.int32());
+enemy.name = 'Enemy';
 
-game.player.cards = [
-  new CardInstance(game.player, dagger, {
-    edition: Edition.Common,
-    print: DEFAULT_PRINT_SPAWN_CHANCE_MULTIPLIER,
-    rng: game.player.rng,
-  }),
-];
+const [armor, attack, corrosion, critical] = STARTER_CARDS;
 
-enemy.cards = [
-  new CardInstance(enemy, dagger, {
-    edition: Edition.Common,
-    print: DEFAULT_PRINT_SPAWN_CHANCE_MULTIPLIER,
-    rng: enemy.rng,
-  }),
-];
-
-for (const card of game.player.cards) {
-  card.source.load({ game, card });
-}
-for (const card of enemy.cards) {
-  card.source.load({ game, card });
-}
-
-game.nextRound(
-  new Round(game.rng.int32(), new Unit(game.player), new Unit(enemy)),
+game.player.deck.push(
+  new CardInstance(game.player, attack),
+  new CardInstance(game.player, critical),
+  new CardInstance(game.player, corrosion),
 );
+
+enemy.deck.push(new CardInstance(enemy, attack), new CardInstance(enemy, armor));
+
+game.setup();
+
+const battle = createRound(game, [enemy], { realtime: true, debug: true });
+game.startRound(battle);
+battle.start();

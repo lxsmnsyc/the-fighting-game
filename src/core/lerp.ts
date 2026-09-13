@@ -1,3 +1,3 @@
-export function lerp(x: number, y: number, time: number) {
+export default function lerp(x: number, y: number, time: number): number {
   return (1 - time) * x + time * y;
 }

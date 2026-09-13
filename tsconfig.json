@@ -1,22 +1,24 @@
 {
+  "exclude": ["node_modules"],
+  "include": ["src", "test"],
   "compilerOptions": {
-    "target": "ESNext",
     "module": "ESNext",
-    "lib": ["ESNext", "DOM"],
-    "moduleResolution": "Node",
-    "strict": true,
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
     "noEmit": true,
+    "sourceMap": true,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": [
-      "vite/client"
-    ]
-  },
-  "include": ["./src"]
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "useDefineForClassFields": false
+  }
 }

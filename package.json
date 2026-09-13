@@ -1,27 +1,37 @@
 {
-	"name": "the-fighting-game",
-	"type": "module",
-	"version": "0.1.0",
-	"private": true,
-	"publishConfig": {
-		"access": "restricted"
-	},
-	"author": "Alexis Munsayac",
-	"scripts": {
-		"dev": "vite",
-		"build": "vite build",
-		"start": "vite preview"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.3.4",
-		"autoprefixer": "^10.4.21",
-		"postcss": "^8.5.6",
-		"tailwindcss": "^4.1.17",
-		"typescript": "^5.9.3",
-		"vite": "^7.2.2",
-		"vite-plugin-solid": "^2.11.10"
-	},
-	"dependencies": {
-		"solid-js": "^1.9.10"
-	}
+  "name": "the-fighting-game",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Alexis Munsayac",
+  "type": "module",
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src test",
+    "format": "oxfmt src test",
+    "cs:add": "changeset add",
+    "cs:ver": "changeset version"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.15"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^3.0.2",
+    "@lxsmnsyc/oxlint-config": "^0.1.2",
+    "@tailwindcss/vite": "^4.3.3",
+    "oxfmt": "^0.67.0",
+    "oxlint": "^1.82.0",
+    "oxlint-tsgolint": "^7.0.2001",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0",
+    "vite-plugin-solid": "^2.11.14",
+    "vitest": "^5.0.0"
+  }
 }

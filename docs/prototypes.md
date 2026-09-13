@@ -16,4 +16,4 @@
 - Intimidate
 - Rough Skin
 - Huge Power
-- 
+-

@@ -1,8 +1,8 @@
 class Mash {
   private n = 0xefc8249d;
 
-  mash(data: string | number) {
-    const current = '' + data;
+  mash(data: string | number): number {
+    const current = String(data);
 
     for (let i = 0, l = current.length; i < l; i++) {
       this.n += current.charCodeAt(i);
@@ -16,11 +16,12 @@ class Mash {
       h -= this.n;
       this.n += h * 0x100000000;
     }
-    return (this.n >>> 0) * 2.3283064365386963e-10; // 2^-32
+    // 2^-32
+    return (this.n >>> 0) * 2.3283064365386963e-10;
   }
 }
 
-export class AleaRNG {
+export default class AleaRNG {
   private s0: number;
   private s1: number;
   private s2: number;
@@ -60,10 +61,11 @@ export class AleaRNG {
     }
   }
 
-  random() {
+  random(): number {
     this.steps++;
 
-    const t = 2091639 * this.s0 + this.c * 2.3283064365386963e-10; // 2^-32
+    // 2^-32
+    const t = 2091639 * this.s0 + this.c * 2.3283064365386963e-10;
 
     this.s0 = this.s1;
     this.s1 = this.s2;
@@ -73,7 +75,7 @@ export class AleaRNG {
     return this.s2;
   }
 
-  int32() {
+  int32(): number {
     return this.random() * 0x100000000;
   }
 }
