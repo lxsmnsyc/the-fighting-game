@@ -1,9 +1,11 @@
 import AleaRNG from '../core/alea';
+import type { AbilityInstance } from '../game/ability';
 import type { CardInstance } from '../game/card';
 import { DEFAULT_MAX_HEALTH, SELF_STACK } from './constants';
 import type Battle from './core';
 import {
   BattleEvents,
+  type CheckUnitAbilityCooldownEvent,
   type CheckUnitEnemyEvent,
   type CheckUnitEnergyPeriodEvent,
   type UnitDamageEvent,
@@ -379,5 +381,69 @@ export default class Unit {
       triggeringCards.delete(id);
     }
     return !event.disabled;
+  }
+
+  // Abilities
+
+  /**
+   * The abilities this unit holds, and how much each has charged, in
+   * milliseconds.
+   */
+  readonly abilities = new Map<AbilityInstance, number>();
+
+  addAbility(ability: AbilityInstance): void {
+    this.battle.emit(BattleEvents.UnitAddAbility, {
+      id: 'UnitAddAbility',
+      disabled: false,
+      source: this,
+      ability,
+    });
+  }
+
+  removeAbility(ability: AbilityInstance): void {
+    this.battle.emit(BattleEvents.UnitRemoveAbility, {
+      id: 'UnitRemoveAbility',
+      disabled: false,
+      source: this,
+      ability,
+    });
+  }
+
+  checkAbilityCooldown(ability: AbilityInstance): number {
+    const event: CheckUnitAbilityCooldownEvent = {
+      id: 'CheckUnitAbilityCooldown',
+      disabled: false,
+      source: this,
+      ability,
+      duration: 0,
+    };
+    this.battle.emit(BattleEvents.CheckUnitAbilityCooldown, event);
+    return event.duration;
+  }
+
+  /**
+   * Adds charge to an ability, in milliseconds. It triggers on the next
+   * tick once the charge reaches its cooldown.
+   */
+  chargeAbility(ability: AbilityInstance, value: number): void {
+    if (value === 0) {
+      return;
+    }
+    this.battle.emit(BattleEvents.UnitChargeAbility, {
+      id: 'UnitChargeAbility',
+      disabled: false,
+      source: this,
+      ability,
+      value,
+    });
+  }
+
+  triggerAbility(ability: AbilityInstance): void {
+    this.battle.emit(BattleEvents.UnitTriggerAbility, {
+      id: 'UnitTriggerAbility',
+      disabled: false,
+      source: this,
+      ability,
+    });
   }
 }

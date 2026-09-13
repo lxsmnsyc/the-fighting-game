@@ -2,14 +2,17 @@ import type Battle from '../battle/core';
 import type { BattleOptions } from '../battle/setup';
 import AleaRNG from '../core/alea';
 import { EventEngine } from '../core/event-engine';
+import type { Ability, AbilityInstance } from './ability';
 import type { Card, CardInstance } from './card';
-import { ROUNDS_PER_PHASE } from './constants';
+import { ABILITY_PHASE_INTERVAL, ROUNDS_PER_PHASE } from './constants';
 import {
   type BuyCardGameEvent,
   type CheckCardPriceGameEvent,
+  type CheckCardWeightGameEvent,
   type GameEventMap,
   GameEvents,
   type GameValueEvent,
+  type PickAbilityGameEvent,
   type RerollShopGameEvent,
 } from './events';
 import { Player } from './player';
@@ -25,12 +28,17 @@ export interface ShopState {
   rerolls: number;
 }
 
+export interface DraftState {
+  offers: Ability[];
+}
+
 /**
  * The RNG of one round, split by stage.
  */
 export interface RoundRNG {
   shop: AleaRNG;
   battle: AleaRNG;
+  draft: AleaRNG;
 }
 
 /**
@@ -39,14 +47,17 @@ export interface RoundRNG {
  */
 export function createRoundRNG(seed: string, round: number): RoundRNG {
   const rng = new AleaRNG(`${seed}:round:${round}`);
+  // Drawn in this order, so adding a stage never changes the others
   return {
     shop: new AleaRNG(rng.int32().toString()),
     battle: new AleaRNG(rng.int32().toString()),
+    draft: new AleaRNG(rng.int32().toString()),
   };
 }
 
 /**
- * One run: phases of rounds, each round a shop and then a battle.
+ * One endless run: phases of rounds, each round a shop and then a
+ * battle. Some rounds open with an ability draft.
  */
 export default class Game extends EventEngine<GameEventMap> {
   readonly player = new Player();
@@ -65,6 +76,8 @@ export default class Game extends EventEngine<GameEventMap> {
   rng: RoundRNG;
 
   readonly shop: ShopState = { offers: [], rerolls: 0 };
+
+  readonly draft: DraftState = { offers: [] };
 
   /**
    * The current battle, or the last one once it has ended.
@@ -95,6 +108,14 @@ export default class Game extends EventEngine<GameEventMap> {
 
   isBossRound(): boolean {
     return this.round % ROUNDS_PER_PHASE === 0;
+  }
+
+  /**
+   * How many abilities a player should have by the current phase: one
+   * from the start, and one more every `ABILITY_PHASE_INTERVAL` phases.
+   */
+  getAbilityCount(): number {
+    return Math.floor((this.getPhase() - 1) / ABILITY_PHASE_INTERVAL) + 1;
   }
 
   // Run
@@ -166,6 +187,17 @@ export default class Game extends EventEngine<GameEventMap> {
     return !event.disabled;
   }
 
+  checkCardWeight(card: Card): number {
+    const event: CheckCardWeightGameEvent = {
+      id: 'CheckCardWeight',
+      disabled: false,
+      card,
+      value: 0,
+    };
+    this.emit(GameEvents.CheckCardWeight, event);
+    return event.value;
+  }
+
   checkCardPrice(card: Card): number {
     const event: CheckCardPriceGameEvent = {
       id: 'CheckCardPrice',
@@ -212,6 +244,29 @@ export default class Game extends EventEngine<GameEventMap> {
 
   disableCard(card: CardInstance): void {
     this.emit(GameEvents.DisableCard, { id: 'DisableCard', disabled: false, card });
+  }
+
+  // Abilities
+
+  offerAbilities(): void {
+    this.emit(GameEvents.OfferAbilities, { id: 'OfferAbilities', disabled: false });
+  }
+
+  /**
+   * Picks the ability offered in `slot`. Returns whether it went through.
+   */
+  pickAbility(slot: number): boolean {
+    const ability = this.draft.offers.at(slot);
+    if (!ability) {
+      return false;
+    }
+    const event: PickAbilityGameEvent = { id: 'PickAbility', disabled: false, slot, ability };
+    this.emit(GameEvents.PickAbility, event);
+    return !event.disabled;
+  }
+
+  acquireAbility(ability: AbilityInstance): void {
+    this.emit(GameEvents.AcquireAbility, { id: 'AcquireAbility', disabled: false, ability });
   }
 
   // Battle

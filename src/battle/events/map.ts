@@ -4,10 +4,13 @@ import type { DamagePriority, ValuePriority } from '../types';
 import type { AllianceEvent, AllianceTeamEvent, TeamUnitEvent, TickEvent } from './field';
 import type BattleEvents from './names';
 import type {
+  CheckUnitAbilityCooldownEvent,
   CheckUnitEnemyEvent,
   CheckUnitEnergyPeriodEvent,
+  UnitAbilityEvent,
   UnitActionEvent,
   UnitCardEvent,
+  UnitChargeAbilityEvent,
   UnitConsumeEnergyEvent,
   UnitCriticalEvent,
   UnitDamageChildEvent,
@@ -25,6 +28,7 @@ export interface BattleEventMap extends EventMap {
   [BattleEvents.Start]: [BaseEvent, EventPriority];
   [BattleEvents.End]: [BaseEvent, EventPriority];
   [BattleEvents.Tick]: [TickEvent, EventPriority];
+  [BattleEvents.Fight]: [BaseEvent, EventPriority];
 
   [BattleEvents.AddAlliance]: [AllianceEvent, EventPriority];
   [BattleEvents.RemoveAlliance]: [AllianceEvent, EventPriority];
@@ -61,4 +65,10 @@ export interface BattleEventMap extends EventMap {
   [BattleEvents.UnitEnableCard]: [UnitCardEvent, EventPriority];
   [BattleEvents.UnitDisableCard]: [UnitCardEvent, EventPriority];
   [BattleEvents.UnitTriggerCard]: [UnitTriggerCardEvent, EventPriority];
+
+  [BattleEvents.UnitAddAbility]: [UnitAbilityEvent, EventPriority];
+  [BattleEvents.UnitRemoveAbility]: [UnitAbilityEvent, EventPriority];
+  [BattleEvents.UnitChargeAbility]: [UnitChargeAbilityEvent, ValuePriority];
+  [BattleEvents.UnitTriggerAbility]: [UnitAbilityEvent, EventPriority];
+  [BattleEvents.CheckUnitAbilityCooldown]: [CheckUnitAbilityCooldownEvent, ValuePriority];
 }

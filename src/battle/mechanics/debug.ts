@@ -50,6 +50,10 @@ export default function setupDebugMechanics(battle: Battle): void {
     log(`${describeUnit(event.source)} triggered ${event.card.source.name}`);
   });
 
+  battle.on(BattleEvents.UnitTriggerAbility, EventPriority.Post, (event) => {
+    log(`${describeUnit(event.source)} used ${event.ability.source.name}`);
+  });
+
   battle.on(BattleEvents.UnitFaints, EventPriority.Post, (event) => {
     log(`${describeUnit(event.source)} fainted`);
   });

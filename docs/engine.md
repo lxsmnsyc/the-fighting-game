@@ -9,7 +9,7 @@ directly: unit methods emit events, and mechanics apply them.
 - A `Battle` holds alliances.
 - An `Alliance` is a side. Its teams fight together.
 - A `Team` is what one `Player` brings. It holds units.
-- A `Unit` is a fighter. It holds stats, energy and cards.
+- A `Unit` is a fighter. It holds stats, energy, cards and abilities.
 
 The battle ends once one alliance or none has units standing. The outcome is
 checked after each tick.
@@ -74,3 +74,10 @@ resolves, its card id sits in `battle.triggeringCards`, and `triggerCard`
 refuses any card already there. This holds through any chain of events and
 other cards, and for copies of the same card. An effect that emits events must
 therefore run on `UnitTriggerCard`, where the rule can see it.
+
+## Abilities
+
+An ability's `setup` works like a card's. The ability mechanics in
+[src/battle/mechanics/ability.ts](../src/battle/mechanics/ability.ts) charge
+each ability on every tick and emit `UnitTriggerAbility` once it is full. The
+effect runs on that event at `Exact`. See [abilities.md](abilities.md).

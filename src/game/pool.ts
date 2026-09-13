@@ -1,8 +1,10 @@
+import ABILITIES from '../abilities';
 import CARDS from '../cards';
 import type CardId from '../cards/ids';
 import type AleaRNG from '../core/alea';
+import type { Ability } from './ability';
 import type { Card } from './card';
-import { COPY_LIMITS, SHOP_SIZE } from './constants';
+import { ABILITY_OFFER_SIZE, COPY_LIMITS, SHOP_SIZE } from './constants';
 import type Game from './game';
 import type { Player } from './player';
 import { RARITIES, Rarity } from './types';
@@ -23,38 +25,49 @@ export function getRarityWeights(phase: number): Record<Rarity, number> {
 }
 
 /**
- * Rolls a rarity by weight, then a card of that rarity. Rarities with
- * no card in `cards` are left out of the roll.
+ * Picks one item by weight. Items without a positive weight are never
+ * picked.
  */
-export function rollCard(rng: AleaRNG, cards: Card[], phase: number): Card | undefined {
-  const weights = getRarityWeights(phase);
-  const groups: { cards: Card[]; weight: number }[] = [];
-  let total = 0;
-
-  for (const rarity of RARITIES) {
-    const group = cards.filter((card) => card.rarity === rarity);
-    if (group.length > 0 && weights[rarity] > 0) {
-      groups.push({ cards: group, weight: weights[rarity] });
-      total += weights[rarity];
-    }
-  }
-
-  if (groups.length === 0) {
+function pickWeighted<T>(rng: AleaRNG, items: T[], getWeight: (item: T) => number): T | undefined {
+  const weights = items.map((item) => Math.max(0, getWeight(item)));
+  const total = weights.reduce((sum, weight) => sum + weight, 0);
+  if (total <= 0) {
     return undefined;
   }
 
   let roll = rng.random() * total;
-  // The last group catches any rounding left over
-  let picked = groups[groups.length - 1];
-  for (const group of groups) {
-    if (roll < group.weight) {
-      picked = group;
-      break;
+  // The last weighted item catches any rounding left over
+  let picked: T | undefined;
+  for (let index = 0; index < items.length; index++) {
+    if (weights[index] > 0) {
+      picked = items[index];
+      if (roll < weights[index]) {
+        break;
+      }
+      roll -= weights[index];
     }
-    roll -= group.weight;
   }
+  return picked;
+}
 
-  return picked.cards[Math.floor(rng.random() * picked.cards.length)];
+/**
+ * Rolls a rarity by weight, then a card of that rarity by `getWeight`.
+ * Rarities with no card in `cards` are left out of the roll.
+ */
+export function rollCard(
+  rng: AleaRNG,
+  cards: Card[],
+  phase: number,
+  getWeight: (card: Card) => number = () => 1,
+): Card | undefined {
+  const weights = getRarityWeights(phase);
+  const groups = RARITIES.map((rarity) => ({
+    rarity,
+    cards: cards.filter((card) => card.rarity === rarity && getWeight(card) > 0),
+  })).filter((group) => group.cards.length > 0);
+
+  const group = pickWeighted(rng, groups, (current) => weights[current.rarity]);
+  return group && pickWeighted(rng, group.cards, getWeight);
 }
 
 /**
@@ -87,7 +100,8 @@ export function isCardUnlocked(game: Game, card: Card): boolean {
 
 /**
  * A fresh set of shop offers. A card is only offered while its copies,
- * owned and already offered, stay under its rarity's limit.
+ * owned and already offered, stay under its rarity's limit. Cards that
+ * share aspects with the player's abilities are rolled more often.
  */
 export function rollShopOffers(game: Game): (Card | undefined)[] {
   const copies = countOwnedCards(game.player);
@@ -97,7 +111,9 @@ export function rollShopOffers(game: Game): (Card | undefined)[] {
     const available = CARDS.filter(
       (card) => isCardUnlocked(game, card) && (copies.get(card.id) ?? 0) < COPY_LIMITS[card.rarity],
     );
-    const card = rollCard(game.rng.shop, available, game.getPhase());
+    const card = rollCard(game.rng.shop, available, game.getPhase(), (current) =>
+      game.checkCardWeight(current),
+    );
     if (card) {
       copies.set(card.id, (copies.get(card.id) ?? 0) + 1);
     }
@@ -105,4 +121,42 @@ export function rollShopOffers(game: Game): (Card | undefined)[] {
   }
 
   return offers;
+}
+
+/**
+ * Up to `count` different abilities from `abilities`, each equally
+ * likely.
+ */
+export function rollAbilities(rng: AleaRNG, abilities: Ability[], count: number): Ability[] {
+  const remaining = [...abilities];
+  const rolled: Ability[] = [];
+  while (rolled.length < count && remaining.length > 0) {
+    const [ability] = remaining.splice(Math.floor(rng.random() * remaining.length), 1);
+    rolled.push(ability);
+  }
+  return rolled;
+}
+
+/**
+ * Abilities the player does not own yet.
+ */
+export function getAvailableAbilities(player: Player): Ability[] {
+  const owned = new Set(player.abilities.map((ability) => ability.source.id));
+  return ABILITIES.filter((ability) => !owned.has(ability.id));
+}
+
+export function rollAbilityOffers(game: Game): Ability[] {
+  return rollAbilities(game.rng.draft, getAvailableAbilities(game.player), ABILITY_OFFER_SIZE);
+}
+
+/**
+ * Whether the player is due an ability they have not picked yet. Checked
+ * from what they own, so a resumed or replayed round offers it again
+ * only if it was never picked.
+ */
+export function isAbilityOwed(game: Game): boolean {
+  return (
+    game.player.abilities.length < game.getAbilityCount() &&
+    getAvailableAbilities(game.player).length > 0
+  );
 }

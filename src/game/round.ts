@@ -7,7 +7,7 @@ import type { Player } from './player';
 
 /**
  * Puts a player's team on an alliance, with one unit holding the
- * player's deck.
+ * player's deck and abilities.
  */
 export function fieldPlayer(battle: Battle, alliance: Alliance, player: Player): Unit {
   const team = new Team(battle, alliance, player);
@@ -21,6 +21,10 @@ export function fieldPlayer(battle: Battle, alliance: Alliance, player: Player):
     if (card.disabled) {
       unit.disableCard(card);
     }
+  }
+
+  for (const ability of player.abilities) {
+    unit.addAbility(ability);
   }
 
   return unit;

@@ -105,6 +105,23 @@ describe('battle', () => {
   });
 });
 
+describe('countdown', () => {
+  it('holds the fight until the countdown is spent', () => {
+    const battle = createBattle('countdown', { countdown: 1000 });
+    const [unit] = createSide(battle, [createPlayer()]).units;
+    createSide(battle, [createPlayer()]);
+
+    battle.start();
+    expect(battle.fighting).toBe(false);
+    expect(unit.alive).toBe(false);
+
+    run(battle, 1000 + FRAME);
+    expect(battle.fighting).toBe(true);
+    expect(unit.alive).toBe(true);
+    expect(battle.elapsed).toBeLessThan(FRAME * 2);
+  });
+});
+
 describe('cards', () => {
   it('run while enabled and skip while disabled', () => {
     const battle = createBattle('cards');

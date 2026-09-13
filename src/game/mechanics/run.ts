@@ -1,13 +1,15 @@
 import { ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
-import { BASE_ROUND_INCOME, PHASES, PHASE_INCOME, ROUNDS_PER_PHASE } from '../constants';
+import { BASE_ROUND_INCOME, PHASE_INCOME } from '../constants';
 import { GameEvents } from '../events';
 import type Game from '../game';
 import { createRoundRNG } from '../game';
-import { GameStage, RunResult } from '../types';
+import { GameStage } from '../types';
+import { openRoundStage } from './ability';
 
 /**
- * Moves the run through its rounds, and ends it.
+ * Moves the run through its rounds, and ends it. Runs are endless:
+ * only losing the last life ends one.
  */
 export default function setupRunMechanics(game: Game): void {
   game.on(GameEvents.Start, EventPriority.Pre, (event) => {
@@ -35,7 +37,7 @@ export default function setupRunMechanics(game: Game): void {
   });
 
   game.on(GameEvents.StartRound, EventPriority.Post, () => {
-    game.openShop();
+    openRoundStage(game);
   });
 
   game.on(GameEvents.CheckRoundIncome, ValuePriority.Initial, (event) => {
@@ -45,12 +47,6 @@ export default function setupRunMechanics(game: Game): void {
   game.on(GameEvents.NextRound, EventPriority.Pre, (event) => {
     if (game.stage === GameStage.Ended) {
       event.disabled = true;
-      return;
-    }
-    // Clearing the last round of the last phase wins the run
-    if (game.round >= PHASES * ROUNDS_PER_PHASE) {
-      event.disabled = true;
-      game.end(RunResult.Won);
     }
   });
 

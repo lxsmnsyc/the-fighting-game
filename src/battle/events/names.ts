@@ -64,6 +64,30 @@ const enum BattleEvents {
    * that set them off apply it here on `Exact`.
    */
   UnitTriggerCard = 32,
+
+  /**
+   * The countdown is over and the units enter. `Start` only starts the
+   * clock, and the countdown is spent from its ticks.
+   */
+  Fight = 33,
+
+  // Abilities
+  UnitAddAbility = 34,
+  UnitRemoveAbility = 35,
+  /**
+   * An ability's cooldown is charged. The ability triggers on the next
+   * tick once its charge reaches the cooldown.
+   */
+  UnitChargeAbility = 36,
+  /**
+   * An ability takes effect. Abilities apply their effect here on
+   * `Exact`, and their charge starts over.
+   */
+  UnitTriggerAbility = 37,
+  /**
+   * How long an ability takes to charge, in milliseconds.
+   */
+  CheckUnitAbilityCooldown = 38,
 }
 
 export default BattleEvents;

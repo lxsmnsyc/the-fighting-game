@@ -1,5 +1,8 @@
+import { getAbility } from '../abilities';
+import type AbilityId from '../abilities/ids';
 import { getCard } from '../cards';
 import type CardId from '../cards/ids';
+import { AbilityInstance } from './ability';
 import { CardInstance } from './card';
 import type Game from './game';
 import type { GameOptions } from './game';
@@ -14,8 +17,9 @@ export interface CardSave {
 }
 
 /**
- * What it takes to resume a run at the start of a round. The shop and
- * the opponent are derived again from the seed and the round number.
+ * What it takes to resume a run at the start of a round. The shop, the
+ * ability offers and the opponent are derived again from the seed and
+ * the round number.
  */
 export interface GameSave {
   seed: string;
@@ -23,11 +27,12 @@ export interface GameSave {
   lives: number;
   gold: number;
   cards: CardSave[];
+  abilities: AbilityId[];
 }
 
 /**
  * Take it when a round starts: a save from later in the round resumes
- * at its start, with whatever was bought since.
+ * at its start, with whatever was bought or picked since.
  */
 export function saveGame(game: Game): GameSave {
   return {
@@ -41,12 +46,13 @@ export function saveGame(game: Game): GameSave {
       print: card.print,
       disabled: card.disabled,
     })),
+    abilities: game.player.abilities.map((ability) => ability.source.id),
   };
 }
 
 /**
- * A run restored from a save. Call `start` to open the saved round's
- * shop.
+ * A run restored from a save. Call `start` to open the saved round, with
+ * an ability draft first if one was never picked.
  */
 export function resumeGame(save: GameSave, options?: GameOptions): Game {
   const game = createGame(save.seed, options);
@@ -58,6 +64,10 @@ export function resumeGame(save: GameSave, options?: GameOptions): Game {
     const card = new CardInstance(game.player, getCard(state.id), state.print, state.edition);
     card.disabled = state.disabled;
     game.player.deck.push(card);
+  }
+
+  for (const id of save.abilities) {
+    game.player.abilities.push(new AbilityInstance(game.player, getAbility(id)));
   }
 
   return game;

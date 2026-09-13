@@ -15,6 +15,21 @@ export const CONSUMABLE_STACKS = 0.4;
 export const NATURAL_PERIOD = 1000;
 
 /**
+ * Speed or Slow at which an ability's cooldown is changed the most.
+ */
+export const MAX_COOLDOWN_STACKS = 1000;
+
+/**
+ * Share of an ability's cooldown that Speed can take off.
+ */
+export const MAX_COOLDOWN_REDUCTION = 0.5;
+
+/**
+ * Share of an ability's cooldown that Slow can add.
+ */
+export const MAX_COOLDOWN_INCREASE = 0.5;
+
+/**
  * Whether an energy goes on the unit that gains it. The rest are put
  * on an enemy instead.
  */

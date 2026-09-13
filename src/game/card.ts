@@ -73,8 +73,9 @@ export function getRandomPrint(rng: AleaRNG, multiplier: PrintSpawnChance): numb
   return print;
 }
 
-const MIN_ERROR_VALUE = 0.75;
-const MAX_ERROR_VALUE = 1.25;
+export const MIN_ERROR_VALUE = 0.75;
+export const MAX_ERROR_VALUE = 1.25;
+export const MONOTONE_MULTIPLIER = 2;
 
 /**
  * One copy of a card. It holds no RNG: its print is rolled once when it
@@ -108,7 +109,7 @@ export class CardInstance {
       result = lerp(value * MIN_ERROR_VALUE, value * MAX_ERROR_VALUE, rng.random());
     }
     if (this.print & Print.Monotone) {
-      result *= 2;
+      result *= MONOTONE_MULTIPLIER;
     }
 
     return result;

@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-zinc-950 text-zinc-100 antialiased;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+  }
+}

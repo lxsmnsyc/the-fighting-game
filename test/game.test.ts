@@ -5,11 +5,13 @@ import CardId from '../src/cards/ids';
 import { MergedLifecycle } from '../src/core/lifecycle';
 import { CardInstance, createCard } from '../src/game/card';
 import {
+  ABILITY_BIAS,
+  ABILITY_OFFER_SIZE,
+  ABILITY_PHASE_INTERVAL,
   CARD_PRICES,
   COPY_LIMITS,
   DEFAULT_GOLD,
   DEFAULT_LIFE,
-  PHASES,
   ROUNDS_PER_PHASE,
   SHOP_SIZE,
 } from '../src/game/constants';
@@ -21,9 +23,11 @@ import { resumeGame, saveGame } from '../src/game/save';
 import createGame from '../src/game/setup';
 import { Aspect, BattleResult, GameStage, PlayerStat, Rarity, RunResult } from '../src/game/types';
 
+// Starts a run and picks the first ability, which opens the first shop
 function startGame(): Game {
   const game = createGame('run');
   game.start();
+  game.pickAbility(0);
   return game;
 }
 
@@ -56,8 +60,18 @@ function getOpponentCards(game: Game): CardId[] {
 }
 
 describe('run', () => {
-  it('starts in the first shop with full lives', () => {
-    const game = startGame();
+  it('opens with an ability draft, then the first shop with full lives', () => {
+    const game = createGame('run');
+    game.start();
+
+    expect(game.stage).toBe(GameStage.Draft);
+    expect(game.draft.offers).toHaveLength(ABILITY_OFFER_SIZE);
+    expect(new Set(game.draft.offers).size).toBe(ABILITY_OFFER_SIZE);
+
+    const [ability] = game.draft.offers;
+    expect(game.pickAbility(0)).toBe(true);
+    expect(game.player.abilities.map((instance) => instance.source)).toEqual([ability]);
+    expect(game.pickAbility(0)).toBe(false);
 
     expect(game.player.stats[PlayerStat.Life]).toBe(DEFAULT_LIFE);
     expect(game.player.stats[PlayerStat.Gold]).toBe(DEFAULT_GOLD);
@@ -89,6 +103,7 @@ describe('run', () => {
     expect(game.stage).toBe(GameStage.Shop);
     expect(game.player.stats[PlayerStat.Life]).toBe(DEFAULT_LIFE - 1);
     expect(game.player.stats[PlayerStat.Gold]).toBe(DEFAULT_GOLD + income);
+    expect(game.player.abilities).toHaveLength(1);
   });
 
   it('ends when the last life is lost', () => {
@@ -116,14 +131,22 @@ describe('run', () => {
     expect(game.getPhaseRound()).toBe(1);
   });
 
-  it('is won by clearing the last phase', () => {
+  it('never ends by winning, and offers another ability every few phases', () => {
     const game = startGame();
-    game.round = PHASES * ROUNDS_PER_PHASE;
+    game.round = ABILITY_PHASE_INTERVAL * ROUNDS_PER_PHASE;
 
     finishBattle(game, BattleResult.Won);
 
-    expect(game.result).toBe(RunResult.Won);
-    expect(game.stage).toBe(GameStage.Ended);
+    expect(game.result).toBe(RunResult.Ongoing);
+    expect(game.getPhase()).toBe(ABILITY_PHASE_INTERVAL + 1);
+    expect(game.stage).toBe(GameStage.Draft);
+    const [owned] = game.player.abilities;
+    expect(game.draft.offers).toHaveLength(ABILITY_OFFER_SIZE);
+    expect(game.draft.offers).not.toContain(owned.source);
+
+    expect(game.pickAbility(ABILITY_OFFER_SIZE - 1)).toBe(true);
+    expect(game.player.abilities).toHaveLength(2);
+    expect(game.stage).toBe(GameStage.Shop);
   });
 
   it('rolls the same opponent for the same round, and more cards for a boss', () => {
@@ -135,6 +158,7 @@ describe('run', () => {
     expect(again.deck.map((card) => card.source.id)).toEqual(
       first.deck.map((card) => card.source.id),
     );
+    expect(first.abilities).toHaveLength(0);
 
     game.round = ROUNDS_PER_PHASE;
     const boss = createOpponent(game, createRoundRNG(game.seed, game.round).battle);
@@ -142,7 +166,27 @@ describe('run', () => {
     expect(boss.deck.length).toBeGreaterThan(first.deck.length);
   });
 
-  it('resumes a saved round with the same shop, opponent and cards', () => {
+  it('gives bosses as many abilities as the player is due', () => {
+    const game = startGame();
+
+    game.round = ROUNDS_PER_PHASE;
+    const boss = createOpponent(game, createRoundRNG(game.seed, game.round).battle);
+    expect(boss.abilities).toHaveLength(1);
+    expect(boss.aspects).toEqual(boss.abilities[0].source.aspects);
+
+    game.round = (ABILITY_PHASE_INTERVAL + 1) * ROUNDS_PER_PHASE;
+    const later = createOpponent(game, createRoundRNG(game.seed, game.round).battle);
+    expect(later.abilities).toHaveLength(2);
+
+    game.round = ROUNDS_PER_PHASE;
+    game.startBattle();
+    const units = [...(game.battle?.units() ?? [])];
+    expect(
+      units.some((unit) => unit.team.player !== game.player && unit.abilities.size === 1),
+    ).toBe(true);
+  });
+
+  it('resumes a saved round with the same shop, opponent, cards and abilities', () => {
     const game = startGame();
     game.setStat(PlayerStat.Gold, 100);
     for (let slot = 0; slot < SHOP_SIZE; slot++) {
@@ -158,6 +202,7 @@ describe('run', () => {
     resumed.start();
 
     expect(resumed.round).toBe(2);
+    expect(resumed.stage).toBe(GameStage.Shop);
     expect(resumed.player.stats).toEqual(game.player.stats);
     expect(saveGame(resumed)).toEqual(save);
     expect(resumed.shop.offers.map((card) => card?.id)).toEqual(offers);
@@ -165,6 +210,18 @@ describe('run', () => {
     resumed.startBattle();
     expect(resumed.battle?.seed).toBe(game.battle?.seed);
     expect(getOpponentCards(resumed)).toEqual(getOpponentCards(game));
+  });
+
+  it('offers the same draft again when resumed before picking', () => {
+    const game = createGame('run');
+    game.start();
+    const save = saveGame(game);
+
+    const resumed = resumeGame(save);
+    resumed.start();
+
+    expect(resumed.stage).toBe(GameStage.Draft);
+    expect(resumed.draft.offers).toEqual(game.draft.offers);
   });
 });
 
@@ -224,6 +281,21 @@ describe('shop', () => {
     for (const card of CARDS) {
       expect(owned.get(card.id) ?? 0).toBeLessThanOrEqual(COPY_LIMITS[card.rarity]);
     }
+  });
+
+  it('favors cards that share aspects with owned abilities', () => {
+    const game = startGame();
+    const [ability] = game.player.abilities;
+    const matching = CARDS.find((card) => card.aspect.includes(ability.source.aspects[0]));
+    const unrelated = CARDS.find((card) =>
+      card.aspect.every((aspect) => !ability.source.aspects.includes(aspect)),
+    );
+    if (!matching || !unrelated) {
+      throw new Error('The card pool is missing a case');
+    }
+
+    expect(game.checkCardWeight(matching)).toBeGreaterThanOrEqual(1 + ABILITY_BIAS);
+    expect(game.checkCardWeight(unrelated)).toBe(1);
   });
 
   it('keeps a secret card locked until every rare of its aspect is owned', () => {

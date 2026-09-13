@@ -5,16 +5,28 @@ export const DEFAULT_GOLD = 5;
 export const DEFAULT_LIFE = 3;
 
 /**
- * Phases to clear to win the run.
- */
-export const PHASES = 8;
-
-/**
  * Rounds in a phase. The last one is a boss.
  */
 export const ROUNDS_PER_PHASE = 3;
 
 export const SHOP_SIZE = 5;
+
+/**
+ * Abilities offered to choose from.
+ */
+export const ABILITY_OFFER_SIZE = 5;
+
+/**
+ * Phases between ability offers. The first offer comes with the first
+ * round.
+ */
+export const ABILITY_PHASE_INTERVAL = 8;
+
+/**
+ * Weight a card gains in rolls for each aspect it shares with an owned
+ * ability. Every card starts at a weight of 1.
+ */
+export const ABILITY_BIAS = 2;
 
 /**
  * Gold earned when a battle ends, before the phase bonus.

@@ -53,12 +53,16 @@ export const enum GameStage {
   Shop = 1,
   Battle = 2,
   Ended = 3,
+  // Choosing an ability, before the shop
+  Draft = 4,
 }
 
+/**
+ * Runs are endless, so the only way one ends is by losing it.
+ */
 export const enum RunResult {
   Ongoing = 0,
-  Won = 1,
-  Lost = 2,
+  Lost = 1,
 }
 
 export const enum BattleResult {

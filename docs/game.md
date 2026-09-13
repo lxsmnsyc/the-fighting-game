@@ -1,13 +1,14 @@
 # Game flow
 
-A run is one game, from a random seed until it is won or lost. It lives in
-[src/game/game.ts](../src/game/game.ts) and, like a battle, every rule is a
-listener on its event bus.
+A run is one game, from a random seed until the player runs out of lives. It
+lives in [src/game/game.ts](../src/game/game.ts) and, like a battle, every rule
+is a listener on its event bus.
 
 ```ts
 const game = createGame(); // or createGame(seed)
-game.start(); // opens the first shop
+game.start(); // opens the first ability draft
 
+game.pickAbility(0); // opens the shop
 game.rerollShop();
 game.buyCard(0);
 game.startBattle();
@@ -15,32 +16,45 @@ game.startBattle();
 
 ## Structure
 
-- A run has `PHASES` (8) phases.
+- A run is endless. It only ends when the last life is lost.
 - A phase has `ROUNDS_PER_PHASE` (3) rounds. The last round of each phase is a
   boss fight.
-- A round has two stages: the shop, then the battle.
+- A round has two stages: the shop, then the battle. Some rounds open with an
+  ability draft first.
 - `game.round` counts rounds across the whole run. `getPhase()` and
   `getPhaseRound()` place it within a phase.
 - The player starts with 3 lives and 5 gold.
 
 ## Rounds
 
-1. The shop opens with 5 offers.
-2. The player buys cards, rerolls, or starts the battle.
-3. The battle ends and the player earns gold. Income rises with the phase.
-4. The result decides what comes next:
+1. If the player is due an ability, the draft opens with 5 offers and the player
+   picks one.
+2. The shop opens with 5 offers.
+3. The player buys cards, rerolls, or starts the battle.
+4. The battle ends and the player earns gold. Income rises with the phase.
+5. The result decides what comes next:
    - A win or a draw moves to the next round.
    - A loss costs a life and replays the same round.
    - Losing the last life ends the run.
-   - Clearing the boss round of the last phase wins the run.
 
 A battle that runs past `BATTLE_TIME_LIMIT` (60 seconds) is a draw.
+
+## Abilities
+
+- The player is due one ability from the start, and one more every
+  `ABILITY_PHASE_INTERVAL` (8) phases.
+- What the player is due is checked against what they own. So a replayed or
+  resumed round only opens a draft if its ability was never picked.
+
+See [abilities.md](abilities.md) for how abilities work.
 
 ## Shop
 
 - Rerolling costs 1 gold, and 1 more for each reroll in the same visit.
 - A card costs gold by rarity. Selling it refunds half.
-- Offers are rolled by rarity weight. Later phases lean toward rarer cards.
+- Offers roll a rarity by weight, then a card of that rarity by weight. Later
+  phases lean toward rarer cards.
+- Cards that share aspects with the player's abilities weigh more.
 - The player can own a limited number of copies of each card: 1 per starter, 5
   per common, 3 per uncommon, and 1 per rare or secret.
 - A secret card stays locked until the player owns every rare card of its first
@@ -53,11 +67,12 @@ resumed round meets the same opponent.
 
 - It picks a pair of aspects and draws cards from them.
 - Its card count grows with the phase and the round.
-- A boss gets 2 more cards.
+- A boss gets 2 more cards and as many abilities as the player is due. Its first
+  ability decides its aspects, and all of them bias its cards.
 
 ## Saving
 
 `saveGame(game)` keeps what a round cannot roll again: the seed, the round,
-lives, gold and the cards. `resumeGame(save)` restores the run at the start of
-that round. Take the save when a round starts. See [rng.md](rng.md) for why
-that is enough.
+lives, gold, the cards and the abilities. `resumeGame(save)` restores the run at
+the start of that round. Take the save when a round starts. See
+[rng.md](rng.md) for why that is enough.

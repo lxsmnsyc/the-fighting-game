@@ -4,7 +4,7 @@ import { BattleEvents } from '../events';
 import { Stat, ValuePriority } from '../types';
 
 export default function setupUnitMechanics(battle: Battle): void {
-  battle.on(BattleEvents.Start, EventPriority.Exact, () => {
+  battle.on(BattleEvents.Fight, EventPriority.Exact, () => {
     for (const unit of battle.units()) {
       unit.enter();
     }

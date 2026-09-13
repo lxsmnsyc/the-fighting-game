@@ -29,6 +29,32 @@ export default class Battle extends EventEngine<BattleEventMap> {
    */
   winner: Alliance | null = null;
 
+  /**
+   * Whether `start` has run and the clock is running.
+   */
+  started = false;
+
+  /**
+   * Battle time left before the fight begins, in milliseconds.
+   */
+  countdown = 0;
+
+  /**
+   * Whether the countdown is over and the units have entered.
+   */
+  fighting = false;
+
+  /**
+   * Battle time since the fight began, in milliseconds.
+   */
+  elapsed = 0;
+
+  /**
+   * How long the battle may run before it ends in a draw, in
+   * milliseconds. Zero means no limit.
+   */
+  timeLimit = 0;
+
   readonly alliances = new Set<Alliance>();
 
   /**
@@ -40,6 +66,13 @@ export default class Battle extends EventEngine<BattleEventMap> {
   start(): void {
     this.emit(BattleEvents.Start, {
       id: 'Start',
+      disabled: false,
+    });
+  }
+
+  fight(): void {
+    this.emit(BattleEvents.Fight, {
+      id: 'Fight',
       disabled: false,
     });
   }
@@ -79,7 +112,7 @@ export default class Battle extends EventEngine<BattleEventMap> {
    * Every team, optionally leaving out one alliance (such as a unit's
    * own, to reach only enemies).
    */
-  *teams(exclude?: Alliance): Generator<Team> {
+  *teams(exclude?: Alliance): Generator<Team, void, undefined> {
     for (const alliance of this.alliances) {
       if (alliance !== exclude) {
         yield* alliance.teams;
@@ -90,7 +123,7 @@ export default class Battle extends EventEngine<BattleEventMap> {
   /**
    * Every unit, optionally leaving out one alliance.
    */
-  *units(exclude?: Alliance): Generator<Unit> {
+  *units(exclude?: Alliance): Generator<Unit, void, undefined> {
     for (const team of this.teams(exclude)) {
       yield* team.units;
     }

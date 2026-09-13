@@ -6,7 +6,7 @@ import { DamagePriority, Energy, ValuePriority } from '../types';
 import { isMissedDamage } from './damage';
 
 // Energy at which every attack is critical
-const MAX_CRITICAL_STACKS = 1000;
+export const MAX_CRITICAL_STACKS = 1000;
 
 export default function setupCriticalMechanics(battle: Battle): void {
   battle.on(BattleEvents.UnitDamage, DamagePriority.Critical, (event) => {

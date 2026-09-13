@@ -5,7 +5,7 @@ import { DamagePriority, Energy, ValuePriority } from '../types';
 import { isMissedDamage } from './damage';
 
 // Energy at which every attack is dodged
-const MAX_DODGE_STACKS = 1000;
+export const MAX_DODGE_STACKS = 1000;
 
 export default function setupDodgeMechanics(battle: Battle): void {
   battle.on(BattleEvents.UnitDamage, DamagePriority.Dodge, (event) => {

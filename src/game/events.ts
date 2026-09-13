@@ -2,6 +2,7 @@ import type Battle from '../battle/core';
 import type { ValuePriority } from '../battle/types';
 import type { BaseEvent, EventPriority } from '../core/event-emitter';
 import type { EventMap } from '../core/event-engine';
+import type { Ability, AbilityInstance } from './ability';
 import type { Card, CardInstance } from './card';
 import type { BattleResult, PlayerStat, RunResult } from './types';
 
@@ -37,6 +38,16 @@ export const enum GameEvents {
   // Battle
   StartBattle = 17,
   EndBattle = 18,
+
+  // Abilities
+  OfferAbilities = 19,
+  PickAbility = 20,
+  AcquireAbility = 21,
+  /**
+   * How likely a card is to be rolled in the shop, against the other
+   * cards of its rarity.
+   */
+  CheckCardWeight = 22,
 }
 
 export interface EndGameEvent extends BaseEvent {
@@ -82,6 +93,20 @@ export interface EndBattleGameEvent extends BaseEvent {
   result: BattleResult;
 }
 
+export interface PickAbilityGameEvent extends BaseEvent {
+  slot: number;
+  ability: Ability;
+}
+
+export interface AbilityGameEvent extends BaseEvent {
+  ability: AbilityInstance;
+}
+
+export interface CheckCardWeightGameEvent extends BaseEvent {
+  card: Card;
+  value: number;
+}
+
 export interface GameEventMap extends EventMap {
   [GameEvents.Start]: [BaseEvent, EventPriority];
   [GameEvents.End]: [EndGameEvent, EventPriority];
@@ -106,4 +131,9 @@ export interface GameEventMap extends EventMap {
 
   [GameEvents.StartBattle]: [BaseEvent, EventPriority];
   [GameEvents.EndBattle]: [EndBattleGameEvent, EventPriority];
+
+  [GameEvents.OfferAbilities]: [BaseEvent, EventPriority];
+  [GameEvents.PickAbility]: [PickAbilityGameEvent, EventPriority];
+  [GameEvents.AcquireAbility]: [AbilityGameEvent, EventPriority];
+  [GameEvents.CheckCardWeight]: [CheckCardWeightGameEvent, ValuePriority];
 }

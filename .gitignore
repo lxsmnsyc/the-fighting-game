@@ -76,3 +76,8 @@ typings/
 .fusebox/
 # Vite build output
 dist
+
+# Playwright
+test-results
+playwright-report
+.playwright

@@ -9,9 +9,14 @@ way. Every RNG is an Alea instance.
   - **Round `n`** is derived from the seed and the round number only.
     - **Shop** rolls the offers when the shop opens and on each reroll. It
       also rolls the print of each card bought.
-    - **Battle** rolls the opponent, then seeds the battle.
+    - **Battle** rolls the opponent and a boss's abilities, then seeds the
+      battle.
       - **Unit** gets one RNG per unit, for chance-based effects such as Dodge
         and Critical.
+    - **Draft** rolls the ability offers.
+
+Each stage's seed is drawn from the round in a fixed order. A new stage is
+drawn last, so adding one never changes the others.
 
 Round numbers count across the whole run, so round 4 is the first round of
 phase 2.
@@ -25,8 +30,9 @@ of any round from a save of:
 - The round number.
 - Lives and gold.
 - The cards: id, edition, print and whether each is disabled.
+- The ability ids.
 
-The shop and the opponent are rolled again and come out the same. See
+The draft, the shop and the opponent are rolled again and come out the same. See
 `saveGame` and `resumeGame` in [src/game/save.ts](../src/game/save.ts).
 
 Cards and players hold no RNG. A card's print is rolled once when it is

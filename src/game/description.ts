@@ -169,7 +169,7 @@ function formatValue(current: ValueToken): string {
   return `${formatNumber(current.value)}${UNIT_SUFFIXES[current.unit]}`;
 }
 
-function formatToken(current: DescriptionToken): string {
+export function formatToken(current: DescriptionToken): string {
   if (current.type === TokenType.Text) {
     return current.text;
   }

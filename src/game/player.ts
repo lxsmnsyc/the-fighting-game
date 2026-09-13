@@ -1,3 +1,4 @@
+import type { AbilityInstance } from './ability';
 import type { Card, CardInstance } from './card';
 import { DEFAULT_GOLD, DEFAULT_LIFE } from './constants';
 import { PlayerStat, Print, type PrintSpawnChance } from './types';
@@ -23,6 +24,8 @@ export class Player {
   name: string | undefined;
 
   readonly deck: CardInstance[] = [];
+
+  readonly abilities: AbilityInstance[] = [];
 
   readonly cardPool: Card[] = [];
 }

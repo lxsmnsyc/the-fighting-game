@@ -1,4 +1,5 @@
 import type { BaseEvent } from '../../core/event-emitter';
+import type { AbilityInstance } from '../../game/ability';
 import type { CardInstance } from '../../game/card';
 import type { DamageType, Energy, Stat } from '../types';
 import type Unit from '../unit';
@@ -82,4 +83,22 @@ export interface UnitCardEvent extends UnitEvent {
 export interface UnitTriggerCardEvent extends UnitCardEvent {
   target: Unit;
   value: number;
+}
+
+export interface UnitAbilityEvent extends UnitEvent {
+  ability: AbilityInstance;
+}
+
+/**
+ * `value` is the charge added, in milliseconds.
+ */
+export interface UnitChargeAbilityEvent extends UnitAbilityEvent {
+  value: number;
+}
+
+/**
+ * `duration` is in milliseconds.
+ */
+export interface CheckUnitAbilityCooldownEvent extends UnitAbilityEvent {
+  duration: number;
 }

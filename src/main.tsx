@@ -1,11 +1,9 @@
-import createGame from './game/setup';
+import { render } from 'solid-js/web';
+import './index.css';
+import App from './ui/app';
 
-const game = createGame(undefined, { battle: { realtime: true, debug: true } });
-game.player.name = 'Player';
-game.start();
+const root = document.getElementById('root');
 
-// Buy what the first shop offers, then fight
-for (let slot = 0; slot < game.shop.offers.length; slot++) {
-  game.buyCard(slot);
+if (root) {
+  render(() => <App />, root);
 }
-game.startBattle();

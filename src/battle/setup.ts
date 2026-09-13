@@ -1,4 +1,5 @@
 import Battle from './core';
+import setupAbilityMechanics from './mechanics/ability';
 import setupArmorMechanics from './mechanics/armor';
 import setupAttackMechanics from './mechanics/attack';
 import setupCardMechanics from './mechanics/card';
@@ -34,6 +35,11 @@ export interface BattleOptions {
    * draw. Zero or unset means no limit.
    */
   timeLimit?: number;
+  /**
+   * Battle time to count down before the fight begins, in
+   * milliseconds. Zero or unset begins it with `start`.
+   */
+  countdown?: number;
 }
 
 /**
@@ -63,13 +69,16 @@ export default function createBattle(seed: string, options?: BattleOptions): Bat
   setupHealingMechanics(battle);
 
   setupCardMechanics(battle);
+  setupAbilityMechanics(battle);
 
   if (options?.debug === true) {
     setupDebugMechanics(battle);
   }
 
   // Last, so it sees each tick after everything else resolved
-  setupOutcomeMechanics(battle, options?.timeLimit ?? 0);
+  battle.timeLimit = options?.timeLimit ?? 0;
+  battle.countdown = options?.countdown ?? 0;
+  setupOutcomeMechanics(battle);
 
   if (options?.realtime === true) {
     setupRealtimeMechanics(battle);
