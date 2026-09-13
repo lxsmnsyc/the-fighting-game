@@ -88,6 +88,13 @@ const enum BattleEvents {
    * How long an ability takes to charge, in milliseconds.
    */
   CheckUnitAbilityCooldown = 38,
+
+  /**
+   * How much of an energy a unit hands out on its own every
+   * `ENERGY_GAIN_PERIOD`: to itself, or to an enemy for energies that
+   * do not stack on their owner.
+   */
+  CheckUnitEnergyGain = 39,
 }
 
 export default BattleEvents;

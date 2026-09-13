@@ -9,6 +9,7 @@ import setupDamageMechanics from './mechanics/damage';
 import setupDebugMechanics from './mechanics/debug';
 import setupDodgeMechanics from './mechanics/dodge';
 import setupEnergyMechanics from './mechanics/energy';
+import setupEnergyGainMechanics from './mechanics/energy-gain';
 import setupFieldMechanics from './mechanics/field';
 import setupHealingMechanics from './mechanics/healing';
 import setupMagicMechanics from './mechanics/magic';
@@ -67,6 +68,9 @@ export default function createBattle(seed: string, options?: BattleOptions): Bat
   setupSpeedMechanics(battle);
   setupSlowMechanics(battle);
   setupHealingMechanics(battle);
+
+  // Energy every unit gains on its own
+  setupEnergyGainMechanics(battle);
 
   setupCardMechanics(battle);
   setupAbilityMechanics(battle);

@@ -55,6 +55,10 @@ The shared rules live in
   unless `NoConsume` is set.
 - Each energy triggers on its own period, answered by `CheckUnitEnergyPeriod`.
   Energies with no period, such as Magic, never trigger on their own.
+- Every standing unit hands out 5 of each energy every second, answered by
+  `CheckUnitEnergyGain`. It gains the energies that stack on their owner, such
+  as Attack and Armor. It gives the rest, such as Poison, to an enemy. See
+  [src/battle/mechanics/energy-gain.ts](../src/battle/mechanics/energy-gain.ts).
 
 ## Cards
 
@@ -74,6 +78,9 @@ resolves, its card id sits in `battle.triggeringCards`, and `triggerCard`
 refuses any card already there. This holds through any chain of events and
 other cards, and for copies of the same card. An effect that emits events must
 therefore run on `UnitTriggerCard`, where the rule can see it.
+
+`battle.cardTriggers` lists the triggers still resolving, the innermost last.
+Anything that happens while one resolves was set off by that card.
 
 ## Abilities
 

@@ -98,8 +98,11 @@ export default function ShopScreen(props: ShopScreenProps): JSX.Element {
               <Show
                 when={offer()}
                 fallback={
-                  <div class="grid h-44 w-32 shrink-0 place-items-center rounded-xl border-2 border-dashed border-zinc-800 text-xs uppercase text-zinc-600">
-                    Sold
+                  // Wrapped, so the slot can shrink in the row while the box keeps its size
+                  <div>
+                    <div class="grid h-44 w-32 place-items-center rounded-xl border-2 border-dashed border-zinc-800 text-xs uppercase text-zinc-600">
+                      Sold
+                    </div>
                   </div>
                 }
               >

@@ -1,7 +1,27 @@
-import { expect, test } from '@playwright/test';
+import { type Page, expect, test } from '@playwright/test';
 
 // A fixed seed, so the first shop always has something affordable
 const SEED = 'e2e';
+
+// A tooltip is open, and once placed it sits fully inside the viewport
+async function expectTooltipInView(page: Page): Promise<void> {
+  const tooltip = page.getByRole('tooltip');
+  await expect(tooltip).toBeVisible();
+  await expect
+    .poll(async () => {
+      const box = await tooltip.boundingBox();
+      const viewport = page.viewportSize();
+      return (
+        box != null &&
+        viewport != null &&
+        box.x >= 0 &&
+        box.y >= 0 &&
+        box.x + box.width <= viewport.width &&
+        box.y + box.height <= viewport.height
+      );
+    })
+    .toBe(true);
+}
 
 test('picks an ability, buys cards in the shop and fights a battle', async ({ page }, testInfo) => {
   const errors: string[] = [];
@@ -17,7 +37,7 @@ test('picks an ability, buys cards in the shop and fights a battle', async ({ pa
   const abilities = rows.nth(0).getByTestId('ability-offer');
   await expect(abilities).toHaveCount(5);
   await abilities.first().hover();
-  await expect(rows.nth(0).getByRole('tooltip')).toBeVisible();
+  await expectTooltipInView(page);
   await page.screenshot({ path: testInfo.outputPath('draft-hover.png') });
   await abilities.first().getByRole('button').click();
 
@@ -27,7 +47,7 @@ test('picks an ability, buys cards in the shop and fights a battle', async ({ pa
   await expect(rows.nth(1).getByTestId('ability-badge')).toHaveCount(1);
 
   await offers.first().hover();
-  await expect(rows.nth(0).getByRole('tooltip')).toBeVisible();
+  await expectTooltipInView(page);
   await page.screenshot({ path: testInfo.outputPath('shop-hover.png') });
 
   // From the last offer back, since a bought slot stops being a card
@@ -48,6 +68,12 @@ test('picks an ability, buys cards in the shop and fights a battle', async ({ pa
 
   // The countdown gives way to the time limit
   await expect(timer).toHaveText(/^(60|59|58|57)$/);
+  // Energy a card hands out flies from that card
+  await expect(
+    page.locator('[data-testid="projectile"][data-kind="energy"]').first(),
+  ).toBeAttached();
+  await page.screenshot({ path: testInfo.outputPath('energy-projectile.png') });
+
   await page.waitForTimeout(4000);
   await page.screenshot({ path: testInfo.outputPath('battle.png') });
 

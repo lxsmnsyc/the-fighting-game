@@ -5,7 +5,7 @@
 - Every card has a fixed id in [src/cards/ids.ts](../src/cards/ids.ts). An id
   is never changed or reused.
 - Every card has a unique name of one word. The name is a verb or an adjective
-  that says what the card does, such as `Fortify` or `Vampiric`.
+  that says what the card does, such as `Guarded` or `Vampiric`.
 
 ## Descriptions
 
@@ -26,12 +26,10 @@ describe`When attacking, ${token.percent(0.25)} chance to gain ${token.energy(En
 
 ## Rarity
 
-- Starter: Cards that are offered to the player at the beginning of the game. Starter card also unlocks the cards of the same aspect.
-- Common: Unlocked after acquiring a starter card. Each Common card has 5 copies that can be bought.
+- Common: Each Common card has 5 copies that can be bought.
 - Uncommon: Unlocked after acquiring 10 Common cards. Each Uncommon card has 3 copies that can be bought.
 - Rare: Unlocked after acquiring 10 Uncommon cards. Each Rare card only has one copy.
 - Secret: Unlocked after acquiring all of the Rare cards in a given aspect.
-- Utility: Unlocked after acquiring a starter. Each Utility card only has one copy.
 
 ## Prints
 

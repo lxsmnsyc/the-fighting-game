@@ -2,7 +2,7 @@ import { type Accessor, createSignal, onCleanup } from 'solid-js';
 import type Battle from '../battle/core';
 import { BattleEvents } from '../battle/events';
 import { isMissedDamage } from '../battle/mechanics/damage';
-import { DamagePriority, type DamageType, ValuePriority } from '../battle/types';
+import { DamagePriority, type DamageType, type Energy, ValuePriority } from '../battle/types';
 import type Unit from '../battle/unit';
 import { EventPriority } from '../core/event-emitter';
 import { MergedLifecycle } from '../core/lifecycle';
@@ -50,12 +50,29 @@ export const enum Side {
   Enemy = 1,
 }
 
-export interface Projectile {
+/**
+ * Damage, flying from the dealer's side to the target's health.
+ */
+export interface DamageProjectile {
+  kind: 'damage';
   id: number;
   from: Side;
   to: Side;
   type: DamageType;
 }
+
+/**
+ * Energy handed out by a card, flying from the card to the receiver.
+ */
+export interface EnergyProjectile {
+  kind: 'energy';
+  id: number;
+  card: CardInstance;
+  to: Side;
+  energy: Energy;
+}
+
+export type Projectile = DamageProjectile | EnergyProjectile;
 
 export interface BattleView {
   readonly battle: Battle;
@@ -89,6 +106,9 @@ export function createBattleView(game: Game, battle: Battle): BattleView {
   const bump = (): void => {
     setVersion((value) => value + 1);
   };
+  const addProjectile = (projectile: Projectile): void => {
+    setProjectiles((current) => [...current, projectile]);
+  };
   const getSide = (unit: Unit): Side =>
     unit.team.player === game.player ? Side.Player : Side.Enemy;
 
@@ -112,13 +132,27 @@ export function createBattleView(game: Game, battle: Battle): BattleView {
       if (isMissedDamage(event.flags) || event.value <= 0) {
         return;
       }
-      const projectile: Projectile = {
+      addProjectile({
+        kind: 'damage',
         id: nextProjectile++,
         from: getSide(event.source),
         to: getSide(event.target),
         type: event.type,
-      };
-      setProjectiles((current) => [...current, projectile]);
+      });
+    }),
+    // Energy gained while a card trigger resolves came from that card
+    battle.on(BattleEvents.UnitAddEnergy, ValuePriority.Post, (event) => {
+      const trigger = battle.cardTriggers.at(-1);
+      if (!trigger || event.value <= 0) {
+        return;
+      }
+      addProjectile({
+        kind: 'energy',
+        id: nextProjectile++,
+        card: trigger.card,
+        to: getSide(event.source),
+        energy: event.energy,
+      });
     }),
   ]);
   onCleanup(() => {

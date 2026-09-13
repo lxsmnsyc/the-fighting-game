@@ -1,17 +1,43 @@
 import { For, type JSX } from 'solid-js';
 import type Battle from '../../battle/core';
+import type { Energy } from '../../battle/types';
 import type { CardInstance } from '../../game/card';
 import type Game from '../../game/game';
-import { Side, createBattleView } from '../state';
+import { type Projectile, Side, createBattleView } from '../state';
 import BattleBar from './battle-bar';
 import CardRow from './card-row';
 import CardView from './card-view';
 import ProjectileLayer from './projectile-layer';
 
+// An element that has since been removed, such as an energy icon whose
+// energy ran out, is no anchor
+function connected(element: HTMLElement | undefined): HTMLElement | undefined {
+  return element?.isConnected === true ? element : undefined;
+}
+
 export default function BattleScreen(props: { game: Game; battle: Battle }): JSX.Element {
   const view = createBattleView(props.game, props.battle);
   const rows: Partial<Record<Side, HTMLElement>> = {};
   const healthBars: Partial<Record<Side, HTMLElement>> = {};
+  const energyRows: Partial<Record<Side, HTMLElement>> = {};
+  const energyIcons = new Map<string, HTMLElement>();
+  const cards = new Map<CardInstance, HTMLElement>();
+
+  const getEnergyKey = (side: Side, energy: Energy): string => `${side}:${energy}`;
+
+  const getSource = (projectile: Projectile): HTMLElement | undefined =>
+    projectile.kind === 'damage' ? rows[projectile.from] : connected(cards.get(projectile.card));
+
+  const getTarget = (projectile: Projectile): HTMLElement | undefined => {
+    if (projectile.kind === 'damage') {
+      return healthBars[projectile.to];
+    }
+    return (
+      connected(energyIcons.get(getEnergyKey(projectile.to, projectile.energy))) ??
+      energyRows[projectile.to] ??
+      healthBars[projectile.to]
+    );
+  };
 
   const cardsOf = (side: Side): CardInstance[] =>
     view.units[side].flatMap((unit) => [...unit.cards.keys()]);
@@ -26,6 +52,9 @@ export default function BattleScreen(props: { game: Game; battle: Battle }): JSX
             placement={side === Side.Player ? 'bottom' : 'top'}
             onTrigger={(play) => {
               view.onTrigger(card, play);
+            }}
+            setElement={(element) => {
+              cards.set(card, element);
             }}
           />
         )}
@@ -47,8 +76,16 @@ export default function BattleScreen(props: { game: Game; battle: Battle }): JSX
         <BattleBar
           battle={props.battle}
           view={view}
-          setHealthBar={(side, element) => {
-            healthBars[side] = element;
+          anchors={{
+            setHealthBar: (side, element) => {
+              healthBars[side] = element;
+            },
+            setEnergyRow: (side, element) => {
+              energyRows[side] = element;
+            },
+            setEnergyIcon: (side, energy, element) => {
+              energyIcons.set(getEnergyKey(side, energy), element);
+            },
           }}
         />
       </section>
@@ -60,11 +97,7 @@ export default function BattleScreen(props: { game: Game; battle: Battle }): JSX
       >
         {renderCards(Side.Player)}
       </section>
-      <ProjectileLayer
-        view={view}
-        getSource={(side) => rows[side]}
-        getTarget={(side) => healthBars[side]}
-      />
+      <ProjectileLayer view={view} getSource={getSource} getTarget={getTarget} />
     </>
   );
 }

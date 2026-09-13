@@ -1,16 +1,25 @@
 import { For, type JSX, Show } from 'solid-js';
 import type Battle from '../../battle/core';
-import { ENERGIES, Stat } from '../../battle/types';
+import { ENERGIES, type Energy, Stat } from '../../battle/types';
 import type Unit from '../../battle/unit';
 import type { AbilityInstance } from '../../game/ability';
 import { type BattleView, Side } from '../state';
 import { AbilityBadge } from './ability-view';
 import EnergyIcon from './energy-icon';
 
+/**
+ * Receives the elements projectiles fly to.
+ */
+export interface BattleBarAnchors {
+  setHealthBar: (side: Side, element: HTMLDivElement) => void;
+  setEnergyRow: (side: Side, element: HTMLDivElement) => void;
+  setEnergyIcon: (side: Side, energy: Energy, element: HTMLDivElement) => void;
+}
+
 interface SideStatusProps {
   view: BattleView;
   side: Side;
-  setHealthBar: (side: Side, element: HTMLDivElement) => void;
+  anchors: BattleBarAnchors;
 }
 
 function SideStatus(props: SideStatusProps): JSX.Element {
@@ -37,7 +46,7 @@ function SideStatus(props: SideStatusProps): JSX.Element {
   const fill = (): JSX.CSSProperties =>
     isPlayer() ? { left: '0', width: width() } : { right: '0', width: width() };
 
-  const energies = (): number[] => {
+  const energies = (): Energy[] => {
     props.view.version();
     const current = unit();
     return current ? ENERGIES.filter((energy) => current.getTotalEnergy(energy) > 0) : [];
@@ -58,7 +67,7 @@ function SideStatus(props: SideStatusProps): JSX.Element {
       </div>
       <div
         ref={(element) => {
-          props.setHealthBar(props.side, element);
+          props.anchors.setHealthBar(props.side, element);
         }}
         class="relative h-7 overflow-hidden rounded-md bg-zinc-800 ring-1 ring-zinc-600"
       >
@@ -74,7 +83,12 @@ function SideStatus(props: SideStatusProps): JSX.Element {
           {Math.ceil(health().current)} / {health().max}
         </span>
       </div>
-      <div class={`flex min-h-9 flex-wrap gap-3 ${isPlayer() ? '' : 'justify-end'}`}>
+      <div
+        ref={(element) => {
+          props.anchors.setEnergyRow(props.side, element);
+        }}
+        class={`flex min-h-9 flex-wrap gap-3 ${isPlayer() ? '' : 'justify-end'}`}
+      >
         <Show when={unit()}>
           {(current) => (
             <For each={abilities()}>
@@ -100,6 +114,9 @@ function SideStatus(props: SideStatusProps): JSX.Element {
                   energy={energy}
                   version={props.view.version}
                   opens={isPlayer() ? 'down' : 'up'}
+                  setElement={(element) => {
+                    props.anchors.setEnergyIcon(props.side, energy, element);
+                  }}
                 />
               )}
             </For>
@@ -140,7 +157,7 @@ function BattleTimer(props: { battle: Battle; view: BattleView }): JSX.Element {
 interface BattleBarProps {
   battle: Battle;
   view: BattleView;
-  setHealthBar: (side: Side, element: HTMLDivElement) => void;
+  anchors: BattleBarAnchors;
 }
 
 /**
@@ -150,9 +167,9 @@ interface BattleBarProps {
 export default function BattleBar(props: BattleBarProps): JSX.Element {
   return (
     <div class="flex items-center gap-6 px-8 py-4">
-      <SideStatus view={props.view} side={Side.Player} setHealthBar={props.setHealthBar} />
+      <SideStatus view={props.view} side={Side.Player} anchors={props.anchors} />
       <BattleTimer battle={props.battle} view={props.view} />
-      <SideStatus view={props.view} side={Side.Enemy} setHealthBar={props.setHealthBar} />
+      <SideStatus view={props.view} side={Side.Enemy} anchors={props.anchors} />
     </div>
   );
 }

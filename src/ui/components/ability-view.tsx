@@ -1,9 +1,10 @@
-import { type Accessor, For, type JSX, Show } from 'solid-js';
+import { type Accessor, For, type JSX, Show, createSignal } from 'solid-js';
 import type { Ability } from '../../game/ability';
 import { ASPECT_NAMES } from '../../game/info';
 import createShakeKeyframes from '../spring';
 import { ASPECT_COLORS } from '../theme';
 import DescriptionText from './description-text';
+import Tooltip from './tooltip';
 
 const SHAKE_KEYFRAMES = createShakeKeyframes();
 const SHAKE_DURATION = 600;
@@ -18,10 +19,6 @@ function getGradient(ability: Ability): string {
 
 function getInitials(ability: Ability): string {
   return ability.name.slice(0, 2);
-}
-
-function tooltipClass(direction: TooltipDirection): string {
-  return direction === 'down' ? 'top-full mt-3' : 'bottom-full mb-3';
 }
 
 function AbilityTooltip(props: { ability: Ability }): JSX.Element {
@@ -64,12 +61,24 @@ interface AbilityOfferProps {
  * hover, like a card.
  */
 export function AbilityOffer(props: AbilityOfferProps): JSX.Element {
+  let face: HTMLButtonElement | undefined;
+  const [hovered, setHovered] = createSignal(false);
+
   return (
     <div
       data-testid="ability-offer"
-      class="group relative shrink-0 transition-transform duration-200 ease-out hover:z-10 hover:translate-y-6"
+      class="relative transition-transform duration-200 ease-out hover:z-10 hover:translate-y-6"
+      onPointerEnter={() => {
+        setHovered(true);
+      }}
+      onPointerLeave={() => {
+        setHovered(false);
+      }}
     >
       <button
+        ref={(element) => {
+          face = element;
+        }}
         type="button"
         class="flex h-48 w-36 cursor-pointer flex-col items-center gap-2 rounded-2xl bg-zinc-900 p-3 shadow-lg shadow-black/50 ring-2 ring-zinc-700 transition hover:ring-zinc-300"
         onClick={() => {
@@ -94,12 +103,9 @@ export function AbilityOffer(props: AbilityOfferProps): JSX.Element {
           {props.ability.cooldown / 1000}s
         </span>
       </button>
-      <div
-        role="tooltip"
-        class={`pointer-events-none absolute left-1/2 z-20 hidden -translate-x-1/2 group-hover:block ${tooltipClass('down')}`}
-      >
+      <Tooltip anchor={face} open={hovered()} placement="bottom">
         <AbilityTooltip ability={props.ability} />
-      </div>
+      </Tooltip>
     </div>
   );
 }
@@ -123,7 +129,9 @@ interface AbilityBadgeProps {
  * cooldown charges, and it shakes when it triggers.
  */
 export function AbilityBadge(props: AbilityBadgeProps): JSX.Element {
+  let badge: HTMLDivElement | undefined;
   let face: HTMLDivElement | undefined;
+  const [hovered, setHovered] = createSignal(false);
 
   props.onTrigger?.(() => {
     face?.animate(SHAKE_KEYFRAMES, { duration: SHAKE_DURATION });
@@ -136,8 +144,23 @@ export function AbilityBadge(props: AbilityBadgeProps): JSX.Element {
   };
 
   return (
-    <div data-testid="ability-badge" class="group relative">
-      <div class="relative size-10 rounded-full" style={{ background: ring() }}>
+    <div
+      data-testid="ability-badge"
+      class="relative"
+      onPointerEnter={() => {
+        setHovered(true);
+      }}
+      onPointerLeave={() => {
+        setHovered(false);
+      }}
+    >
+      <div
+        ref={(element) => {
+          badge = element;
+        }}
+        class="relative size-10 rounded-full"
+        style={{ background: ring() }}
+      >
         <div
           ref={(element) => {
             face = element;
@@ -148,12 +171,9 @@ export function AbilityBadge(props: AbilityBadgeProps): JSX.Element {
           {getInitials(props.ability)}
         </div>
       </div>
-      <div
-        role="tooltip"
-        class={`pointer-events-none absolute left-1/2 z-20 hidden -translate-x-1/2 group-hover:block ${tooltipClass(props.opens)}`}
-      >
+      <Tooltip anchor={badge} open={hovered()} placement={props.opens === 'up' ? 'top' : 'bottom'}>
         <AbilityTooltip ability={props.ability} />
-      </div>
+      </Tooltip>
     </div>
   );
 }

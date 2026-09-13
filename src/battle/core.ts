@@ -2,7 +2,7 @@ import type CardId from '../cards/ids';
 import AleaRNG from '../core/alea';
 import { EventEngine } from '../core/event-engine';
 import type Alliance from './alliance';
-import { type BattleEventMap, BattleEvents } from './events';
+import { type BattleEventMap, BattleEvents, type UnitTriggerCardEvent } from './events';
 import type Team from './team';
 import type Unit from './unit';
 
@@ -62,6 +62,12 @@ export default class Battle extends EventEngine<BattleEventMap> {
    * again until it finishes, however many events lie in between.
    */
   readonly triggeringCards = new Set<CardId>();
+
+  /**
+   * The card triggers still resolving, the innermost last. Anything that
+   * happens while one resolves was set off by it.
+   */
+  readonly cardTriggers: UnitTriggerCardEvent[] = [];
 
   start(): void {
     this.emit(BattleEvents.Start, {

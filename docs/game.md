@@ -55,8 +55,8 @@ See [abilities.md](abilities.md) for how abilities work.
 - Offers roll a rarity by weight, then a card of that rarity by weight. Later
   phases lean toward rarer cards.
 - Cards that share aspects with the player's abilities weigh more.
-- The player can own a limited number of copies of each card: 1 per starter, 5
-  per common, 3 per uncommon, and 1 per rare or secret.
+- The player can own a limited number of copies of each card: 5 per common, 3
+  per uncommon, and 1 per rare or secret.
 - A secret card stays locked until the player owns every rare card of its first
   aspect.
 
@@ -65,10 +65,15 @@ See [abilities.md](abilities.md) for how abilities work.
 Each round's opponent is rolled from that round's battle RNG, so a replayed or
 resumed round meets the same opponent.
 
-- It picks a pair of aspects and draws cards from them.
-- Its card count grows with the phase and the round.
-- A boss gets 2 more cards and as many abilities as the player is due. Its first
-  ability decides its aspects, and all of them bias its cards.
+- It picks a pair of aspects.
+- It buys cards like a player. Its budget is all the gold a player could have by
+  that round: the starting gold plus every earlier round's income. So it keeps up
+  with the run.
+- It buys cards of its aspects first, then any card, until nothing it can afford
+  is left. It keeps to the same copy limits as the player.
+- A boss spends `BOSS_BUDGET_MULTIPLIER` (1.5) times the budget and gets as many
+  abilities as the player is due. Its first ability decides its aspects, and all
+  of them bias its cards.
 
 ## Saving
 

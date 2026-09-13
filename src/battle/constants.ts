@@ -15,6 +15,17 @@ export const CONSUMABLE_STACKS = 0.4;
 export const NATURAL_PERIOD = 1000;
 
 /**
+ * How often every unit gains energy on its own, in milliseconds.
+ */
+export const ENERGY_GAIN_PERIOD = 1000;
+
+/**
+ * How much of each energy a unit gains on its own every period, before
+ * anything changes it.
+ */
+export const BASE_ENERGY_GAIN = 5;
+
+/**
  * Speed or Slow at which an ability's cooldown is changed the most.
  */
 export const MAX_COOLDOWN_STACKS = 1000;

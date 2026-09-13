@@ -30,7 +30,6 @@ export const ASPECT_NAMES: Record<Aspect, string> = {
 };
 
 export const RARITY_NAMES: Record<Rarity, string> = {
-  [Rarity.Starter]: 'Starter',
   [Rarity.Common]: 'Common',
   [Rarity.Uncommon]: 'Uncommon',
   [Rarity.Rare]: 'Rare',
@@ -48,9 +47,6 @@ export const PRINTS: Print[] = [Print.Error, Print.Monotone, Print.Negative];
 export function describeRarity(rarity: Rarity): Description {
   const limit = COPY_LIMITS[rarity];
   const copies = describe`${token.value(limit)} ${limit === 1 ? 'copy' : 'copies'}`;
-  if (rarity === Rarity.Starter) {
-    return describe`Offered early in a run. Own up to ${copies}.`;
-  }
   if (rarity === Rarity.Secret) {
     return describe`Unlocks once you own every rare card of its aspect. Own up to ${copies}.`;
   }

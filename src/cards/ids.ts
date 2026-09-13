@@ -4,17 +4,8 @@
  * Each group of cards gets its own hundred.
  */
 const enum CardId {
-  // Starter: energy every second
-  Fortify = 100,
-  Sharpen = 101,
-  Corrode = 102,
-  Focus = 103,
-  Evade = 104,
-  Mend = 105,
-  Channel = 106,
-  Envenom = 107,
-  Hinder = 108,
-  Hasten = 109,
+  // 100 to 109 were the starter cards, now every unit's own energy
+  // gain. Do not reuse them.
 
   // Bonus whenever the energy is gained
   Ferocious = 200,

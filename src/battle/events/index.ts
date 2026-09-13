@@ -3,6 +3,7 @@ export type { AllianceEvent, AllianceTeamEvent, TeamUnitEvent, TickEvent } from 
 export type {
   CheckUnitAbilityCooldownEvent,
   CheckUnitEnemyEvent,
+  CheckUnitEnergyGainEvent,
   CheckUnitEnergyPeriodEvent,
   UnitAbilityEvent,
   UnitActionEvent,

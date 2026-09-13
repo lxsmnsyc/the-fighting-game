@@ -66,7 +66,7 @@ export default function GameView(props: GameViewProps): JSX.Element {
   };
 
   return (
-    <main class="relative grid h-dvh select-none grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-hidden">
+    <main class="relative grid h-dvh select-none grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] overflow-hidden">
       <Switch fallback={<ShopScreen game={props.game} version={version} lastResult={lastResult} />}>
         <Match when={battle()} keyed>
           {(current) => <BattleScreen game={props.game} battle={current} />}

@@ -17,6 +17,7 @@ import {
 } from '../src/game/constants';
 import type Game from '../src/game/game';
 import { createRoundRNG } from '../src/game/game';
+import { getRoundBudget } from '../src/game/economy';
 import createOpponent from '../src/game/opponent';
 import { countOwnedCards, isCardUnlocked } from '../src/game/pool';
 import { resumeGame, saveGame } from '../src/game/save';
@@ -164,6 +165,31 @@ describe('run', () => {
     const boss = createOpponent(game, createRoundRNG(game.seed, game.round).battle);
     expect(boss.boss).toBe(true);
     expect(boss.deck.length).toBeGreaterThan(first.deck.length);
+  });
+
+  it('spends a budget that grows with the run on opponent cards', () => {
+    const game = startGame();
+    const getDeckValue = (round: number): number => {
+      game.round = round;
+      const opponent = createOpponent(game, createRoundRNG(game.seed, round).battle);
+      return opponent.deck.reduce((sum, card) => sum + CARD_PRICES[card.source.rarity], 0);
+    };
+
+    expect(getRoundBudget(1)).toBe(DEFAULT_GOLD);
+    expect(getRoundBudget(2)).toBe(DEFAULT_GOLD + game.checkRoundIncome());
+
+    const early = getDeckValue(1);
+    const middle = getDeckValue(10);
+    const late = getDeckValue(22);
+    expect(early).toBeLessThanOrEqual(getRoundBudget(1));
+    expect(middle).toBeLessThanOrEqual(getRoundBudget(10));
+    expect(late).toBeLessThanOrEqual(getRoundBudget(22));
+    expect(middle).toBeGreaterThan(early);
+    expect(late).toBeGreaterThan(middle);
+
+    // Nothing affordable is left unspent
+    const cheapest = Math.min(...Object.values(CARD_PRICES));
+    expect(getRoundBudget(22) - late).toBeLessThan(cheapest);
   });
 
   it('gives bosses as many abilities as the player is due', () => {

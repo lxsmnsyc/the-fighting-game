@@ -1,9 +1,11 @@
 import ABILITIES from '../abilities';
 import CARDS from '../cards';
+import type CardId from '../cards/ids';
 import type AleaRNG from '../core/alea';
 import { AbilityInstance, getAbilityBias } from './ability';
-import { rollCardInstance } from './card';
-import { BOSS_BONUS_CARDS } from './constants';
+import { type Card, rollCardInstance } from './card';
+import { BOSS_BUDGET_MULTIPLIER, CARD_PRICES, COPY_LIMITS } from './constants';
+import { getRoundBudget } from './economy';
 import type Game from './game';
 import { Player } from './player';
 import { rollAbilities, rollCard } from './pool';
@@ -42,11 +44,27 @@ export class Opponent extends Player {
 }
 
 /**
+ * Cards in `pool` that fit in `budget` and are under their copy limit.
+ */
+function getAffordableCards(pool: Card[], budget: number, copies: Map<CardId, number>): Card[] {
+  return pool.filter(
+    (card) =>
+      CARD_PRICES[card.rarity] <= budget && (copies.get(card.id) ?? 0) < COPY_LIMITS[card.rarity],
+  );
+}
+
+/**
  * The opponent for the current round, rolled from the round's battle
- * RNG. Its card count grows with the phase and the round.
+ * RNG.
  *
- * A boss gets more cards, and as many abilities as the player is due.
- * Its first ability decides its aspects, and all of them bias its cards.
+ * It buys cards like a player would. Its budget is all the gold a player
+ * could have by this round, so it keeps up with the run. It spends it on
+ * cards of its aspects first, then on any card, within the same copy
+ * limits as the player.
+ *
+ * A boss gets a bigger budget, and as many abilities as the player is
+ * due. Its first ability decides its aspects, and all of them bias its
+ * cards.
  */
 export default function createOpponent(game: Game, rng: AleaRNG): Opponent {
   const boss = game.isBossRound();
@@ -62,13 +80,19 @@ export default function createOpponent(game: Game, rng: AleaRNG): Opponent {
     opponent.abilities.push(new AbilityInstance(opponent, ability));
   }
 
+  let budget = Math.floor(getRoundBudget(game.round) * (boss ? BOSS_BUDGET_MULTIPLIER : 1));
+  const copies = new Map<CardId, number>();
+  const getWeight = (card: Card): number => 1 + getAbilityBias(abilities, card);
   const matching = CARDS.filter((card) => card.aspect.some((aspect) => aspects.includes(aspect)));
-  const pool = matching.length > 0 ? matching : CARDS;
-  const count = phase + game.getPhaseRound() + (boss ? BOSS_BONUS_CARDS : 0);
 
-  for (let i = 0; i < count; i++) {
-    const card = rollCard(rng, pool, phase, (current) => 1 + getAbilityBias(abilities, current));
-    if (card) {
+  for (const pool of [matching, CARDS]) {
+    for (;;) {
+      const card = rollCard(rng, getAffordableCards(pool, budget, copies), phase, getWeight);
+      if (!card) {
+        break;
+      }
+      budget -= CARD_PRICES[card.rarity];
+      copies.set(card.id, (copies.get(card.id) ?? 0) + 1);
       opponent.deck.push(rollCardInstance(opponent, card, rng));
     }
   }

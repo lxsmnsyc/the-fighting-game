@@ -16,6 +16,13 @@ The screen has three rows:
   battle.
 - The bottom row holds the player's cards.
 
+A card row never grows past the screen. The more cards it holds, the more they
+overlap.
+
+Tooltips render over the whole page, so no row clips them. Each opens on its
+preferred side of what it describes, flips to the other side when only that one
+fits, and is kept inside the viewport.
+
 In the draft, the middle row shows the phase, round and lives on the left, a
 prompt in the middle, and the abilities already owned on the right. Clicking an
 offer picks it.
@@ -39,6 +46,10 @@ does. A ring around each ability fills as its cooldown charges.
 - A card or ability that triggers shakes with a spring.
 - Damage flies as a dot from the dealer's card row to the target's health, in
   the color of its damage type.
+- Energy a card hands out flies as a dot from that card to the receiver's icon
+  for that energy, in the energy's color. Energy counts as the card's when it is
+  gained while the card's trigger resolves.
+- A projectile flies in a gentle arc that bends to a random side.
 
 ## State
 

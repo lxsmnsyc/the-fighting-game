@@ -1,6 +1,6 @@
 import { ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
-import { BASE_ROUND_INCOME, PHASE_INCOME } from '../constants';
+import { getRoundIncome } from '../economy';
 import { GameEvents } from '../events';
 import type Game from '../game';
 import { createRoundRNG } from '../game';
@@ -41,7 +41,7 @@ export default function setupRunMechanics(game: Game): void {
   });
 
   game.on(GameEvents.CheckRoundIncome, ValuePriority.Initial, (event) => {
-    event.value = BASE_ROUND_INCOME + PHASE_INCOME * (game.getPhase() - 1);
+    event.value = getRoundIncome(game.getPhase());
   });
 
   game.on(GameEvents.NextRound, EventPriority.Pre, (event) => {

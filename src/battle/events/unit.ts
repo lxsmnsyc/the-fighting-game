@@ -42,6 +42,11 @@ export interface CheckUnitEnergyPeriodEvent extends UnitEvent {
   duration: number;
 }
 
+export interface CheckUnitEnergyGainEvent extends UnitEvent {
+  energy: Energy;
+  value: number;
+}
+
 export interface CheckUnitEnemyEvent extends UnitEvent {
   target: Unit | undefined;
 }

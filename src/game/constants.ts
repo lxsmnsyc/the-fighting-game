@@ -46,7 +46,6 @@ export const BASE_REROLL_COST = 1;
 export const REROLL_COST_STEP = 1;
 
 export const CARD_PRICES: Record<Rarity, number> = {
-  [Rarity.Starter]: 1,
   [Rarity.Common]: 3,
   [Rarity.Uncommon]: 5,
   [Rarity.Rare]: 8,
@@ -62,14 +61,16 @@ export const SELL_RATIO = 0.5;
  * How many copies of one card the player can own.
  */
 export const COPY_LIMITS: Record<Rarity, number> = {
-  [Rarity.Starter]: 1,
   [Rarity.Common]: 5,
   [Rarity.Uncommon]: 3,
   [Rarity.Rare]: 1,
   [Rarity.Secret]: 1,
 };
 
-export const BOSS_BONUS_CARDS = 2;
+/**
+ * How much more gold a boss spends on cards than a regular opponent.
+ */
+export const BOSS_BUDGET_MULTIPLIER = 1.5;
 
 /**
  * A battle still going after this long, in milliseconds, is a draw.

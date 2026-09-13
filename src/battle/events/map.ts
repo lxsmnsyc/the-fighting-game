@@ -6,6 +6,7 @@ import type BattleEvents from './names';
 import type {
   CheckUnitAbilityCooldownEvent,
   CheckUnitEnemyEvent,
+  CheckUnitEnergyGainEvent,
   CheckUnitEnergyPeriodEvent,
   UnitAbilityEvent,
   UnitActionEvent,
@@ -71,4 +72,6 @@ export interface BattleEventMap extends EventMap {
   [BattleEvents.UnitChargeAbility]: [UnitChargeAbilityEvent, ValuePriority];
   [BattleEvents.UnitTriggerAbility]: [UnitAbilityEvent, EventPriority];
   [BattleEvents.CheckUnitAbilityCooldown]: [CheckUnitAbilityCooldownEvent, ValuePriority];
+
+  [BattleEvents.CheckUnitEnergyGain]: [CheckUnitEnergyGainEvent, ValuePriority];
 }

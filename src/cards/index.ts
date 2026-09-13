@@ -6,11 +6,10 @@ import COMMON_CARDS from './common';
 import merciless from './critical/coup-de-grace';
 import endure from './health/endure';
 import type CardId from './ids';
-import STARTER_CARDS from './starter';
 
 const RARE_CARDS: Card[] = [relentless, ambidextrous, vampiric, merciless, endure];
 
-const CARDS: Card[] = [...STARTER_CARDS, ...COMMON_CARDS, ...RARE_CARDS];
+const CARDS: Card[] = [...COMMON_CARDS, ...RARE_CARDS];
 
 const CARDS_BY_ID = new Map(CARDS.map((card) => [card.id, card]));
 

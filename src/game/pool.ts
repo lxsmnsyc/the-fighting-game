@@ -16,7 +16,6 @@ import { RARITIES, Rarity } from './types';
 export function getRarityWeights(phase: number): Record<Rarity, number> {
   const step = Math.max(0, phase - 1);
   return {
-    [Rarity.Starter]: Math.max(0, 40 - 10 * step),
     [Rarity.Common]: 45,
     [Rarity.Uncommon]: 15 + 4 * step,
     [Rarity.Rare]: 3 + 2 * step,

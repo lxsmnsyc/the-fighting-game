@@ -37,7 +37,6 @@ export const ENERGY_LABELS: Record<Energy, string> = {
 };
 
 export const RARITY_COLORS: Record<Rarity, string> = {
-  [Rarity.Starter]: '#a1a1aa',
   [Rarity.Common]: '#e4e4e7',
   [Rarity.Uncommon]: '#4ade80',
   [Rarity.Rare]: '#60a5fa',

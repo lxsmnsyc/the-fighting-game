@@ -1,10 +1,11 @@
-import { For, type JSX, Show } from 'solid-js';
+import { For, type JSX, Show, createSignal } from 'solid-js';
 import type { Card, CardInstance } from '../../game/card';
 import { PRINTS, PRINT_NAMES, RARITY_NAMES, describePrint, describeRarity } from '../../game/info';
 import type { Print } from '../../game/types';
 import createShakeKeyframes from '../spring';
 import { RARITY_COLORS } from '../theme';
 import DescriptionText from './description-text';
+import Tooltip from './tooltip';
 
 /**
  * Which row the card sits in. Hovered cards rise toward the middle row,
@@ -26,6 +27,10 @@ interface CardViewProps {
    * Receives the function that plays the trigger animation.
    */
   onTrigger?: (play: () => void) => void;
+  /**
+   * Receives the card's face, such as to anchor projectiles on it.
+   */
+  setElement?: (element: HTMLDivElement) => void;
 }
 
 function getPrints(instance: CardInstance | undefined): Print[] {
@@ -71,6 +76,7 @@ function CardTooltip(props: { card: Card; instance?: CardInstance }): JSX.Elemen
 
 export default function CardView(props: CardViewProps): JSX.Element {
   let face: HTMLDivElement | undefined;
+  const [hovered, setHovered] = createSignal(false);
 
   props.onTrigger?.(() => {
     face?.animate(SHAKE_KEYFRAMES, { duration: SHAKE_DURATION });
@@ -78,8 +84,6 @@ export default function CardView(props: CardViewProps): JSX.Element {
 
   const liftClass = (): string =>
     props.placement === 'bottom' ? 'hover:-translate-y-6' : 'hover:translate-y-6';
-  const tooltipClass = (): string =>
-    props.placement === 'bottom' ? 'bottom-full mb-3' : 'top-full mt-3';
   const cursorClass = (): string => {
     if (props.disabled === true) {
       return 'cursor-not-allowed opacity-50';
@@ -90,11 +94,18 @@ export default function CardView(props: CardViewProps): JSX.Element {
   return (
     <div
       data-testid="card"
-      class={`group relative shrink-0 transition-transform duration-200 ease-out hover:z-10 ${liftClass()}`}
+      class={`relative transition-transform duration-200 ease-out hover:z-10 ${liftClass()}`}
+      onPointerEnter={() => {
+        setHovered(true);
+      }}
+      onPointerLeave={() => {
+        setHovered(false);
+      }}
     >
       <div
         ref={(element) => {
           face = element;
+          props.setElement?.(element);
         }}
         class={`flex h-44 w-32 flex-col rounded-xl border-2 bg-zinc-900 p-2 shadow-lg shadow-black/50 ${cursorClass()}`}
         style={{ 'border-color': RARITY_COLORS[props.card.rarity] }}
@@ -105,7 +116,7 @@ export default function CardView(props: CardViewProps): JSX.Element {
         }}
       >
         <span class="truncate text-sm font-bold">{props.card.name}</span>
-        <div class="relative my-2 flex-1 rounded-md bg-gradient-to-br from-zinc-700 to-zinc-800">
+        <div class="relative my-2 flex-1 rounded-md bg-linear-to-br from-zinc-700 to-zinc-800">
           <div class="absolute right-1 top-1 flex gap-0.5">
             <For each={getPrints(props.instance)}>
               {(print) => (
@@ -125,12 +136,13 @@ export default function CardView(props: CardViewProps): JSX.Element {
           </Show>
         </div>
       </div>
-      <div
-        role="tooltip"
-        class={`pointer-events-none absolute left-1/2 z-20 hidden -translate-x-1/2 group-hover:block ${tooltipClass()}`}
+      <Tooltip
+        anchor={face}
+        open={hovered()}
+        placement={props.placement === 'bottom' ? 'top' : 'bottom'}
       >
         <CardTooltip card={props.card} instance={props.instance} />
-      </div>
+      </Tooltip>
     </div>
   );
 }

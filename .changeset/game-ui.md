@@ -8,3 +8,4 @@
   that explain themselves on hover.
 - Cards shake when they trigger, and damage flies to the target's health in the
   color of its type.
+- Energy a card hands out flies from that card to the receiver's energy icons.

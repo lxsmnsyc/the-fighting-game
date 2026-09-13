@@ -18,13 +18,7 @@ export const enum Print {
  * Rarity of a card
  */
 export const enum Rarity {
-  // Starter cards are the cards that are offered
-  // initially by the card pool. Purchasing a starter
-  // card of an aspect unlocks Common cards of the same
-  // aspect
-  Starter = 0,
-  // 5 copies of Common cards are added to the card pool after being
-  // unlocked by the starter card of the same aspect.
+  // 5 copies of Common cards are added to the card pool.
   // Unlocks Uncommon cards.
   Common = 1,
   // 3 copies of Uncommon cards are added to the card pool after
@@ -39,13 +33,7 @@ export const enum Rarity {
   Secret = 4,
 }
 
-export const RARITIES: Rarity[] = [
-  Rarity.Starter,
-  Rarity.Common,
-  Rarity.Uncommon,
-  Rarity.Rare,
-  Rarity.Secret,
-];
+export const RARITIES: Rarity[] = [Rarity.Common, Rarity.Uncommon, Rarity.Rare, Rarity.Secret];
 
 export const enum GameStage {
   // Between stages, and before the run starts

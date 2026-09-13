@@ -7,6 +7,7 @@ import {
   BattleEvents,
   type CheckUnitAbilityCooldownEvent,
   type CheckUnitEnemyEvent,
+  type CheckUnitEnergyGainEvent,
   type CheckUnitEnergyPeriodEvent,
   type UnitDamageEvent,
   type UnitTriggerCardEvent,
@@ -188,6 +189,22 @@ export default class Unit {
     };
     this.battle.emit(BattleEvents.CheckUnitEnergyPeriod, event);
     return event.duration;
+  }
+
+  /**
+   * How much of `energy` this unit hands out on its own every
+   * `ENERGY_GAIN_PERIOD`.
+   */
+  checkEnergyGain(energy: Energy): number {
+    const event: CheckUnitEnergyGainEvent = {
+      id: 'CheckUnitEnergyGain',
+      disabled: false,
+      source: this,
+      energy,
+      value: 0,
+    };
+    this.battle.emit(BattleEvents.CheckUnitEnergyGain, event);
+    return event.value;
   }
 
   // Targeting
@@ -375,10 +392,12 @@ export default class Unit {
       value,
     };
     triggeringCards.add(id);
+    this.battle.cardTriggers.push(event);
     try {
       this.battle.emit(BattleEvents.UnitTriggerCard, event);
     } finally {
       triggeringCards.delete(id);
+      this.battle.cardTriggers.pop();
     }
     return !event.disabled;
   }

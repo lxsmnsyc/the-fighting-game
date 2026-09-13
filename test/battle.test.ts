@@ -39,6 +39,14 @@ function run(battle: Battle, duration: number): void {
   }
 }
 
+// Leaves one mechanic to test on its own, without the energy every
+// unit gains each second
+function disableEnergyGain(battle: Battle): void {
+  battle.on(BattleEvents.CheckUnitEnergyGain, ValuePriority.Post, (event) => {
+    event.value = 0;
+  });
+}
+
 describe('battle', () => {
   it('ends with the alliance that still has units standing', () => {
     const battle = createBattle('outcome');
@@ -93,6 +101,7 @@ describe('battle', () => {
 
   it('hurts the unit carrying poison every second', () => {
     const battle = createBattle('poison');
+    disableEnergyGain(battle);
     createSide(battle, [createPlayer()]);
     const [unit] = createSide(battle, [createPlayer()]).units;
     battle.start();
@@ -102,6 +111,27 @@ describe('battle', () => {
 
     expect(unit.stats[Stat.Health]).toBe(900);
     expect(unit.getEnergy(Energy.Poison, false)).toBe(60);
+  });
+
+  it('gives every unit energy each second, and its enemy the unfriendly kinds', () => {
+    const battle = createBattle('gain');
+    const [unit] = createSide(battle, [createPlayer()]).units;
+    const [enemy] = createSide(battle, [createPlayer()]).units;
+    battle.on(BattleEvents.CheckUnitEnergyGain, ValuePriority.Additive, (event) => {
+      if (event.source === unit && event.energy === Energy.Attack) {
+        event.value += 5;
+      }
+    });
+    battle.start();
+
+    run(battle, 1000 - FRAME);
+    expect(unit.getEnergy(Energy.Attack, false)).toBe(0);
+
+    run(battle, FRAME * 2);
+    expect(unit.getEnergy(Energy.Attack, false)).toBe(10);
+    expect(enemy.getEnergy(Energy.Attack, false)).toBe(5);
+    expect(enemy.getEnergy(Energy.Poison, false)).toBe(5);
+    expect(unit.getEnergy(Energy.Poison, false)).toBe(5);
   });
 });
 
@@ -139,6 +169,7 @@ describe('cards', () => {
 
   it('repeat a natural attack once with Ambidextrous', () => {
     const battle = createBattle('ambidextrous');
+    disableEnergyGain(battle);
     const [attacker] = createSide(battle, [createPlayer([getCard(CardId.Ambidextrous)])]).units;
     const [defender] = createSide(battle, [createPlayer()]).units;
 
@@ -181,7 +212,7 @@ describe('cards', () => {
         ]),
     });
     const healWhenPoisoned = createCard({
-      id: CardId.Mend,
+      id: CardId.Refresh,
       name: 'Mend',
       image: '',
       rarity: Rarity.Common,
@@ -215,7 +246,7 @@ describe('cards', () => {
     unit.heal(unit, 10, 0);
 
     // The inner trigger finishes first
-    expect(triggers).toEqual([CardId.Mend, CardId.Blight]);
+    expect(triggers).toEqual([CardId.Refresh, CardId.Blight]);
     expect(unit.stats[Stat.Health]).toBe(920);
   });
 
@@ -233,5 +264,21 @@ describe('cards', () => {
 
     expect(attacker.getEnergy(Energy.Critical, false)).toBe(30);
     expect(defender.getEnergy(Energy.Slow, false)).toBe(30);
+  });
+
+  it('expose the trigger that is still resolving', () => {
+    const battle = createBattle('resolving');
+    const [unit] = createSide(battle, [createPlayer([getCard(CardId.Ambush)])]).units;
+
+    const sources: (CardId | undefined)[] = [];
+    battle.on(BattleEvents.UnitAddEnergy, ValuePriority.Post, () => {
+      sources.push(battle.cardTriggers.at(-1)?.card.source.id);
+    });
+
+    battle.start();
+    unit.addEnergy(Energy.Armor, 10, false);
+
+    expect(sources).toEqual([CardId.Ambush, undefined]);
+    expect(battle.cardTriggers).toHaveLength(0);
   });
 });
