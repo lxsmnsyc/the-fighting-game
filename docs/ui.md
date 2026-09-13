@@ -28,8 +28,9 @@ prompt in the middle, and the abilities already owned on the right. Clicking an
 offer picks it.
 
 In the shop, the middle row shows the phase, round and lives on the left, the
-reroll button, gold and start button in the middle, and the last battle's result
-and the owned abilities on the right.
+reroll button, gold, card slots and start button in the middle, and the last
+battle's result and the owned abilities on the right. Clicking a card in the
+deck sells it, and offers cannot be bought while the deck is full.
 
 In battle, the middle row is one health strip. The left half is the player and
 the right half is the enemy. The timer sits in the middle. It counts down 3

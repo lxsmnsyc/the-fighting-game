@@ -34,6 +34,8 @@ function ShopBar(props: ShopScreenProps): JSX.Element {
     };
   const gold = read(() => props.game.player.stats[PlayerStat.Gold]);
   const rerollCost = read(() => props.game.checkRerollCost());
+  const cards = read(() => props.game.player.deck.length);
+  const slots = read(() => props.game.checkCardSlots());
 
   return (
     <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-6 px-8 py-4">
@@ -53,6 +55,14 @@ function ShopBar(props: ShopScreenProps): JSX.Element {
         <div class="min-w-24 text-center">
           <div class="text-3xl font-black tabular-nums text-amber-300">{gold()}g</div>
           <div class="text-[10px] uppercase tracking-wide text-zinc-400">Gold</div>
+        </div>
+        <div data-testid="card-slots" class="min-w-16 text-center">
+          <div
+            class={`text-3xl font-black tabular-nums ${cards() >= slots() ? 'text-rose-400' : ''}`}
+          >
+            {cards()}/{slots()}
+          </div>
+          <div class="text-[10px] uppercase tracking-wide text-zinc-400">Cards</div>
         </div>
         <button
           type="button"
@@ -88,6 +98,10 @@ export default function ShopScreen(props: ShopScreenProps): JSX.Element {
     props.version();
     return props.game.player.stats[PlayerStat.Gold];
   };
+  const full = (): boolean => {
+    props.version();
+    return props.game.player.deck.length >= props.game.checkCardSlots();
+  };
 
   return (
     <>
@@ -112,7 +126,7 @@ export default function ShopScreen(props: ShopScreenProps): JSX.Element {
                     instance={card()}
                     placement="top"
                     price={props.game.checkCardPrice(card().source)}
-                    disabled={gold() < props.game.checkCardPrice(card().source)}
+                    disabled={full() || gold() < props.game.checkCardPrice(card().source)}
                     onClick={() => {
                       props.game.buyCard(slot);
                     }}
@@ -127,7 +141,13 @@ export default function ShopScreen(props: ShopScreenProps): JSX.Element {
         <ShopBar game={props.game} version={props.version} lastResult={props.lastResult} />
       </section>
       <section class="min-h-0">
-        <DeckRow game={props.game} version={props.version} />
+        <DeckRow
+          game={props.game}
+          version={props.version}
+          onSell={(card) => {
+            props.game.sellCard(card);
+          }}
+        />
       </section>
     </>
   );

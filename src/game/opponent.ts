@@ -5,7 +5,7 @@ import type AleaRNG from '../core/alea';
 import { AbilityInstance, getAbilityBias } from './ability';
 import { type Card, CardInstance, getRandomPrint } from './card';
 import { BOSS_BUDGET_MULTIPLIER, CARD_PRICES } from './constants';
-import { getRoundBudget } from './economy';
+import { getCardSlots, getRoundBudget } from './economy';
 import type Game from './game';
 import { Player } from './player';
 import { isUnderCopyLimit, rollAbilities, rollCard } from './pool';
@@ -58,14 +58,36 @@ function getAffordableCards(
   );
 }
 
+// Negative copies do not count toward the copy limit
+function countCopy(copies: Map<CardId, number>, card: CardInstance, change: number): void {
+  if ((card.print & Print.Negative) === 0) {
+    copies.set(card.source.id, (copies.get(card.source.id) ?? 0) + change);
+  }
+}
+
+function getCheapestIndex(deck: CardInstance[]): number {
+  let cheapest = -1;
+  for (let index = 0; index < deck.length; index++) {
+    const price = CARD_PRICES[deck[index].source.rarity];
+    if (cheapest === -1 || price < CARD_PRICES[deck[cheapest].source.rarity]) {
+      cheapest = index;
+    }
+  }
+  return cheapest;
+}
+
 /**
  * The opponent for the current round, rolled from the round's battle
  * RNG.
  *
- * It buys cards like a player would. Its budget is all the gold a player
- * could have by this round, so it keeps up with the run. It spends it on
- * cards of its aspects first, then on any card, within the same copy
- * limits as the player.
+ * It builds its deck like a player would, with the same card slots and
+ * copy limits. Its budget is all the gold a player could have by this
+ * round, so it keeps up with the run:
+ *
+ * 1. It fills its slots with cards it can afford, cards of its aspects
+ *    first.
+ * 2. It spends what is left swapping its cheapest card for a pricier
+ *    one, until no swap fits the budget.
  *
  * A boss gets a bigger budget, and as many abilities as the player is
  * due. Its first ability decides its aspects, and all of them bias its
@@ -85,25 +107,54 @@ export default function createOpponent(game: Game, rng: AleaRNG): Opponent {
     opponent.abilities.push(new AbilityInstance(opponent, ability));
   }
 
+  const { deck } = opponent;
+  const slots = getCardSlots(phase);
   let budget = Math.floor(getRoundBudget(game.round) * (boss ? BOSS_BUDGET_MULTIPLIER : 1));
   const copies = new Map<CardId, number>();
   const getWeight = (card: Card): number => 1 + getAbilityBias(abilities, card);
   const matching = CARDS.filter((card) => card.aspect.some((aspect) => aspects.includes(aspect)));
+  const pools = [matching, CARDS];
 
-  for (const pool of [matching, CARDS]) {
-    for (;;) {
+  for (const pool of pools) {
+    while (deck.length < slots) {
       // The print comes first, since a Negative copy may go past the limit
       const print = getRandomPrint(rng, opponent.printSpawnChance);
-      const affordable = getAffordableCards(pool, budget, print, copies);
-      const card = rollCard(rng, affordable, phase, getWeight);
+      const card = rollCard(rng, getAffordableCards(pool, budget, print, copies), phase, getWeight);
       if (!card) {
         break;
       }
       budget -= CARD_PRICES[card.rarity];
-      if ((print & Print.Negative) === 0) {
-        copies.set(card.id, (copies.get(card.id) ?? 0) + 1);
+      const copy = new CardInstance(opponent, card, print);
+      countCopy(copies, copy, 1);
+      deck.push(copy);
+    }
+  }
+
+  // Every swap raises the deck's worth, so this always ends
+  for (const pool of pools) {
+    for (;;) {
+      const index = getCheapestIndex(deck);
+      if (index === -1) {
+        break;
       }
-      opponent.deck.push(new CardInstance(opponent, card, print));
+      const weakest = deck[index];
+      const refund = CARD_PRICES[weakest.source.rarity];
+      const print = getRandomPrint(rng, opponent.printSpawnChance);
+
+      countCopy(copies, weakest, -1);
+      const upgrades = getAffordableCards(pool, budget + refund, print, copies).filter(
+        (card) => CARD_PRICES[card.rarity] > refund,
+      );
+      const card = rollCard(rng, upgrades, phase, getWeight);
+      if (!card) {
+        countCopy(copies, weakest, 1);
+        break;
+      }
+
+      budget += refund - CARD_PRICES[card.rarity];
+      const copy = new CardInstance(opponent, card, print);
+      countCopy(copies, copy, 1);
+      deck[index] = copy;
     }
   }
 

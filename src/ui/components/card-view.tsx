@@ -21,6 +21,10 @@ interface CardViewProps {
   instance?: CardInstance;
   placement: Placement;
   price?: number;
+  /**
+   * What the card sells for, when clicking it sells it.
+   */
+  sellPrice?: number;
   disabled?: boolean;
   onClick?: () => void;
   /**
@@ -133,6 +137,9 @@ export default function CardView(props: CardViewProps): JSX.Element {
           </span>
           <Show when={props.price}>
             {(price) => <span class="font-bold normal-case text-amber-300">{price()}g</span>}
+          </Show>
+          <Show when={props.sellPrice}>
+            {(price) => <span class="font-bold normal-case text-emerald-300">Sell {price()}g</span>}
           </Show>
         </div>
       </div>

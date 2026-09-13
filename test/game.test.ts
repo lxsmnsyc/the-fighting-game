@@ -8,16 +8,18 @@ import {
   ABILITY_BIAS,
   ABILITY_OFFER_SIZE,
   ABILITY_PHASE_INTERVAL,
+  BASE_CARD_SLOTS,
   CARD_PRICES,
   COPY_LIMITS,
   DEFAULT_GOLD,
   DEFAULT_LIFE,
+  PHASE_CARD_SLOTS,
   ROUNDS_PER_PHASE,
   SHOP_SIZE,
 } from '../src/game/constants';
 import type Game from '../src/game/game';
 import { createRoundRNG } from '../src/game/game';
-import { getRoundBudget } from '../src/game/economy';
+import { getCardSlots, getRoundBudget, getSellPrice } from '../src/game/economy';
 import createOpponent from '../src/game/opponent';
 import { countLimitedCopies, isCardUnlocked, isUnderCopyLimit } from '../src/game/pool';
 import { resumeGame, saveGame } from '../src/game/save';
@@ -177,27 +179,63 @@ describe('run', () => {
 
   it('spends a budget that grows with the run on opponent cards', () => {
     const game = startGame();
-    const getDeckValue = (round: number): number => {
+    const getDeck = (round: number): { value: number; size: number; slots: number } => {
       game.round = round;
       const opponent = createOpponent(game, createRoundRNG(game.seed, round).battle);
-      return opponent.deck.reduce((sum, card) => sum + CARD_PRICES[card.source.rarity], 0);
+      return {
+        value: opponent.deck.reduce((sum, card) => sum + CARD_PRICES[card.source.rarity], 0),
+        size: opponent.deck.length,
+        slots: getCardSlots(game.getPhase()),
+      };
     };
 
     expect(getRoundBudget(1)).toBe(DEFAULT_GOLD);
     expect(getRoundBudget(2)).toBe(DEFAULT_GOLD + game.checkRoundIncome());
 
-    const early = getDeckValue(1);
-    const middle = getDeckValue(10);
-    const late = getDeckValue(22);
-    expect(early).toBeLessThanOrEqual(getRoundBudget(1));
-    expect(middle).toBeLessThanOrEqual(getRoundBudget(10));
-    expect(late).toBeLessThanOrEqual(getRoundBudget(22));
-    expect(middle).toBeGreaterThan(early);
-    expect(late).toBeGreaterThan(middle);
+    const early = getDeck(1);
+    const middle = getDeck(10);
+    const late = getDeck(22);
+    expect(early.value).toBeLessThanOrEqual(getRoundBudget(1));
+    expect(middle.value).toBeLessThanOrEqual(getRoundBudget(10));
+    expect(late.value).toBeLessThanOrEqual(getRoundBudget(22));
+    expect(middle.value).toBeGreaterThan(early.value);
+    expect(late.value).toBeGreaterThan(middle.value);
 
-    // Nothing affordable is left unspent
-    const cheapest = Math.min(...Object.values(CARD_PRICES));
-    expect(getRoundBudget(22) - late).toBeLessThan(cheapest);
+    // Within its slots, and filling them once it can afford to
+    for (const deck of [early, middle, late]) {
+      expect(deck.size).toBeLessThanOrEqual(deck.slots);
+    }
+    expect(late.size).toBe(late.slots);
+  });
+
+  it('holds as many cards as the phase allows, and sells to make room', () => {
+    const game = startGame();
+    expect(game.checkCardSlots()).toBe(BASE_CARD_SLOTS);
+
+    game.round = ROUNDS_PER_PHASE * 2 + 1;
+    expect(game.checkCardSlots()).toBe(BASE_CARD_SLOTS + PHASE_CARD_SLOTS * 2);
+
+    game.round = 1;
+    game.setStat(PlayerStat.Gold, 1_000_000);
+    for (let i = 0; i < 20 && game.player.deck.length < BASE_CARD_SLOTS; i++) {
+      for (let slot = 0; slot < SHOP_SIZE; slot++) {
+        game.buyCard(slot);
+      }
+      game.rerollShop();
+    }
+    expect(game.player.deck).toHaveLength(BASE_CARD_SLOTS);
+
+    const slot = game.shop.offers.findIndex((card) => card != null);
+    expect(game.buyCard(slot)).toBe(false);
+
+    const [sold] = game.player.deck;
+    const gold = game.player.stats[PlayerStat.Gold];
+    game.sellCard(sold);
+    expect(game.player.deck).toHaveLength(BASE_CARD_SLOTS - 1);
+    expect(game.player.stats[PlayerStat.Gold]).toBe(
+      gold + getSellPrice(CARD_PRICES[sold.source.rarity]),
+    );
+    expect(game.buyCard(slot)).toBe(true);
   });
 
   it('gives bosses as many abilities as the player is due', () => {

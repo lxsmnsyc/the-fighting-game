@@ -1,4 +1,12 @@
-import { BASE_ROUND_INCOME, DEFAULT_GOLD, PHASE_INCOME, ROUNDS_PER_PHASE } from './constants';
+import {
+  BASE_CARD_SLOTS,
+  BASE_ROUND_INCOME,
+  DEFAULT_GOLD,
+  PHASE_CARD_SLOTS,
+  PHASE_INCOME,
+  ROUNDS_PER_PHASE,
+  SELL_RATIO,
+} from './constants';
 
 /**
  * Gold earned when a battle in `phase` ends.
@@ -17,4 +25,19 @@ export function getRoundBudget(round: number): number {
     budget += getRoundIncome(Math.ceil(previous / ROUNDS_PER_PHASE));
   }
   return budget;
+}
+
+/**
+ * How many cards a player can hold in `phase`: `BASE_CARD_SLOTS`, plus
+ * `PHASE_CARD_SLOTS` for each phase beaten.
+ */
+export function getCardSlots(phase: number): number {
+  return BASE_CARD_SLOTS + PHASE_CARD_SLOTS * (phase - 1);
+}
+
+/**
+ * Gold refunded for selling a card worth `price`.
+ */
+export function getSellPrice(price: number): number {
+  return Math.floor(price * SELL_RATIO);
 }

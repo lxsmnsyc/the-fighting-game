@@ -48,6 +48,11 @@ export const enum GameEvents {
    * cards of its rarity.
    */
   CheckCardWeight = 22,
+
+  /**
+   * How many cards the player can hold.
+   */
+  CheckCardSlots = 23,
 }
 
 export interface EndGameEvent extends BaseEvent {
@@ -136,4 +141,5 @@ export interface GameEventMap extends EventMap {
   [GameEvents.PickAbility]: [PickAbilityGameEvent, EventPriority];
   [GameEvents.AcquireAbility]: [AbilityGameEvent, EventPriority];
   [GameEvents.CheckCardWeight]: [CheckCardWeightGameEvent, ValuePriority];
+  [GameEvents.CheckCardSlots]: [GameValueEvent, ValuePriority];
 }

@@ -188,6 +188,12 @@ export default class Game extends EventEngine<GameEventMap> {
     return !event.disabled;
   }
 
+  checkCardSlots(): number {
+    const event: GameValueEvent = { id: 'CheckCardSlots', disabled: false, value: 0 };
+    this.emit(GameEvents.CheckCardSlots, event);
+    return event.value;
+  }
+
   checkCardWeight(card: Card): number {
     const event: CheckCardWeightGameEvent = {
       id: 'CheckCardWeight',

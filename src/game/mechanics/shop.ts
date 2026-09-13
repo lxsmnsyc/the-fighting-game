@@ -1,6 +1,7 @@
 import { ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
-import { BASE_REROLL_COST, CARD_PRICES, REROLL_COST_STEP, SELL_RATIO } from '../constants';
+import { BASE_REROLL_COST, CARD_PRICES, REROLL_COST_STEP } from '../constants';
+import { getCardSlots, getSellPrice } from '../economy';
 import { GameEvents } from '../events';
 import type Game from '../game';
 import { rollShopOffers } from '../pool';
@@ -44,9 +45,14 @@ export default function setupShopMechanics(game: Game): void {
     event.value = CARD_PRICES[event.card.rarity];
   });
 
+  game.on(GameEvents.CheckCardSlots, ValuePriority.Initial, (event) => {
+    event.value = getCardSlots(game.getPhase());
+  });
+
   game.on(GameEvents.BuyCard, EventPriority.Pre, (event) => {
     if (
       game.stage !== GameStage.Shop ||
+      game.player.deck.length >= game.checkCardSlots() ||
       game.shop.offers[event.slot] !== event.card ||
       game.player.stats[PlayerStat.Gold] < event.value
     ) {
@@ -72,7 +78,7 @@ export default function setupShopMechanics(game: Game): void {
 
   game.on(GameEvents.SellCard, EventPriority.Exact, ({ card }) => {
     game.player.deck.splice(game.player.deck.indexOf(card), 1);
-    game.addStat(PlayerStat.Gold, Math.floor(game.checkCardPrice(card.source) * SELL_RATIO));
+    game.addStat(PlayerStat.Gold, getSellPrice(game.checkCardPrice(card.source)));
   });
 
   game.on(GameEvents.EnableCard, EventPriority.Exact, ({ card }) => {

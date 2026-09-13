@@ -12,6 +12,16 @@ export const ROUNDS_PER_PHASE = 3;
 export const SHOP_SIZE = 5;
 
 /**
+ * Cards a player can hold in the first phase.
+ */
+export const BASE_CARD_SLOTS = 5;
+
+/**
+ * Card slots gained for each phase beaten.
+ */
+export const PHASE_CARD_SLOTS = 2;
+
+/**
  * Abilities offered to choose from.
  */
 export const ABILITY_OFFER_SIZE = 5;

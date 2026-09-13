@@ -50,6 +50,9 @@ See [abilities.md](abilities.md) for how abilities work.
 
 ## Shop
 
+- The player can hold `BASE_CARD_SLOTS` (5) cards, plus `PHASE_CARD_SLOTS` (2)
+  for each phase beaten. `CheckCardSlots` answers it. The shop does not sell a
+  card into a full deck, so the player sells a card to make room.
 - Rerolling costs 1 gold, and 1 more for each reroll in the same visit.
 - A card costs gold by rarity. Selling it refunds half.
 - Offers roll a rarity by weight, then a card of that rarity by weight. Later
@@ -69,8 +72,10 @@ resumed round meets the same opponent.
 - It buys cards like a player. Its budget is all the gold a player could have by
   that round: the starting gold plus every earlier round's income. So it keeps up
   with the run.
-- It buys cards of its aspects first, then any card, until nothing it can afford
-  is left. It keeps to the same copy limits as the player.
+- It keeps to the same card slots and copy limits as the player.
+- It fills its slots with cards it can afford, cards of its aspects first. Then
+  it spends what is left swapping its cheapest card for a pricier one, until no
+  swap fits the budget.
 - A boss spends `BOSS_BUDGET_MULTIPLIER` (1.5) times the budget and gets as many
   abilities as the player is due. Its first ability decides its aspects, and all
   of them bias its cards.
