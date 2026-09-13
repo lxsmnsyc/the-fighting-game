@@ -3,7 +3,7 @@ import { AttackFlags } from '../../battle/flags';
 import { DamageType, ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
-import { createCard } from '../../game/card';
+import { applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import CardId from '../ids';
@@ -16,8 +16,8 @@ export default createCard({
   image: '',
   rarity: Rarity.Rare,
   aspect: [Aspect.Attack],
-  description(): Description {
-    return describe`Natural attacks deal ${token.percent(DEFAULT_MULTIPLIER)} of their ${token.damage(DamageType.Physical)}, then repeat at once.`;
+  description(print): Description {
+    return describe`Natural attacks deal ${token.percent(applyPrint(DEFAULT_MULTIPLIER, print))} of their ${token.damage(DamageType.Physical)}, then repeat at once.`;
   },
   setup({ battle, unit, card }): Lifecycle {
     const isNaturalAttack = (event: UnitActionEvent): boolean =>

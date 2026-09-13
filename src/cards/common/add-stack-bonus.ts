@@ -2,7 +2,7 @@ import { SELF_STACK } from '../../battle/constants';
 import { BattleEvents } from '../../battle/events';
 import { Energy, ValuePriority } from '../../battle/types';
 import type { Lifecycle } from '../../core/lifecycle';
-import { type Card, createCard } from '../../game/card';
+import { type Card, applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import type { EnergyCardOptions } from '../effects';
@@ -29,9 +29,9 @@ function createAddEnergyBonusCard({
     image,
     rarity: Rarity.Common,
     aspect: [aspect],
-    description(): Description {
+    description(print): Description {
       const gained = token.energy(energy);
-      const bonus = token.value(amount);
+      const bonus = token.value(applyPrint(amount, print));
       return SELF_STACK[energy]
         ? describe`Whenever you gain ${gained}, gain ${bonus} more.`
         : describe`Whenever an enemy gains ${gained}, it gains ${bonus} more.`;

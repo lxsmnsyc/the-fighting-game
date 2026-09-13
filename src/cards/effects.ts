@@ -4,7 +4,7 @@ import { BattleEvents, type UnitTriggerCardEvent } from '../battle/events';
 import type { Energy } from '../battle/types';
 import { type EventListenerLifecycle, EventPriority } from '../core/event-emitter';
 import type { CardInstance } from '../game/card';
-import { type Description, describe, token } from '../game/description';
+import { type Amount, type Description, describe, token } from '../game/description';
 import type { Aspect } from '../game/types';
 import type CardId from './ids';
 
@@ -42,7 +42,7 @@ export function addEnergyOnTrigger(
  * "gain 5 Armor", or "give <receiver> 5 Poison" for energy that goes on
  * an enemy.
  */
-export function describeGrant(energy: Energy, amount: number, receiver: string): Description {
+export function describeGrant(energy: Energy, amount: Amount, receiver: string): Description {
   const granted = token.energy(energy, amount);
   return SELF_STACK[energy] ? describe`gain ${granted}` : describe`give ${receiver} ${granted}`;
 }

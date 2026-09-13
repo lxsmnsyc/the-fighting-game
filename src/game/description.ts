@@ -22,11 +22,26 @@ export interface TextToken {
 }
 
 /**
+ * A value that may vary, such as a card value under an Error print.
+ */
+export interface ValueRange {
+  min: number;
+  max: number;
+}
+
+/**
+ * A single value, or a range of them.
+ */
+export type Amount = number | ValueRange;
+
+/**
  * A raw number from the card's effect, such as a chance or a duration.
+ * `max` is set when the number is a range, with `value` as its low end.
  */
 export interface ValueToken {
   type: TokenType.Value;
   value: number;
+  max?: number;
   unit: ValueUnit;
 }
 
@@ -34,6 +49,7 @@ export interface EnergyToken {
   type: TokenType.Energy;
   energy: Energy;
   value?: number;
+  max?: number;
 }
 
 /**
@@ -43,12 +59,14 @@ export interface DamageToken {
   type: TokenType.Damage;
   damage: DamageType;
   value?: number;
+  max?: number;
 }
 
 export interface StatToken {
   type: TokenType.Stat;
   stat: Stat;
   value?: number;
+  max?: number;
 }
 
 export type DescriptionToken = TextToken | ValueToken | EnergyToken | DamageToken | StatToken;
@@ -63,34 +81,53 @@ function text(content: string): TextToken {
   return { type: TokenType.Text, text: content };
 }
 
-function value(amount: number, unit = ValueUnit.None): ValueToken {
-  return { type: TokenType.Value, value: amount, unit };
+// A range whose ends match is a single value
+function splitAmount(amount: Amount | undefined): { value?: number; max?: number } {
+  if (amount == null || typeof amount === 'number') {
+    return { value: amount };
+  }
+  return amount.min === amount.max ? { value: amount.min } : { value: amount.min, max: amount.max };
+}
+
+function mapAmount(amount: Amount, map: (current: number) => number): Amount {
+  return typeof amount === 'number' ? map(amount) : { min: map(amount.min), max: map(amount.max) };
+}
+
+function value(amount: Amount, unit = ValueUnit.None): ValueToken {
+  const { value: low = 0, max } = splitAmount(amount);
+  return { type: TokenType.Value, value: low, max, unit };
 }
 
 // Takes a ratio, so 0.25 reads as 25%
-function percent(ratio: number): ValueToken {
-  return value(Math.round(ratio * 10000) / 100, ValueUnit.Percent);
+function percent(ratio: Amount): ValueToken {
+  return value(
+    mapAmount(ratio, (current) => Math.round(current * 10000) / 100),
+    ValueUnit.Percent,
+  );
 }
 
 // Takes milliseconds, like the rest of the engine
-function seconds(duration: number): ValueToken {
-  return value(duration / 1000, ValueUnit.Seconds);
+function seconds(duration: Amount): ValueToken {
+  return value(
+    mapAmount(duration, (current) => current / 1000),
+    ValueUnit.Seconds,
+  );
 }
 
-function multiplier(amount: number): ValueToken {
+function multiplier(amount: Amount): ValueToken {
   return value(amount, ValueUnit.Multiplier);
 }
 
-function energy(type: Energy, amount?: number): EnergyToken {
-  return { type: TokenType.Energy, energy: type, value: amount };
+function energy(type: Energy, amount?: Amount): EnergyToken {
+  return { type: TokenType.Energy, energy: type, ...splitAmount(amount) };
 }
 
-function damage(type: DamageType, amount?: number): DamageToken {
-  return { type: TokenType.Damage, damage: type, value: amount };
+function damage(type: DamageType, amount?: Amount): DamageToken {
+  return { type: TokenType.Damage, damage: type, ...splitAmount(amount) };
 }
 
-function stat(type: Stat, amount?: number): StatToken {
-  return { type: TokenType.Stat, stat: type, value: amount };
+function stat(type: Stat, amount?: Amount): StatToken {
+  return { type: TokenType.Stat, stat: type, ...splitAmount(amount) };
 }
 
 export const token = {
@@ -154,8 +191,13 @@ function formatNumber(amount: number): string {
   return String(Math.round(amount * 100) / 100);
 }
 
-function withAmount(name: string, amount: number | undefined): string {
-  return amount == null ? name : `${formatNumber(amount)} ${name}`;
+// "15" or "15–25"
+function formatAmount(low: number, max: number | undefined): string {
+  return max == null ? formatNumber(low) : `${formatNumber(low)}–${formatNumber(max)}`;
+}
+
+function withAmount(name: string, low: number | undefined, max: number | undefined): string {
+  return low == null ? name : `${formatAmount(low, max)} ${name}`;
 }
 
 const UNIT_SUFFIXES: Record<ValueUnit, string> = {
@@ -166,7 +208,7 @@ const UNIT_SUFFIXES: Record<ValueUnit, string> = {
 };
 
 function formatValue(current: ValueToken): string {
-  return `${formatNumber(current.value)}${UNIT_SUFFIXES[current.unit]}`;
+  return `${formatAmount(current.value, current.max)}${UNIT_SUFFIXES[current.unit]}`;
 }
 
 export function formatToken(current: DescriptionToken): string {
@@ -177,12 +219,12 @@ export function formatToken(current: DescriptionToken): string {
     return formatValue(current);
   }
   if (current.type === TokenType.Energy) {
-    return withAmount(ENERGY_NAMES[current.energy], current.value);
+    return withAmount(ENERGY_NAMES[current.energy], current.value, current.max);
   }
   if (current.type === TokenType.Damage) {
-    return withAmount(`${DAMAGE_TYPE_NAMES[current.damage]} damage`, current.value);
+    return withAmount(`${DAMAGE_TYPE_NAMES[current.damage]} damage`, current.value, current.max);
   }
-  return withAmount(STAT_NAMES[current.stat], current.value);
+  return withAmount(STAT_NAMES[current.stat], current.value, current.max);
 }
 
 /**

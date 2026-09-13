@@ -4,7 +4,7 @@ import { isMissedDamage } from '../../battle/mechanics/damage';
 import { DamagePriority, DamageType } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import type { Lifecycle } from '../../core/lifecycle';
-import { createCard } from '../../game/card';
+import { applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import CardId from '../ids';
@@ -19,8 +19,8 @@ export default createCard({
   image: '',
   rarity: Rarity.Rare,
   aspect: [Aspect.Health],
-  description(): Description {
-    return describe`Reduce damage taken by ${token.percent(DEFAULT_REDUCTION)}. The reduced amount is taken later as ${token.damage(DamageType.HealthLoss)}, ${token.percent(DEFAULT_DAMAGE)} of it every ${token.seconds(DEFAULT_PERIOD)}.`;
+  description(print): Description {
+    return describe`Reduce damage taken by ${token.percent(applyPrint(DEFAULT_REDUCTION, print))}. The reduced amount is taken later as ${token.damage(DamageType.HealthLoss)}, ${token.percent(DEFAULT_DAMAGE)} of it every ${token.seconds(DEFAULT_PERIOD)}.`;
   },
   setup({ battle, unit, card }): Lifecycle {
     let collected = 0;

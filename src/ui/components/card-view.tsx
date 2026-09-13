@@ -50,7 +50,7 @@ function CardTooltip(props: { card: Card; instance?: CardInstance }): JSX.Elemen
         </span>
       </div>
       <p class="mt-2 leading-snug text-zinc-300">
-        <DescriptionText description={props.card.description()} />
+        <DescriptionText description={props.card.description(props.instance?.print ?? 0)} />
       </p>
       <div class="mt-3 flex flex-col gap-1.5 border-t border-zinc-700 pt-2 text-xs text-zinc-400">
         <div>

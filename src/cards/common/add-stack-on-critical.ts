@@ -3,7 +3,7 @@ import { BattleEvents } from '../../battle/events';
 import { TriggerEnergyFlags } from '../../battle/flags';
 import { Energy, ValuePriority } from '../../battle/types';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
-import { type Card, createCard } from '../../game/card';
+import { type Card, applyPrint, createCard } from '../../game/card';
 import { type Description, describe } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from '../effects';
@@ -31,8 +31,8 @@ function createAddEnergyOnCriticalCard({
     image,
     rarity: Rarity.Common,
     aspect: [Aspect.Critical, aspect],
-    description(): Description {
-      return describe`On a critical hit, ${describeGrant(energy, amount, 'the target')}.`;
+    description(print): Description {
+      return describe`On a critical hit, ${describeGrant(energy, applyPrint(amount, print), 'the target')}.`;
     },
     setup({ battle, unit, card }): Lifecycle {
       return new MergedLifecycle([

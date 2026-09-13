@@ -24,6 +24,11 @@ Descriptions are built with the `describe` template tag:
 describe`When attacking, ${token.percent(0.25)} chance to gain ${token.energy(Energy.Armor, 20)}.`;
 ```
 
+`card.description(print)` takes the print of the copy it describes. Values the
+print changes in battle are shown changed: a Monotone print doubles them, and an
+Error print shows the range they roll in, such as `15–25 Armor`. Pass 0 for a
+card with no print, such as a shop offer.
+
 ## Rarity
 
 - Common: Each Common card has 5 copies that can be bought.

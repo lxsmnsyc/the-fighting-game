@@ -3,7 +3,7 @@ import { AttackFlags } from '../../battle/flags';
 import { DamageType, ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
-import { createCard } from '../../game/card';
+import { applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import CardId from '../ids';
@@ -17,8 +17,8 @@ export default createCard({
   image: '',
   rarity: Rarity.Rare,
   aspect: [Aspect.Attack],
-  description(): Description {
-    return describe`Natural attacks have a ${token.percent(DEFAULT_CHANCE)} chance to attack again for ${token.percent(DEFAULT_MULTIPLIER)} of their ${token.damage(DamageType.Physical)}.`;
+  description(print): Description {
+    return describe`Natural attacks have a ${token.percent(DEFAULT_CHANCE)} chance to attack again for ${token.percent(applyPrint(DEFAULT_MULTIPLIER, print))} of their ${token.damage(DamageType.Physical)}.`;
   },
   setup({ battle, unit, card }): Lifecycle {
     return new MergedLifecycle([

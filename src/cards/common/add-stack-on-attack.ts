@@ -2,7 +2,7 @@ import { SELF_STACK } from '../../battle/constants';
 import { BattleEvents } from '../../battle/events';
 import { Energy, ValuePriority } from '../../battle/types';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
-import { type Card, createCard } from '../../game/card';
+import { type Card, applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from '../effects';
@@ -30,8 +30,8 @@ function createAddEnergyOnAttackCard({
     image,
     rarity: Rarity.Common,
     aspect: [Aspect.Attack, aspect],
-    description(): Description {
-      return describe`When attacking, ${token.percent(DEFAULT_CHANCE)} chance to ${describeGrant(energy, amount, 'the target')}.`;
+    description(print): Description {
+      return describe`When attacking, ${token.percent(DEFAULT_CHANCE)} chance to ${describeGrant(energy, applyPrint(amount, print), 'the target')}.`;
     },
     setup({ battle, unit, card }): Lifecycle {
       return new MergedLifecycle([

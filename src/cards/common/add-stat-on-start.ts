@@ -2,7 +2,7 @@ import { BattleEvents } from '../../battle/events';
 import { Stat } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
-import { type Card, createCard } from '../../game/card';
+import { type Card, applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import CardId from '../ids';
@@ -33,8 +33,8 @@ function createAddStatOnStartCard({
     rarity: Rarity.Common,
     image,
     aspect,
-    description(): Description {
-      return describe`At the start of battle, gain ${token.stat(stat, DEFAULT_AMOUNT)}.`;
+    description(print): Description {
+      return describe`At the start of battle, gain ${token.stat(stat, applyPrint(DEFAULT_AMOUNT, print))}.`;
     },
     setup({ battle, unit, card }): Lifecycle {
       return new MergedLifecycle([

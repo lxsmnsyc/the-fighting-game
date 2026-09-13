@@ -4,7 +4,7 @@ import { isMissedDamage } from '../../battle/mechanics/damage';
 import { DamagePriority, DamageType, Energy } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
-import { createCard } from '../../game/card';
+import { applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import CardId from '../ids';
@@ -17,8 +17,8 @@ export default createCard({
   image: '',
   rarity: Rarity.Rare,
   aspect: [Aspect.Attack, Aspect.Healing],
-  description(): Description {
-    return describe`Gain ${token.percent(DEFAULT_MULTIPLIER)} of the ${token.damage(DamageType.Physical)} your attacks deal as ${token.energy(Energy.Healing)}, then heal.`;
+  description(print): Description {
+    return describe`Gain ${token.percent(applyPrint(DEFAULT_MULTIPLIER, print))} of the ${token.damage(DamageType.Physical)} your attacks deal as ${token.energy(Energy.Healing)}, then heal.`;
   },
   setup({ battle, unit, card }): Lifecycle {
     return new MergedLifecycle([

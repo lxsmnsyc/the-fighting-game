@@ -1,7 +1,7 @@
 import { BattleEvents } from '../../battle/events';
 import { Stat, ValuePriority } from '../../battle/types';
 import type { Lifecycle } from '../../core/lifecycle';
-import { createCard } from '../../game/card';
+import { applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import CardId from '../ids';
@@ -15,8 +15,8 @@ export default createCard({
   image: '',
   rarity: Rarity.Rare,
   aspect: [Aspect.Critical],
-  description(): Description {
-    return describe`Critical hits on enemies at or below ${token.percent(DEFAULT_THRESHOLD)} ${token.stat(Stat.Health)} deal an extra ${token.multiplier(DEFAULT_MULTIPLIER)} damage.`;
+  description(print): Description {
+    return describe`Critical hits on enemies at or below ${token.percent(DEFAULT_THRESHOLD)} ${token.stat(Stat.Health)} deal an extra ${token.multiplier(applyPrint(DEFAULT_MULTIPLIER, print))} damage.`;
   },
   setup({ battle, unit, card }): Lifecycle {
     return battle.on(BattleEvents.UnitCritical, ValuePriority.Additive, (event) => {

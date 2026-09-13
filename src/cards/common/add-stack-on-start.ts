@@ -2,7 +2,7 @@ import { BattleEvents } from '../../battle/events';
 import { Energy } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
-import { type Card, createCard } from '../../game/card';
+import { type Card, applyPrint, createCard } from '../../game/card';
 import { type Description, describe } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from '../effects';
@@ -28,8 +28,8 @@ function createAddEnergyOnStartCard({
     image,
     rarity: Rarity.Common,
     aspect: [aspect],
-    description(): Description {
-      return describe`At the start of battle, ${describeGrant(energy, amount, 'a random enemy')}.`;
+    description(print): Description {
+      return describe`At the start of battle, ${describeGrant(energy, applyPrint(amount, print), 'a random enemy')}.`;
     },
     setup({ battle, unit, card }): Lifecycle {
       return new MergedLifecycle([

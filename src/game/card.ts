@@ -4,7 +4,7 @@ import type CardId from '../cards/ids';
 import type AleaRNG from '../core/alea';
 import lerp from '../core/lerp';
 import type { Lifecycle } from '../core/lifecycle';
-import type { Description } from './description';
+import type { Description, ValueRange } from './description';
 import type { Player } from './player';
 import { type Aspect, Edition, Print, type PrintSpawnChance, type Rarity } from './types';
 
@@ -34,8 +34,11 @@ export interface Card {
   /**
    * What the card does, with its raw values, energies, stats and damage
    * types as tokens a UI can highlight.
+   *
+   * Values that go through `getValue` in battle are shown as `print`
+   * changes them, with `applyPrint`. Pass 0 for a card with no print.
    */
-  description(): Description;
+  description(print: number): Description;
 
   /**
    * Registers the card's listeners for one unit in one battle. The
@@ -78,6 +81,26 @@ export const MAX_ERROR_VALUE = 1.25;
 export const MONOTONE_MULTIPLIER = 2;
 
 /**
+ * The values a card value can take under `print`. An Error print makes
+ * it a range, and a Monotone print multiplies it.
+ */
+export function applyPrint(value: number, print: number): ValueRange {
+  let min = value;
+  let max = value;
+
+  if (print & Print.Error) {
+    min = value * MIN_ERROR_VALUE;
+    max = value * MAX_ERROR_VALUE;
+  }
+  if (print & Print.Monotone) {
+    min *= MONOTONE_MULTIPLIER;
+    max *= MONOTONE_MULTIPLIER;
+  }
+
+  return { min, max };
+}
+
+/**
  * One copy of a card. It holds no RNG: its print is rolled once when it
  * is created, so saving its fields is enough to restore it.
  */
@@ -103,16 +126,8 @@ export class CardInstance {
    * battle, such as the unit's.
    */
   getValue(value: number, rng: AleaRNG): number {
-    let result = value;
-
-    if (this.print & Print.Error) {
-      result = lerp(value * MIN_ERROR_VALUE, value * MAX_ERROR_VALUE, rng.random());
-    }
-    if (this.print & Print.Monotone) {
-      result *= MONOTONE_MULTIPLIER;
-    }
-
-    return result;
+    const { min, max } = applyPrint(value, this.print);
+    return this.print & Print.Error ? lerp(min, max, rng.random()) : min;
   }
 }
 

@@ -1,7 +1,7 @@
 import { BattleEvents } from '../../battle/events';
 import { Energy, ValuePriority } from '../../battle/types';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
-import { type Card, createCard } from '../../game/card';
+import { type Card, applyPrint, createCard } from '../../game/card';
 import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from '../effects';
@@ -28,8 +28,8 @@ function createAddEnergyOnHealCard({
     aspect: [Aspect.Healing, aspect],
     image,
     rarity: Rarity.Common,
-    description(): Description {
-      return describe`When healed, ${token.percent(DEFAULT_CHANCE)} chance to ${describeGrant(energy, amount, 'a random enemy')}.`;
+    description(print): Description {
+      return describe`When healed, ${token.percent(DEFAULT_CHANCE)} chance to ${describeGrant(energy, applyPrint(amount, print), 'a random enemy')}.`;
     },
     setup({ battle, unit, card }): Lifecycle {
       return new MergedLifecycle([
