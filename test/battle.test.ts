@@ -412,6 +412,39 @@ describe('cards', () => {
     expect(enemy.getEnergy(Energy.Magic, false)).toBe(10);
   });
 
+  it('convert a share of gained energy into another', () => {
+    const battle = createBattle('convert');
+    disableEnergyGain(battle);
+    const [unit] = createSide(battle, [
+      createPlayer([
+        getCard(CardId.Restorative),
+        getCard(CardId.Venomous),
+        getCard(CardId.Brittle),
+        getCard(CardId.Fleeting),
+        getCard(CardId.Bounding),
+      ]),
+    ]).units;
+    const [enemy] = createSide(battle, [createPlayer()]).units;
+    battle.start();
+
+    // Restorative: half the Armor gained comes as Healing
+    unit.addEnergy(Energy.Armor, 40, false);
+    expect(unit.getEnergy(Energy.Healing, false)).toBe(20);
+
+    // Venomous: half the Poison an enemy gains comes to the unit as Magic
+    enemy.addEnergy(Energy.Poison, 40, false);
+    expect(unit.getEnergy(Energy.Magic, false)).toBe(20);
+
+    // Brittle: half the Slow an enemy gains goes on it as Corrosion
+    enemy.addEnergy(Energy.Slow, 40, false);
+    expect(enemy.getEnergy(Energy.Corrosion, false)).toBe(20);
+
+    // Fleeting and Bounding feed each other once, then the chain rule stops them
+    unit.addEnergy(Energy.Speed, 40, false);
+    expect(unit.getEnergy(Energy.Dodge, false)).toBe(20);
+    expect(unit.getEnergy(Energy.Speed, false)).toBe(50);
+  });
+
   it('expose the trigger that is still resolving', () => {
     const battle = createBattle('resolving');
     const [unit] = createSide(battle, [createPlayer([getCard(CardId.Ambush)])]).units;

@@ -55,6 +55,14 @@ New families are built with `createTriggerCard` in
 | On consume     | The unit's energy of one kind is spent     | 25%    | 20     |
 | Low health     | Health first drops below half, once        | Always | 100    |
 
+## Conversion
+
+Uncommon conversion cards hand out 50% of gained energy as another energy, such
+as Healing from Armor. Energy that stacks on its owner counts when the player
+gains it. Poison and Slow count when an enemy gains them, whoever gave it. Cards
+that feed each other, such as Fleeting and Bounding, convert once each, then
+the chain rule stops them.
+
 ## Rarity
 
 - Common: Each Common card has 5 copies that can be bought.

@@ -154,6 +154,16 @@ const enum CardId {
   Cornered = 2000,
   Resolute = 2001,
   Skittish = 2002,
+
+  // Uncommon: a share of gained energy as another energy
+  Restorative = 2100,
+  Hardy = 2101,
+  Fleeting = 2102,
+  Bounding = 2103,
+  Brutal = 2104,
+  Mystic = 2105,
+  Venomous = 2106,
+  Brittle = 2107,
 }
 
 export default CardId;

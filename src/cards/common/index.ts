@@ -15,6 +15,7 @@ import ADD_STACK_ON_MAGIC_CARDS from './add-stack-on-magic';
 import ADD_STACK_ON_POISON_TICK_CARDS from './add-stack-on-poison-tick';
 import ADD_STACK_ON_START_CARDS from './add-stack-on-start';
 import ADD_STAT_ON_START_CARDS from './add-stat-on-start';
+import CONVERT_ENERGY_CARDS from './convert-energy';
 
 const COMMON_CARDS: Card[] = [
   ...ADD_STACK_BONUS_CARDS,
@@ -33,6 +34,7 @@ const COMMON_CARDS: Card[] = [
   ...ADD_STACK_ON_COUNTER_CARDS,
   ...ADD_STACK_ON_CONSUME_CARDS,
   ...ADD_STACK_ON_LOW_HEALTH_CARDS,
+  ...CONVERT_ENERGY_CARDS,
 ];
 
 export default COMMON_CARDS;
