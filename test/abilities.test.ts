@@ -82,6 +82,11 @@ describe('ability registry', () => {
     }
   });
 
+  it('gives every ability a unique ordered pair of aspects', () => {
+    const pairs = ABILITIES.map(({ aspects: [first, second] }) => `${first}:${second}`);
+    expect(new Set(pairs).size).toBe(pairs.length);
+  });
+
   it('describes every ability with highlighted parts', () => {
     for (const ability of ABILITIES) {
       const description = ability.description();
@@ -230,6 +235,77 @@ describe('abilities', () => {
     expect(strikes).toBeGreaterThan(0);
     expect(left.stats[Stat.Health]).toBe(1000);
     expect(right.stats[Stat.Health]).toBe(1000);
+  });
+
+  it('Crab gains Armor from Attack, unlike Rhino', () => {
+    const battle = createBattle('crab');
+    const unit = createUnit(battle, [getAbility(AbilityId.Crab)]);
+    const enemy = createUnit(battle);
+    battle.start();
+
+    unit.addEnergy(Energy.Attack, 10, true);
+    unit.triggerAbility(getInstance(unit, AbilityId.Crab));
+
+    expect(unit.getEnergy(Energy.Armor, false)).toBe(40);
+    expect(enemy.stats[Stat.Health]).toBe(1000);
+  });
+
+  it('Hyena spends Health to corrode, but never below 1', () => {
+    const battle = createBattle('hyena');
+    const unit = createUnit(battle, [getAbility(AbilityId.Hyena)]);
+    const enemy = createUnit(battle);
+    battle.start();
+
+    const hyena = getInstance(unit, AbilityId.Hyena);
+    unit.triggerAbility(hyena);
+    expect(unit.stats[Stat.Health]).toBe(950);
+    expect(enemy.getEnergy(Energy.Corrosion, false)).toBe(110);
+
+    unit.removeStat(Stat.Health, 949);
+    unit.triggerAbility(hyena);
+    expect(unit.stats[Stat.Health]).toBe(1);
+    expect(enemy.getEnergy(Energy.Corrosion, false)).toBe(120);
+  });
+
+  it('Porcupine slows attackers its Armor blocks', () => {
+    const battle = createBattle('porcupine');
+    const unit = createUnit(battle, [getAbility(AbilityId.Porcupine)]);
+    const enemy = createUnit(battle);
+    battle.start();
+
+    unit.triggerAbility(getInstance(unit, AbilityId.Porcupine));
+    enemy.attack(unit, 20, 0);
+
+    expect(enemy.getEnergy(Energy.Slow, false)).toBe(15);
+  });
+
+  it('Falcon grants Critical only for a while', () => {
+    const battle = createBattle('falcon');
+    const unit = createUnit(battle, [getAbility(AbilityId.Falcon)]);
+    createUnit(battle);
+    battle.start();
+
+    unit.addEnergy(Energy.Speed, 100, true);
+    unit.triggerAbility(getInstance(unit, AbilityId.Falcon));
+    expect(unit.getEnergy(Energy.Critical, true)).toBe(200);
+
+    run(battle, 3000 + FRAME * 2);
+    expect(unit.getEnergy(Energy.Critical, true)).toBe(0);
+  });
+
+  it('Bear heals, then attacks by its Healing', () => {
+    const battle = createBattle('bear');
+    const unit = createUnit(battle, [getAbility(AbilityId.Bear)]);
+    const enemy = createUnit(battle);
+    battle.start();
+
+    unit.addEnergy(Energy.Healing, 30, false);
+    unit.removeStat(Stat.Health, 100);
+    unit.triggerAbility(getInstance(unit, AbilityId.Bear));
+
+    expect(unit.stats[Stat.Health]).toBe(930);
+    expect(unit.getEnergy(Energy.Healing, false)).toBe(30);
+    expect(enemy.stats[Stat.Health]).toBe(970);
   });
 
   it('all run through a battle against each other', () => {

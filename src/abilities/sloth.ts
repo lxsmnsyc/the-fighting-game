@@ -1,4 +1,4 @@
-import { DamageType, Energy } from '../battle/types';
+import { Energy, Stat } from '../battle/types';
 import type { Lifecycle } from '../core/lifecycle';
 import { createAbility } from '../game/ability';
 import { type Description, describe, token } from '../game/description';
@@ -6,23 +6,22 @@ import { Aspect } from '../game/types';
 import { onTriggerAbility } from './effects';
 import AbilityId from './ids';
 
-const SLOW = 30;
+const SLOW = 20;
 
 export default createAbility({
-  id: AbilityId.Octopus,
-  name: 'Octopus',
+  id: AbilityId.Sloth,
+  name: 'Sloth',
   image: '',
-  aspects: [Aspect.Slow, Aspect.Magic],
-  cooldown: 6000,
+  aspects: [Aspect.Slow, Aspect.Health],
+  cooldown: 10_000,
   description(): Description {
-    return describe`Give the enemy ${token.energy(Energy.Slow, SLOW)}, then deal ${token.damage(DamageType.Magical)} equal to your ${token.energy(Energy.Magic)} plus its ${token.energy(Energy.Slow)}.`;
+    return describe`Give the enemy ${token.energy(Energy.Slow, SLOW)}, then gain ${token.stat(Stat.MaxHealth)} equal to its ${token.energy(Energy.Slow)}.`;
   },
   setup(context): Lifecycle {
     const { unit } = context;
     return onTriggerAbility(context, (enemy) => {
       enemy.addEnergy(Energy.Slow, SLOW, false);
-      const value = unit.getTotalEnergy(Energy.Magic) + enemy.getTotalEnergy(Energy.Slow);
-      unit.dealDamage(enemy, DamageType.Magical, value, 0);
+      unit.addStat(Stat.MaxHealth, enemy.getTotalEnergy(Energy.Slow));
     });
   },
 });

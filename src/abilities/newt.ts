@@ -6,23 +6,21 @@ import { Aspect } from '../game/types';
 import { onTriggerAbility } from './effects';
 import AbilityId from './ids';
 
-const SPEED = 20;
-const POISON_RATIO = 0.5;
+const BONUS = 20;
 
 export default createAbility({
-  id: AbilityId.Viper,
-  name: 'Viper',
+  id: AbilityId.Newt,
+  name: 'Newt',
   image: '',
-  aspects: [Aspect.Speed, Aspect.Poison],
-  cooldown: 4000,
+  aspects: [Aspect.Healing, Aspect.Poison],
+  cooldown: 6000,
   description(): Description {
-    return describe`Gain ${token.energy(Energy.Speed, SPEED)}, then give the enemy ${token.energy(Energy.Poison)} equal to ${token.percent(POISON_RATIO)} of your ${token.energy(Energy.Speed)}.`;
+    return describe`Give the enemy ${token.energy(Energy.Poison)} equal to your ${token.energy(Energy.Healing)} plus ${token.value(BONUS)}.`;
   },
   setup(context): Lifecycle {
     const { unit } = context;
     return onTriggerAbility(context, (enemy) => {
-      unit.addEnergy(Energy.Speed, SPEED, false);
-      enemy.addEnergy(Energy.Poison, unit.getTotalEnergy(Energy.Speed) * POISON_RATIO, false);
+      enemy.addEnergy(Energy.Poison, unit.getTotalEnergy(Energy.Healing) + BONUS, false);
     });
   },
 });

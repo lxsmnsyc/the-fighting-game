@@ -6,23 +6,24 @@ import { Aspect } from '../game/types';
 import { onTriggerAbility } from './effects';
 import AbilityId from './ids';
 
-const SLOW = 30;
+const ATTACK_RATIO = 3;
+const BONUS = 30;
 
 export default createAbility({
-  id: AbilityId.Octopus,
-  name: 'Octopus',
+  id: AbilityId.Tiger,
+  name: 'Tiger',
   image: '',
-  aspects: [Aspect.Slow, Aspect.Magic],
+  aspects: [Aspect.Attack, Aspect.Critical],
   cooldown: 6000,
   description(): Description {
-    return describe`Give the enemy ${token.energy(Energy.Slow, SLOW)}, then deal ${token.damage(DamageType.Magical)} equal to your ${token.energy(Energy.Magic)} plus its ${token.energy(Energy.Slow)}.`;
+    return describe`Gain ${token.energy(Energy.Critical)} equal to three times your ${token.energy(Energy.Attack)} plus ${token.value(BONUS)}, then attack the enemy for ${token.damage(DamageType.Physical)} equal to your ${token.energy(Energy.Attack)}.`;
   },
   setup(context): Lifecycle {
     const { unit } = context;
     return onTriggerAbility(context, (enemy) => {
-      enemy.addEnergy(Energy.Slow, SLOW, false);
-      const value = unit.getTotalEnergy(Energy.Magic) + enemy.getTotalEnergy(Energy.Slow);
-      unit.dealDamage(enemy, DamageType.Magical, value, 0);
+      const attack = unit.getTotalEnergy(Energy.Attack);
+      unit.addEnergy(Energy.Critical, attack * ATTACK_RATIO + BONUS, false);
+      unit.attack(enemy, attack, 0);
     });
   },
 });

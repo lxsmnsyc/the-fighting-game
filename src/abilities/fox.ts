@@ -6,16 +6,16 @@ import { Aspect } from '../game/types';
 import { measureDamage, onTriggerAbility } from './effects';
 import AbilityId from './ids';
 
-const BONUS = 20;
+const BONUS = 10;
 
 export default createAbility({
-  id: AbilityId.Scorpion,
-  name: 'Scorpion',
+  id: AbilityId.Fox,
+  name: 'Fox',
   image: '',
-  aspects: [Aspect.Critical, Aspect.Poison],
+  aspects: [Aspect.Critical, Aspect.Dodge],
   cooldown: 6000,
   description(): Description {
-    return describe`Attack the enemy for ${token.damage(DamageType.Physical)} equal to your ${token.energy(Energy.Attack)} plus ${token.value(BONUS)}. On a critical hit, also give it ${token.energy(Energy.Poison)} equal to the damage dealt.`;
+    return describe`Attack the enemy for ${token.damage(DamageType.Physical)} equal to your ${token.energy(Energy.Attack)} plus ${token.value(BONUS)}. On a critical hit, also gain ${token.energy(Energy.Dodge)} equal to the damage dealt.`;
   },
   setup(context): Lifecycle {
     const { battle, unit } = context;
@@ -24,7 +24,7 @@ export default createAbility({
         unit.attack(enemy, unit.getTotalEnergy(Energy.Attack) + BONUS, 0);
       });
       if (report.critical) {
-        enemy.addEnergy(Energy.Poison, report.damage, false);
+        unit.addEnergy(Energy.Dodge, report.damage, false);
       }
     });
   },

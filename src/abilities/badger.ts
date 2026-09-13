@@ -13,7 +13,7 @@ export default createAbility({
   id: AbilityId.Badger,
   name: 'Badger',
   image: '',
-  aspects: [Aspect.Attack, Aspect.Health],
+  aspects: [Aspect.Health, Aspect.Attack],
   cooldown: 6000,
   description(): Description {
     return describe`Attack the enemy for ${token.damage(DamageType.Physical)} equal to your ${token.energy(Energy.Attack)} plus ${token.value(BONUS)}, plus ${token.percent(MISSING_HEALTH_RATIO)} of your missing ${token.stat(Stat.Health)}.`;

@@ -16,7 +16,7 @@ export default createAbility({
   id: AbilityId.Mantis,
   name: 'Mantis',
   image: '',
-  aspects: [Aspect.Critical, Aspect.Dodge],
+  aspects: [Aspect.Dodge, Aspect.Critical],
   cooldown: 7000,
   description(): Description {
     return describe`Gain ${token.energy(Energy.Dodge, DODGE)}. For ${token.seconds(DURATION)}, strike back at every natural attack you dodge for ${token.damage(DamageType.Physical)} equal to your ${token.energy(Energy.Attack)} plus ${token.value(BONUS)}, as a critical hit.`;
