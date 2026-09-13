@@ -166,7 +166,7 @@ describe('cards', () => {
     const [right] = createSide(battle, [disabled]).units;
     battle.start();
 
-    expect(left.getEnergy(Energy.Attack, false)).toBe(20);
+    expect(left.getEnergy(Energy.Attack, false)).toBe(80);
     expect(right.getEnergy(Energy.Attack, false)).toBe(0);
   });
 
@@ -352,8 +352,8 @@ describe('cards', () => {
     battle.start();
 
     // Ambush runs twice with Savage, and once with an Armor secret
-    expect(unit.getEnergy(Energy.Attack, false)).toBe(40);
-    expect(other.getEnergy(Energy.Attack, false)).toBe(20);
+    expect(unit.getEnergy(Energy.Attack, false)).toBe(160);
+    expect(other.getEnergy(Energy.Attack, false)).toBe(80);
     expect(triggers).toEqual([CardId.Ambush, CardId.Savage, CardId.Ambush]);
   });
 
@@ -364,7 +364,7 @@ describe('cards', () => {
     const [unit] = createSide(battle, [player]).units;
     battle.start();
 
-    expect(unit.getEnergy(Energy.Attack, false)).toBe(40);
+    expect(unit.getEnergy(Energy.Attack, false)).toBe(160);
   });
 
   it('apply inline effects once per repeat', () => {

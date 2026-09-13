@@ -8,7 +8,8 @@ import { Aspect, Rarity } from '../../game/types';
 import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from '../effects';
 import CardId from '../ids';
 
-const DEFAULT_AMOUNT = 20;
+// High, since it only triggers once per battle
+const DEFAULT_AMOUNT = 80;
 
 /**
  * Hands out energy when the unit enters the battle.
@@ -25,7 +26,7 @@ function createAddEnergyOnStartCard({
     id,
     name,
     image,
-    rarity: Rarity.Common,
+    rarity: Rarity.Uncommon,
     aspect: [aspect],
     description(print): Description {
       return describe`At the start of battle, ${describeGrant(energy, applyPrint(amount, print), 'a random enemy')}.`;

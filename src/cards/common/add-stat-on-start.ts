@@ -7,7 +7,8 @@ import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
 import CardId from '../ids';
 
-const DEFAULT_AMOUNT = 100;
+// High, since it only triggers once per battle
+const DEFAULT_AMOUNT = 200;
 
 interface AddStatOnStartCardOptions {
   id: CardId;
@@ -30,7 +31,7 @@ function createAddStatOnStartCard({
   return createCard({
     id,
     name,
-    rarity: Rarity.Common,
+    rarity: Rarity.Uncommon,
     image,
     aspect,
     description(print): Description {

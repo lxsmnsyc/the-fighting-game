@@ -31,14 +31,15 @@ card with no print, such as a shop offer.
 
 ## Trigger families
 
-Most common cards hand out one energy when something happens. The energy goes
+Most common cards hand out one energy when something happens. The on-start
+cards, and Hearty, only trigger once, so they are stronger and Uncommon. The energy goes
 to the unit when it stacks on its owner, and to the enemy involved otherwise.
 New families are built with `createTriggerCard` in
 [src/cards/effects.ts](../src/cards/effects.ts).
 
 | Family         | Sets it off                                | Chance | Amount |
 | -------------- | ------------------------------------------ | ------ | ------ |
-| On start       | The battle starts                          | Always | 20     |
+| On start       | The battle starts                          | Always | 80     |
 | On attack      | The unit attacks                           | 25%    | 20     |
 | On critical    | The unit lands a critical hit              | Always | 30     |
 | On heal        | The unit is healed                         | 20%    | 50     |
