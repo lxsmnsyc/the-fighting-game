@@ -2,36 +2,35 @@ import { BattleEvents } from '../../battle/events';
 import { Energy, Stat, ValuePriority } from '../../battle/types';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
 import { type Card, createCard } from '../../game/card';
+import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
-import addEnergyOnTrigger from '../effects';
+import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from '../effects';
+import CardId from '../ids';
 
+const DEFAULT_AMOUNT = 50;
 const DEFAULT_HEALTH_THRESHOLD = 100;
-
-interface AddEnergyOnHealthLostCardOptions {
-  name: string;
-  energy: Energy;
-  aspect: Aspect;
-  amount: number;
-  permanent?: boolean;
-  image?: string;
-}
 
 /**
  * Hands out energy for every 100 health the unit loses.
  */
 function createAddEnergyOnHealthLostCard({
+  id,
   name,
   energy,
   aspect,
   amount,
   permanent = false,
   image = '',
-}: AddEnergyOnHealthLostCardOptions): Card {
+}: EnergyCardOptions): Card {
   return createCard({
+    id,
     name,
     aspect: [Aspect.Health, aspect],
     image,
     rarity: Rarity.Common,
+    description(): Description {
+      return describe`For every ${token.stat(Stat.Health, DEFAULT_HEALTH_THRESHOLD)} lost, ${describeGrant(energy, amount, 'a random enemy')}.`;
+    },
     setup({ battle, unit, card }): Lifecycle {
       let lost = 0;
 
@@ -57,58 +56,67 @@ function createAddEnergyOnHealthLostCard({
 
 const ADD_STACK_ON_HEALTH_LOST_CARDS: Card[] = [
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Scarred,
+    name: 'Scarred',
     energy: Energy.Armor,
     aspect: Aspect.Armor,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Vengeful,
+    name: 'Vengeful',
     energy: Energy.Attack,
     aspect: Aspect.Attack,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Bitter,
+    name: 'Bitter',
     energy: Energy.Corrosion,
     aspect: Aspect.Corrosion,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Desperate,
+    name: 'Desperate',
     energy: Energy.Critical,
     aspect: Aspect.Critical,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Wary,
+    name: 'Wary',
     energy: Energy.Dodge,
     aspect: Aspect.Dodge,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Anguished,
+    name: 'Anguished',
     energy: Energy.Magic,
     aspect: Aspect.Magic,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Spiteful,
+    name: 'Spiteful',
     energy: Energy.Poison,
     aspect: Aspect.Poison,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Crippling,
+    name: 'Crippling',
     energy: Energy.Slow,
     aspect: Aspect.Slow,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealthLostCard({
-    name: '',
+    id: CardId.Frantic,
+    name: 'Frantic',
     energy: Energy.Speed,
     aspect: Aspect.Speed,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
 ];
 

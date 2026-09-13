@@ -1,8 +1,10 @@
 import type Battle from '../battle/core';
 import type Unit from '../battle/unit';
+import type CardId from '../cards/ids';
 import AleaRNG from '../core/alea';
 import lerp from '../core/lerp';
 import type { Lifecycle } from '../core/lifecycle';
+import type { Description } from './description';
 import type { Player } from './player';
 import { type Aspect, Edition, Print, type PrintSpawnChance, type Rarity } from './types';
 
@@ -13,8 +15,14 @@ export interface CardContext {
 }
 
 export interface Card {
-  id: number;
+  /**
+   * Fixed for good. See `CardId`.
+   */
+  id: CardId;
 
+  /**
+   * One word, a verb or an adjective, that says what the card does.
+   */
   name: string;
 
   image: string;
@@ -24,17 +32,27 @@ export interface Card {
   aspect: Aspect[];
 
   /**
+   * What the card does, with its raw values, energies, stats and damage
+   * types as tokens a UI can highlight.
+   */
+  description(): Description;
+
+  /**
    * Registers the card's listeners for one unit in one battle. The
    * card mechanics start the returned lifecycle, and stop it while the
    * card is disabled.
+   *
+   * An effect that emits events must run on `UnitTriggerCard`, so the
+   * card cannot be triggered again by what it sets off.
    */
   setup(context: CardContext): Lifecycle;
 }
 
-let ID = 0;
-
-export function createCard(card: Omit<Card, 'id'>): Card {
-  return { ...card, id: ID++ };
+/**
+ * Types a card literal, so `setup` and `description` get their context.
+ */
+export function createCard(card: Card): Card {
+  return card;
 }
 
 export function getRandomPrint(rng: AleaRNG, multiplier: PrintSpawnChance): number {

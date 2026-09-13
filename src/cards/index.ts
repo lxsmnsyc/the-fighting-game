@@ -1,7 +1,25 @@
 import type { Card } from '../game/card';
+import relentless from './attack/double-attack';
+import ambidextrous from './attack/dual-wield';
+import vampiric from './attack/life-steal';
 import COMMON_CARDS from './common';
+import merciless from './critical/coup-de-grace';
+import endure from './health/endure';
+import type CardId from './ids';
 import STARTER_CARDS from './starter';
 
-const CARDS: Card[] = [...STARTER_CARDS, ...COMMON_CARDS];
+const RARE_CARDS: Card[] = [relentless, ambidextrous, vampiric, merciless, endure];
+
+const CARDS: Card[] = [...STARTER_CARDS, ...COMMON_CARDS, ...RARE_CARDS];
+
+const CARDS_BY_ID = new Map(CARDS.map((card) => [card.id, card]));
+
+export function getCard(id: CardId): Card {
+  const card = CARDS_BY_ID.get(id);
+  if (!card) {
+    throw new Error(`Unknown card: ${id}`);
+  }
+  return card;
+}
 
 export default CARDS;

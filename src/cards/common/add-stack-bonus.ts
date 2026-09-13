@@ -3,34 +3,39 @@ import { BattleEvents } from '../../battle/events';
 import { Energy, ValuePriority } from '../../battle/types';
 import type { Lifecycle } from '../../core/lifecycle';
 import { type Card, createCard } from '../../game/card';
+import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
+import type { EnergyCardOptions } from '../effects';
+import CardId from '../ids';
 
-interface AddEnergyBonusCardOptions {
-  name: string;
-  energy: Energy;
-  aspect: Aspect;
-  amount: number;
-  permanent?: boolean;
-  image?: string;
-}
+const DEFAULT_AMOUNT = 20;
 
 /**
  * Adds a flat bonus whenever the energy is gained: by the unit itself
  * for energies that stack on their owner, and by an enemy otherwise.
  */
 function createAddEnergyBonusCard({
+  id,
   name,
   energy,
   aspect,
   amount,
   permanent = false,
   image = '',
-}: AddEnergyBonusCardOptions): Card {
+}: EnergyCardOptions): Card {
   return createCard({
+    id,
     name,
     image,
     rarity: Rarity.Common,
     aspect: [aspect],
+    description(): Description {
+      const gained = token.energy(energy);
+      const bonus = token.value(amount);
+      return SELF_STACK[energy]
+        ? describe`Whenever you gain ${gained}, gain ${bonus} more.`
+        : describe`Whenever an enemy gains ${gained}, it gains ${bonus} more.`;
+    },
     setup({ battle, unit, card }): Lifecycle {
       return battle.on(BattleEvents.UnitAddEnergy, ValuePriority.Additive, (event) => {
         const receives = SELF_STACK[energy]
@@ -52,65 +57,75 @@ function createAddEnergyBonusCard({
 const ADD_STACK_BONUS_CARDS: Card[] = [
   // Offensive cards
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Ferocious,
+    name: 'Ferocious',
     energy: Energy.Attack,
     aspect: Aspect.Attack,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Arcane,
+    name: 'Arcane',
     energy: Energy.Magic,
     aspect: Aspect.Magic,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Toxic,
+    name: 'Toxic',
     energy: Energy.Poison,
     aspect: Aspect.Poison,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   // Supportive cards
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Sturdy,
+    name: 'Sturdy',
     energy: Energy.Armor,
     aspect: Aspect.Armor,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Caustic,
+    name: 'Caustic',
     energy: Energy.Corrosion,
     aspect: Aspect.Corrosion,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Swift,
+    name: 'Swift',
     energy: Energy.Speed,
     aspect: Aspect.Speed,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Sluggish,
+    name: 'Sluggish',
     energy: Energy.Slow,
     aspect: Aspect.Slow,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Nimble,
+    name: 'Nimble',
     energy: Energy.Dodge,
     aspect: Aspect.Dodge,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Keen,
+    name: 'Keen',
     energy: Energy.Critical,
     aspect: Aspect.Critical,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyBonusCard({
-    name: '',
+    id: CardId.Vital,
+    name: 'Vital',
     energy: Energy.Healing,
     aspect: Aspect.Healing,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
 ];
 

@@ -3,27 +3,34 @@ import { Energy } from '../battle/types';
 import { EventPriority } from '../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../core/lifecycle';
 import { type Card, createCard } from '../game/card';
+import { type Description, describe, token } from '../game/description';
 import { Aspect, Rarity } from '../game/types';
-import addEnergyOnTrigger from './effects';
+import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from './effects';
+import CardId from './ids';
 
-interface AspectOptions {
-  name: string;
-  image: string;
-  amount: number;
-  period: number;
-  aspect: Aspect;
-  energy: Energy;
-}
+const DEFAULT_AMOUNT = 5;
+const DEFAULT_PERIOD = 1000;
 
 /**
  * Hands out energy every period while the unit stands.
  */
-function createAspect({ name, image, aspect, amount, period, energy }: AspectOptions): Card {
+function createStarterCard({
+  id,
+  name,
+  energy,
+  aspect,
+  amount,
+  image = '',
+}: EnergyCardOptions): Card {
   return createCard({
+    id,
     name,
     image,
     rarity: Rarity.Starter,
     aspect: [aspect],
+    description(): Description {
+      return describe`Every ${token.seconds(DEFAULT_PERIOD)}, ${describeGrant(energy, amount, 'a random enemy')}.`;
+    },
     setup({ battle, unit, card }): Lifecycle {
       let elapsed = 0;
 
@@ -33,10 +40,10 @@ function createAspect({ name, image, aspect, amount, period, energy }: AspectOpt
             return;
           }
           elapsed += event.duration;
-          if (elapsed < period) {
+          if (elapsed < DEFAULT_PERIOD) {
             return;
           }
-          elapsed -= period;
+          elapsed -= DEFAULT_PERIOD;
           const target = unit.checkEnergyTarget(energy);
           if (target) {
             unit.triggerCard(card, target, card.getValue(amount));
@@ -49,85 +56,75 @@ function createAspect({ name, image, aspect, amount, period, energy }: AspectOpt
 }
 
 const STARTER_CARDS: Card[] = [
-  createAspect({
-    name: 'Aspect of Armor',
-    image: '',
+  createStarterCard({
+    id: CardId.Fortify,
+    name: 'Fortify',
     aspect: Aspect.Armor,
     energy: Energy.Armor,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Attack',
-    image: '',
+  createStarterCard({
+    id: CardId.Sharpen,
+    name: 'Sharpen',
     aspect: Aspect.Attack,
     energy: Energy.Attack,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Corrosion',
-    image: '',
+  createStarterCard({
+    id: CardId.Corrode,
+    name: 'Corrode',
     aspect: Aspect.Corrosion,
     energy: Energy.Corrosion,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Critical',
-    image: '',
+  createStarterCard({
+    id: CardId.Focus,
+    name: 'Focus',
     aspect: Aspect.Critical,
     energy: Energy.Critical,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Dodge',
-    image: '',
+  createStarterCard({
+    id: CardId.Evade,
+    name: 'Evade',
     aspect: Aspect.Dodge,
     energy: Energy.Dodge,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Healing',
-    image: '',
+  createStarterCard({
+    id: CardId.Mend,
+    name: 'Mend',
     aspect: Aspect.Healing,
     energy: Energy.Healing,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Magic',
-    image: '',
+  createStarterCard({
+    id: CardId.Channel,
+    name: 'Channel',
     aspect: Aspect.Magic,
     energy: Energy.Magic,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Poison',
-    image: '',
+  createStarterCard({
+    id: CardId.Envenom,
+    name: 'Envenom',
     aspect: Aspect.Poison,
     energy: Energy.Poison,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Slow',
-    image: '',
+  createStarterCard({
+    id: CardId.Hinder,
+    name: 'Hinder',
     aspect: Aspect.Slow,
     energy: Energy.Slow,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
-  createAspect({
-    name: 'Aspect of Speed',
-    image: '',
+  createStarterCard({
+    id: CardId.Hasten,
+    name: 'Hasten',
     aspect: Aspect.Speed,
     energy: Energy.Speed,
-    amount: 5,
-    period: 1000,
+    amount: DEFAULT_AMOUNT,
   }),
 ];
 

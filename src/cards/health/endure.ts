@@ -5,22 +5,23 @@ import { DamagePriority, DamageType } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import type { Lifecycle } from '../../core/lifecycle';
 import { createCard } from '../../game/card';
+import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
+import CardId from '../ids';
 
 const DEFAULT_REDUCTION = 0.25;
 const DEFAULT_PERIOD = 1000;
 const DEFAULT_DAMAGE = 0.25;
 
-/**
- * Reduces received damage by 25% and delays the rest
- * by 25% of the total delayed damage per second as health
- * loss.
- */
 export default createCard({
+  id: CardId.Endure,
   name: 'Endure',
   image: '',
   rarity: Rarity.Rare,
   aspect: [Aspect.Health],
+  description(): Description {
+    return describe`Reduce damage taken by ${token.percent(DEFAULT_REDUCTION)}. The reduced amount is taken later as ${token.damage(DamageType.HealthLoss)}, ${token.percent(DEFAULT_DAMAGE)} of it every ${token.seconds(DEFAULT_PERIOD)}.`;
+  },
   setup({ battle, unit, card }): Lifecycle {
     let collected = 0;
     let elapsed = 0;

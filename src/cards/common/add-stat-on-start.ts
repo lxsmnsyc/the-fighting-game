@@ -3,24 +3,44 @@ import { Stat } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
 import { type Card, createCard } from '../../game/card';
+import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
+import CardId from '../ids';
 
-const DEFAULT_MULTIPLIER = 100;
+const DEFAULT_AMOUNT = 100;
+
+interface AddStatOnStartCardOptions {
+  id: CardId;
+  name: string;
+  stat: Stat;
+  aspect: Aspect[];
+  image?: string;
+}
 
 /**
  * Raises a stat when the unit enters the battle.
  */
-function createAddStatOnStartCard(name: string, stat: Stat, aspect: Aspect[], image = ''): Card {
+function createAddStatOnStartCard({
+  id,
+  name,
+  stat,
+  aspect,
+  image = '',
+}: AddStatOnStartCardOptions): Card {
   return createCard({
+    id,
     name,
     rarity: Rarity.Common,
     image,
     aspect,
+    description(): Description {
+      return describe`At the start of battle, gain ${token.stat(stat, DEFAULT_AMOUNT)}.`;
+    },
     setup({ battle, unit, card }): Lifecycle {
       return new MergedLifecycle([
         battle.on(BattleEvents.UnitEntersBattle, EventPriority.Post, (event) => {
           if (event.source === unit) {
-            unit.triggerCard(card, unit, card.getValue(DEFAULT_MULTIPLIER));
+            unit.triggerCard(card, unit, card.getValue(DEFAULT_AMOUNT));
           }
         }),
         battle.on(BattleEvents.UnitTriggerCard, EventPriority.Exact, (event) => {
@@ -34,7 +54,12 @@ function createAddStatOnStartCard(name: string, stat: Stat, aspect: Aspect[], im
 }
 
 const ADD_STAT_ON_START_CARDS: Card[] = [
-  createAddStatOnStartCard('', Stat.MaxHealth, [Aspect.Health]),
+  createAddStatOnStartCard({
+    id: CardId.Hearty,
+    name: 'Hearty',
+    stat: Stat.MaxHealth,
+    aspect: [Aspect.Health],
+  }),
 ];
 
 export default ADD_STAT_ON_START_CARDS;

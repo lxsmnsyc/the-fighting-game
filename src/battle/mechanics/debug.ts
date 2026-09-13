@@ -2,22 +2,10 @@ import { EventPriority } from '../../core/event-emitter';
 import type Alliance from '../alliance';
 import type Battle from '../core';
 import { BattleEvents } from '../events';
-import { DamagePriority, Energy, ValuePriority } from '../types';
+import { ENERGY_NAMES } from '../names';
+import { DamagePriority, ValuePriority } from '../types';
 import type Unit from '../unit';
 import { isMissedDamage } from './damage';
-
-const ENERGY_NAMES: Record<Energy, string> = {
-  [Energy.Attack]: 'Attack',
-  [Energy.Magic]: 'Magic',
-  [Energy.Poison]: 'Poison',
-  [Energy.Armor]: 'Armor',
-  [Energy.Corrosion]: 'Corrosion',
-  [Energy.Speed]: 'Speed',
-  [Energy.Slow]: 'Slow',
-  [Energy.Dodge]: 'Dodge',
-  [Energy.Critical]: 'Critical',
-  [Energy.Healing]: 'Healing',
-};
 
 function log(message: string): void {
   // oxlint-disable-next-line no-console

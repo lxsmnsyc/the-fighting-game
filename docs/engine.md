@@ -68,3 +68,9 @@ it while the card is disabled.
   `UnitTriggerCard` at `Exact`.
 - A card that changes the triggering event checks the return value of
   `triggerCard` and applies the change inline.
+
+A card cannot trigger from anything its own trigger sets off. While a trigger
+resolves, its card id sits in `battle.triggeringCards`, and `triggerCard`
+refuses any card already there. This holds through any chain of events and
+other cards, and for copies of the same card. An effect that emits events must
+therefore run on `UnitTriggerCard`, where the rule can see it.

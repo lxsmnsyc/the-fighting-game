@@ -2,36 +2,35 @@ import { BattleEvents } from '../../battle/events';
 import { Energy, ValuePriority } from '../../battle/types';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
 import { type Card, createCard } from '../../game/card';
+import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
-import addEnergyOnTrigger from '../effects';
+import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from '../effects';
+import CardId from '../ids';
 
+const DEFAULT_AMOUNT = 50;
 const DEFAULT_CHANCE = 0.2;
-
-interface AddEnergyOnHealCardOptions {
-  name: string;
-  energy: Energy;
-  aspect: Aspect;
-  amount: number;
-  permanent?: boolean;
-  image?: string;
-}
 
 /**
  * Has a chance to hand out energy whenever the unit is healed.
  */
 function createAddEnergyOnHealCard({
+  id,
   name,
   energy,
   aspect,
   amount,
   permanent = false,
   image = '',
-}: AddEnergyOnHealCardOptions): Card {
+}: EnergyCardOptions): Card {
   return createCard({
+    id,
     name,
     aspect: [Aspect.Healing, aspect],
     image,
     rarity: Rarity.Common,
+    description(): Description {
+      return describe`When healed, ${token.percent(DEFAULT_CHANCE)} chance to ${describeGrant(energy, amount, 'a random enemy')}.`;
+    },
     setup({ battle, unit, card }): Lifecycle {
       return new MergedLifecycle([
         battle.on(BattleEvents.UnitHeal, ValuePriority.Post, (event) => {
@@ -52,58 +51,67 @@ function createAddEnergyOnHealCard({
 
 const ADD_STACK_ON_HEAL_CARDS: Card[] = [
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Harden,
+    name: 'Harden',
     energy: Energy.Armor,
     aspect: Aspect.Armor,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Rally,
+    name: 'Rally',
     energy: Energy.Attack,
     aspect: Aspect.Attack,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Fester,
+    name: 'Fester',
     energy: Energy.Corrosion,
     aspect: Aspect.Corrosion,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Steady,
+    name: 'Steady',
     energy: Energy.Critical,
     aspect: Aspect.Critical,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Limber,
+    name: 'Limber',
     energy: Energy.Dodge,
     aspect: Aspect.Dodge,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Meditate,
+    name: 'Meditate',
     energy: Energy.Magic,
     aspect: Aspect.Magic,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Blight,
+    name: 'Blight',
     energy: Energy.Poison,
     aspect: Aspect.Poison,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Numb,
+    name: 'Numb',
     energy: Energy.Slow,
     aspect: Aspect.Slow,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnHealCard({
-    name: '',
+    id: CardId.Refresh,
+    name: 'Refresh',
     energy: Energy.Speed,
     aspect: Aspect.Speed,
-    amount: 50,
+    amount: DEFAULT_AMOUNT,
   }),
 ];
 

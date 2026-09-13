@@ -1,46 +1,44 @@
-import { BattleEvents } from '../../battle/events';
-import type { UnitActionEvent } from '../../battle/events';
+import { BattleEvents, type UnitActionEvent } from '../../battle/events';
 import { AttackFlags } from '../../battle/flags';
-import { ValuePriority } from '../../battle/types';
+import { DamageType, ValuePriority } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
 import { createCard } from '../../game/card';
+import { type Description, describe, token } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
+import CardId from '../ids';
 
 const DEFAULT_MULTIPLIER = 0.5;
 
-function isNaturalAttack(event: UnitActionEvent): boolean {
-  return (event.flags & AttackFlags.Natural) !== 0 && (event.flags & AttackFlags.Echo) === 0;
-}
-
-/**
- * Causes natural Attack to deal 50% damage but repeats the Attack
- * with the same amount immediately.
- *
- * Second attack does not consume energy.
- */
 export default createCard({
-  name: 'Dual Wield',
+  id: CardId.Ambidextrous,
+  name: 'Ambidextrous',
   image: '',
   rarity: Rarity.Rare,
   aspect: [Aspect.Attack],
+  description(): Description {
+    return describe`Natural attacks deal ${token.percent(DEFAULT_MULTIPLIER)} of their ${token.damage(DamageType.Physical)}, then repeat at once.`;
+  },
   setup({ battle, unit, card }): Lifecycle {
+    const isNaturalAttack = (event: UnitActionEvent): boolean =>
+      event.source === unit && (event.flags & AttackFlags.Natural) !== 0;
+
     return new MergedLifecycle([
-      // Reduce the main attack
+      // Halve the attack, unless it is this card's own repeat
       battle.on(BattleEvents.UnitAttack, ValuePriority.Pre, (event) => {
-        if (event.source === unit && isNaturalAttack(event)) {
+        if (isNaturalAttack(event) && !battle.triggeringCards.has(card.source.id)) {
           event.value *= card.getValue(DEFAULT_MULTIPLIER);
         }
       }),
-      // Repeat it
       battle.on(BattleEvents.UnitAttack, ValuePriority.Post, (event) => {
-        if (event.source === unit && isNaturalAttack(event)) {
+        if (isNaturalAttack(event)) {
           unit.triggerCard(card, event.target, event.value);
         }
       }),
+      // Does not consume energy
       battle.on(BattleEvents.UnitTriggerCard, EventPriority.Exact, (event) => {
         if (event.card === card) {
-          unit.attack(event.target, event.value, AttackFlags.Natural | AttackFlags.Echo);
+          unit.attack(event.target, event.value, AttackFlags.Natural);
         }
       }),
     ]);

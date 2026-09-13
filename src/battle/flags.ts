@@ -61,11 +61,6 @@ export const enum AttackFlags {
    * Tick attack is from a natural tick
    */
   Natural = 0b0010,
-  /**
-   * Attack was repeated by a card. Cards that repeat attacks skip it so
-   * they cannot trigger themselves.
-   */
-  Echo = 0b0100,
 }
 
 export const enum HealFlags {

@@ -1,3 +1,4 @@
+import type CardId from '../cards/ids';
 import AleaRNG from '../core/alea';
 import { EventEngine } from '../core/event-engine';
 import type Alliance from './alliance';
@@ -29,6 +30,12 @@ export default class Battle extends EventEngine<BattleEventMap> {
   winner: Alliance | null = null;
 
   readonly alliances = new Set<Alliance>();
+
+  /**
+   * Cards whose trigger is still resolving. None of them can trigger
+   * again until it finishes, however many events lie in between.
+   */
+  readonly triggeringCards = new Set<CardId>();
 
   start(): void {
     this.emit(BattleEvents.Start, {

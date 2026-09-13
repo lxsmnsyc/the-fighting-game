@@ -3,34 +3,34 @@ import { Energy } from '../../battle/types';
 import { EventPriority } from '../../core/event-emitter';
 import { type Lifecycle, MergedLifecycle } from '../../core/lifecycle';
 import { type Card, createCard } from '../../game/card';
+import { type Description, describe } from '../../game/description';
 import { Aspect, Rarity } from '../../game/types';
-import addEnergyOnTrigger from '../effects';
+import { type EnergyCardOptions, addEnergyOnTrigger, describeGrant } from '../effects';
+import CardId from '../ids';
 
-interface AddEnergyOnStartCardOptions {
-  name: string;
-  energy: Energy;
-  aspect: Aspect;
-  amount: number;
-  permanent?: boolean;
-  image?: string;
-}
+const DEFAULT_AMOUNT = 20;
 
 /**
  * Hands out energy when the unit enters the battle.
  */
 function createAddEnergyOnStartCard({
+  id,
   name,
   energy,
   aspect,
   amount,
   permanent = false,
   image = '',
-}: AddEnergyOnStartCardOptions): Card {
+}: EnergyCardOptions): Card {
   return createCard({
+    id,
     name,
     image,
     rarity: Rarity.Common,
     aspect: [aspect],
+    description(): Description {
+      return describe`At the start of battle, ${describeGrant(energy, amount, 'a random enemy')}.`;
+    },
     setup({ battle, unit, card }): Lifecycle {
       return new MergedLifecycle([
         battle.on(BattleEvents.UnitEntersBattle, EventPriority.Post, (event) => {
@@ -51,65 +51,75 @@ function createAddEnergyOnStartCard({
 const ADD_STACK_ON_START_CARDS: Card[] = [
   // Offensive cards
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Ambush,
+    name: 'Ambush',
     energy: Energy.Attack,
     aspect: Aspect.Attack,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Invoke,
+    name: 'Invoke',
     energy: Energy.Magic,
     aspect: Aspect.Magic,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Taint,
+    name: 'Taint',
     energy: Energy.Poison,
     aspect: Aspect.Poison,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   // Supportive cards
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Brace,
+    name: 'Brace',
     energy: Energy.Armor,
     aspect: Aspect.Armor,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Rust,
+    name: 'Rust',
     energy: Energy.Corrosion,
     aspect: Aspect.Corrosion,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Sprint,
+    name: 'Sprint',
     energy: Energy.Speed,
     aspect: Aspect.Speed,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Ensnare,
+    name: 'Ensnare',
     energy: Energy.Slow,
     aspect: Aspect.Slow,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Sidestep,
+    name: 'Sidestep',
     energy: Energy.Dodge,
     aspect: Aspect.Dodge,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Aim,
+    name: 'Aim',
     energy: Energy.Critical,
     aspect: Aspect.Critical,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
   createAddEnergyOnStartCard({
-    name: '',
+    id: CardId.Rejuvenate,
+    name: 'Rejuvenate',
     energy: Energy.Healing,
     aspect: Aspect.Healing,
-    amount: 20,
+    amount: DEFAULT_AMOUNT,
   }),
 ];
 

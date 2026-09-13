@@ -353,8 +353,16 @@ export default class Unit {
   /**
    * Returns whether the trigger went through. A card that changes the
    * event which set it off applies the change only when this is true.
+   *
+   * A card cannot trigger from anything its own trigger sets off, either
+   * directly or through other cards. Copies of a card share the rule.
    */
   triggerCard(card: CardInstance, target: Unit, value: number): boolean {
+    const { triggeringCards } = this.battle;
+    const { id } = card.source;
+    if (triggeringCards.has(id)) {
+      return false;
+    }
     const event: UnitTriggerCardEvent = {
       id: 'UnitTriggerCard',
       disabled: false,
@@ -363,7 +371,12 @@ export default class Unit {
       target,
       value,
     };
-    this.battle.emit(BattleEvents.UnitTriggerCard, event);
+    triggeringCards.add(id);
+    try {
+      this.battle.emit(BattleEvents.UnitTriggerCard, event);
+    } finally {
+      triggeringCards.delete(id);
+    }
     return !event.disabled;
   }
 }
