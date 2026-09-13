@@ -412,6 +412,30 @@ describe('cards', () => {
     expect(enemy.getEnergy(Energy.Magic, false)).toBe(10);
   });
 
+  it('hand out energy for every 100 Health lost', () => {
+    const battle = createBattle('health-lost');
+    disableEnergyGain(battle);
+    const [unit] = createSide(battle, [
+      createPlayer([getCard(CardId.Scarred), getCard(CardId.Spiteful)]),
+    ]).units;
+    const [enemy] = createSide(battle, [createPlayer()]).units;
+    battle.start();
+
+    // Less than 100 lost gives nothing yet
+    unit.removeStat(Stat.Health, 60);
+    expect(unit.getEnergy(Energy.Armor, false)).toBe(0);
+
+    // Crossing 100 triggers once, and the other 20 carries over
+    unit.removeStat(Stat.Health, 60);
+    expect(unit.getEnergy(Energy.Armor, false)).toBe(30);
+    expect(enemy.getEnergy(Energy.Poison, false)).toBe(30);
+
+    // Healing keeps the progress, and a big loss triggers once per 100
+    unit.heal(unit, 120, 0);
+    unit.removeStat(Stat.Health, 280);
+    expect(unit.getEnergy(Energy.Armor, false)).toBe(120);
+  });
+
   it('convert a share of gained energy into another', () => {
     const battle = createBattle('convert');
     disableEnergyGain(battle);

@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import CARDS, { getCard } from '../src/cards';
-import ADD_STACK_ON_HEALTH_LOST_CARDS from '../src/cards/health/pending-001';
 import CardId from '../src/cards/ids';
 import { TokenType, formatDescription } from '../src/game/description';
 import { Print } from '../src/game/types';
 
-const ALL_CARDS = [...CARDS, ...ADD_STACK_ON_HEALTH_LOST_CARDS];
+const ALL_CARDS = CARDS;
 
 describe('card registry', () => {
   it('gives every card a unique id', () => {
@@ -39,6 +38,15 @@ describe('card descriptions', () => {
     expect(formatDescription(card.description(Print.Error))).toContain('15–25 Armor');
     expect(formatDescription(card.description(Print.Error | Print.Monotone))).toContain(
       '30–50 Armor',
+    );
+  });
+
+  it('say how much Health a health-lost card needs', () => {
+    expect(formatDescription(getCard(CardId.Scarred).description(0))).toBe(
+      'For every 100 Health you lose, gain 30 Armor.',
+    );
+    expect(formatDescription(getCard(CardId.Spiteful).description(0))).toBe(
+      'For every 100 Health you lose, give a random enemy 30 Poison.',
     );
   });
 

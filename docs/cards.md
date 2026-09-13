@@ -54,6 +54,7 @@ New families are built with `createTriggerCard` in
 | On counter     | The unit's Armor or Speed cancels its pair | 25%    | 20     |
 | On consume     | The unit's energy of one kind is spent     | 25%    | 20     |
 | Low health     | Health first drops below half, once        | Always | 100    |
+| Health lost    | Every 100 Health the unit loses            | Always | 30     |
 
 ## Conversion
 

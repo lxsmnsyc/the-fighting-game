@@ -9,6 +9,7 @@ import ADD_STACK_ON_CRITICAL_CARDS from './add-stack-on-critical';
 import ADD_STACK_ON_CRITICAL_TAKEN_CARDS from './add-stack-on-critical-taken';
 import ADD_STACK_ON_DODGE_CARDS from './add-stack-on-dodge';
 import ADD_STACK_ON_HEAL_CARDS from './add-stack-on-heal';
+import ADD_STACK_ON_HEALTH_LOST_CARDS from './add-stack-on-health-lost';
 import ADD_STACK_ON_HIT_CARDS from './add-stack-on-hit';
 import ADD_STACK_ON_LOW_HEALTH_CARDS from './add-stack-on-low-health';
 import ADD_STACK_ON_MAGIC_CARDS from './add-stack-on-magic';
@@ -34,6 +35,7 @@ const COMMON_CARDS: Card[] = [
   ...ADD_STACK_ON_COUNTER_CARDS,
   ...ADD_STACK_ON_CONSUME_CARDS,
   ...ADD_STACK_ON_LOW_HEALTH_CARDS,
+  ...ADD_STACK_ON_HEALTH_LOST_CARDS,
   ...CONVERT_ENERGY_CARDS,
 ];
 
